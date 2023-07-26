@@ -22,6 +22,9 @@ public class RustBackend : DafnyExecutableBackend {
   public override string TargetBasename(string dafnyProgramName) =>
     Regex.Replace(base.TargetBasename(dafnyProgramName), "[^_A-Za-z0-9]", "_");
 
+  public override string TargetBaseDir(string dafnyProgramName) =>
+    $"{Path.GetFileNameWithoutExtension(dafnyProgramName)}-rust";
+
   protected override DafnyWrittenCompiler CreateDafnyWrittenCompiler() {
     return new RustCompiler();
   }
@@ -33,8 +36,23 @@ public class RustBackend : DafnyExecutableBackend {
   public override bool CompileTargetProgram(string dafnyProgramName, string targetProgramText,
       string /*?*/ callToMain, string /*?*/ targetFilename, ReadOnlyCollection<string> otherFileNames,
       bool runAfterCompile, TextWriter outputWriter, out object compilationResult) {
+    var targetDirectory = Path.GetDirectoryName(targetFilename);
+    var depsDirectory = Path.Combine(targetDirectory, "deps");
+    if (Directory.Exists(depsDirectory)) {
+      Directory.Delete(depsDirectory, true);
+    }
+    Directory.CreateDirectory(depsDirectory);
+
+    var assembly = System.Reflection.Assembly.Load("DafnyPipeline");
+    assembly.GetManifestResourceNames().Where(f => f.EndsWith(".rlib")).ToList().ForEach(f => {
+      var stream = assembly.GetManifestResourceStream(f);
+      using var outFile = new FileStream(Path.Combine(depsDirectory, f.Replace("DafnyPipeline.", "")), FileMode.Create, FileAccess.Write);
+      stream.CopyTo(outFile);
+    });
+
     compilationResult = null;
     var args = new List<string> {
+      "-L", depsDirectory,
       "-o", ComputeExeName(targetFilename),
       targetFilename
     };
