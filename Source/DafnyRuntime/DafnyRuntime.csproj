@@ -23,10 +23,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <DafnyRuntimeRustInputFile Include="./DafnyRuntimeRust/src/**/*.*" />
+    <DafnyRuntimeRustInputFile Include="./DafnyRuntimeRust/Cargo.toml" />
+    <DafnyRuntimeRustInputFile Include="./DafnyRuntimeRust/Cargo.lock" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DafnyRuntimeJava\build\libs" />
+    <Folder Include="DafnyRuntimeRust\target\release\deps" />
   </ItemGroup>
   <PropertyGroup>
     <DafnyRuntimeJar>DafnyRuntimeJava/build/libs/DafnyRuntime-4.2.0.jar</DafnyRuntimeJar>
+    <DafnyRuntimeRust>DafnyRuntimeRust/target/release/deps/*.rlib</DafnyRuntimeRust>
   </PropertyGroup>
   <Target Name="BuildDafnyRuntimeJar" AfterTargets="ResolveReferences" BeforeTargets="CoreCompile" Inputs="$(MSBuildProjectFile);@(DafnyRuntimeJavaInputFile)" Outputs="$(DafnyRuntimeJar)">
     
@@ -38,6 +46,17 @@
     <ItemGroup>
       <!-- Register the generated file to be deleted when cleaning -->
       <FileWrites Include="$(DafnyRuntimeJar)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="BuildDafnyRuntimeRust" BeforeTargets="BeforeBuild" Inputs="$(MSBuildProjectFile);@(DafnyRuntimeRustInputFile)" Outputs="$(DafnyRuntimeRust)">
+    
+    <Message Text="Compiling DafnyRuntimeRust to $(DafnyRuntimeRust)..." Importance="high" />
+    <Exec WorkingDirectory="DafnyRuntimeRust" Command="cargo clean" />
+    <Exec WorkingDirectory="DafnyRuntimeRust" Command="cargo build --release" />
+    <ItemGroup>
+      <!-- Register the generated file to be deleted when cleaning -->
+      <FileWrites Include="$(DafnyRuntimeRust)" />
     </ItemGroup>
   </Target>
 
