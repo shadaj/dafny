@@ -64,8 +64,7 @@
       <LogicalName>DafnyRuntime.py</LogicalName>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\DafnyRuntime\DafnyRuntimeRust\src\lib.rs">
-      <LogicalName>DafnyRuntimeRust.rs</LogicalName>
+    <EmbeddedResource Include="..\DafnyRuntime\DafnyRuntimeRust\target\release\deps\*.rlib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
