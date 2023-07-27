@@ -45,6 +45,7 @@ module {:extern "DCOMP"} DCOMP {
 
     static method GenClass(c: Class) returns (s: string) {
       var implBody := GenClassImplBody(c.body);
+      implBody := "pub fn new() -> Self {\n" + "r#" + c.name + " {\n" + "" + "\n}\n}\n" + implBody;
       s := "pub struct r#" + c.name + " {\n" + "" +  "\n}" + "\n" + "impl r#" + c.name + " {\n" + implBody + "\n}";
     }
 
@@ -600,6 +601,25 @@ module {:extern "DCOMP"} DCOMP {
             i := i + 1;
           }
           s := s + ")";
+          isOwned := true;
+        }
+        case New(path, args) => {
+          var path := GenPath(path);
+          s := "::std::rc::Rc::new(" + path + "::new(";
+          readIdents := {};
+          var i := 0;
+          while i < |args| {
+            if i > 0 {
+              s := s + ", ";
+            }
+
+            var recursiveGen, _, recIdents := GenExpr(args[i], params, true);
+            s := s + recursiveGen;
+            readIdents := readIdents + recIdents;
+
+            i := i + 1;
+          }
+          s := s + "))";
           isOwned := true;
         }
         case DatatypeValue(path, variant, isCo, values) => {
