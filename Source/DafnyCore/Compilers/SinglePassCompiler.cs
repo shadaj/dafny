@@ -3068,6 +3068,8 @@ namespace Microsoft.Dafny.Compilers {
 
       wStmts ??= wr.Fork();
 
+      Console.WriteLine(stmt);
+
       if (stmt.IsGhost) {
         return;
       }
@@ -4780,7 +4782,11 @@ namespace Microsoft.Dafny.Compilers {
         // Need to avoid if (true) because some languages (Go, someday Java)
         // pretend that an if (true) isn't a certainty, leading to a complaint
         // about a missing return statement
-        w = EmitBlock(wr);
+        if (caseCount > 1) {
+          w = EmitBlock(wr);
+        } else {
+          w = wr;
+        }
       } else {
         w = EmitIf(out var guardWriter, !lastCase, wr);
         EmitConstructorCheck(source, ctor, guardWriter);

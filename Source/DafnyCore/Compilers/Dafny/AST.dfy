@@ -46,6 +46,7 @@ module {:extern "DAST"} DAST {
     DatatypeValue(path: seq<Ident>, variant: string, isCo: bool, contents: seq<(string, Expression)>) |
     This() |
     Ite(cond: Expression, thn: Expression, els: Expression) |
+    IIFE(name: string, value: Expression, body: Expression) |
     BinOp(op: string, left: Expression, right: Expression) |
     Select(expr: Expression, field: string, onDatatype: bool) |
     TupleSelect(expr: Expression, index: nat) |
