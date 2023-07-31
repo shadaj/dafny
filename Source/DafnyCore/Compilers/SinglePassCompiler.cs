@@ -1473,7 +1473,7 @@ namespace Microsoft.Dafny.Compilers {
             // writing the trait
             var w = CreateTrait(trait.GetCompileName(Options), trait.IsExtern(Options, out _, out _), trait.TypeArgs, trait, trait.ParentTypeInformation.UniqueParentTraits(), trait.tok, wr);
             CompileClassMembers(program, trait, w);
-
+            w.Finish();
           } else if (d is DefaultClassDecl defaultClassDecl) {
             Contract.Assert(defaultClassDecl.InheritedMembers.Count == 0);
             Predicate<MemberDecl> compilationMaterial = x =>
@@ -1976,7 +1976,10 @@ namespace Microsoft.Dafny.Compilers {
             if (!Attributes.Contains(method.Attributes, "extern")) {
               Contract.Assert(method.Body != null);
               var w = classWriter.CreateMethod(method, CombineAllTypeArguments(member), true, true, false);
-              EmitCallToInheritedMethod(method, null, w);
+              var wBefore = w.Fork();
+              var wCall = w.Fork();
+              var wAfter = w;
+              EmitCallToInheritedMethod(method, null, wBefore, wCall, wAfter);
             }
           } else {
             Contract.Assert(false);  // unexpected member
@@ -2141,7 +2144,10 @@ namespace Microsoft.Dafny.Compilers {
           } else if (c is NewtypeDecl && m != m.Original) {
             CompileMethod(program, m, classWriter, false);
             var w = classWriter.CreateMethod(m, CombineAllTypeArguments(member), true, true, false);
-            EmitCallToInheritedMethod(m, c, w);
+            var wBefore = w.Fork();
+            var wCall = w.Fork();
+            var wAfter = w;
+            EmitCallToInheritedMethod(m, c, wBefore, wCall, wAfter);
           } else {
             CompileMethod(program, m, classWriter, false);
           }
@@ -2274,11 +2280,26 @@ namespace Microsoft.Dafny.Compilers {
       wr.Write("{0} = ", Util.Comma(outTmps));
     }
 
+    protected virtual void EmitMultiReturnTuple(List<Formal> outs, List<Type> outTypes, List<string> outTmps, IToken methodToken, ConcreteSyntaxTree wr) {
+      var wrReturn = EmitReturnExpr(wr);
+      var sep = "";
+      for (int j = 0, l = 0; j < outs.Count; j++) {
+        var p = outs[j];
+        if (!p.IsGhost) {
+          wrReturn.Write(sep);
+          var w = EmitCoercionIfNecessary(outs[j].Type, outTypes[l], methodToken, wrReturn);
+          w.Write(outTmps[l]);
+          sep = ", ";
+          l++;
+        }
+      }
+    }
+
     /// <summary>
     /// "heir" is the type declaration that inherits the method. Or, it can be "null" to indicate that the method is declared in
     /// the type itself, in which case the "call to inherited" is actually a call from the dynamically dispatched method to its implementation.
     /// </summary>
-    protected void EmitCallToInheritedMethod(Method method, [CanBeNull] TopLevelDeclWithMembers heir, ConcreteSyntaxTree wr) {
+    protected virtual void EmitCallToInheritedMethod(Method method, [CanBeNull] TopLevelDeclWithMembers heir, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts, ConcreteSyntaxTree wStmtsAfterCall) {
       Contract.Requires(method != null);
       Contract.Requires(!method.IsStatic);
       Contract.Requires(method.EnclosingClass is TraitDecl);
@@ -2300,7 +2321,7 @@ namespace Microsoft.Dafny.Compilers {
           var target = returnStyleOutCollector != null ? IdName(p) : ProtectedFreshId("_out");
           outTmps.Add(target);
           outTypes.Add(p.Type);
-          DeclareLocalVar(target, p.Type, p.tok, false, null, wr);
+          DeclareLocalVar(target, p.Type, p.tok, false, null, wStmts);
         }
       }
       Contract.Assert(outTmps.Count == nonGhostOutParameterCount && outTypes.Count == nonGhostOutParameterCount);
@@ -2313,7 +2334,7 @@ namespace Microsoft.Dafny.Compilers {
 
       var companionName = CompanionMemberIdName(method);
       var calleeReceiverType = UserDefinedType.FromTopLevelDecl(method.tok, method.EnclosingClass).Subst(thisContext.ParentFormalTypeParametersToActuals);
-      wr.Write(TypeName_Companion(calleeReceiverType, wr, method.tok, method));
+      EmitTypeName_Companion(calleeReceiverType, wr, wr, method.tok, method);
       wr.Write(ClassAccessor);
 
       var typeArgs = CombineAllTypeArguments(method, thisContext);
@@ -2332,7 +2353,7 @@ namespace Microsoft.Dafny.Compilers {
         if (!p.IsGhost) {
           wr.Write(sep);
           w = EmitCoercionIfNecessary(method.Original.Ins[j].Type, method.Ins[j].Type, method.tok, wr);
-          w.Write(IdName(p));
+          EmitIdentifier(IdName(p), w);
           sep = ", ";
           l++;
         }
@@ -2349,29 +2370,18 @@ namespace Microsoft.Dafny.Compilers {
       EndStmt(wr);
 
       if (returnStyleOutCollector != null) {
-        EmitCastOutParameterSplits(returnStyleOutCollector, outTmps, wr, outTypes, outTypes, method.tok);
-        EmitReturn(method.Outs, wr);
+        EmitCastOutParameterSplits(returnStyleOutCollector, outTmps, wStmtsAfterCall, outTypes, outTypes, method.tok);
+        EmitReturn(method.Outs, wStmtsAfterCall);
       } else if (!returnStyleOuts) {
         for (int j = 0, l = 0; j < method.Outs.Count; j++) {
           var p = method.Outs[j];
           if (!p.IsGhost) {
-            EmitAssignment(IdName(p), method.Outs[j].Type, outTmps[l], outTypes[l], wr);
+            EmitAssignment(IdName(p), method.Outs[j].Type, outTmps[l], outTypes[l], wStmtsAfterCall);
             l++;
           }
         }
       } else {
-        var wrReturn = EmitReturnExpr(wr);
-        sep = "";
-        for (int j = 0, l = 0; j < method.Outs.Count; j++) {
-          var p = method.Outs[j];
-          if (!p.IsGhost) {
-            wrReturn.Write(sep);
-            w = EmitCoercionIfNecessary(method.Outs[j].Type, outTypes[l], method.tok, wrReturn);
-            w.Write(outTmps[l]);
-            sep = ", ";
-            l++;
-          }
-        }
+        EmitMultiReturnTuple(method.Outs, outTypes, outTmps, method.tok, wStmtsAfterCall);
       }
     }
 
