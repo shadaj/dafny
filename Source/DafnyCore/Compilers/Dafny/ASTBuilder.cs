@@ -25,7 +25,7 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
-  class ModuleBuilder : ClassContainer, NewtypeContainer, DatatypeContainer {
+  class ModuleBuilder : ClassContainer, TraitContainer, NewtypeContainer, DatatypeContainer {
     readonly ModuleContainer parent;
     readonly string name;
     readonly List<ModuleItem> body = new();
@@ -41,6 +41,10 @@ namespace Microsoft.Dafny.Compilers {
 
     public void AddClass(Class item) {
       body.Add((ModuleItem)ModuleItem.create_Class(item));
+    }
+
+    public void AddTrait(Trait item) {
+      body.Add((ModuleItem)ModuleItem.create_Trait(item));
     }
 
     public void AddNewtype(Newtype item) {
@@ -60,19 +64,21 @@ namespace Microsoft.Dafny.Compilers {
   interface ClassContainer {
     void AddClass(Class item);
 
-    public ClassBuilder Class(string name) {
-      return new ClassBuilder(this, name);
+    public ClassBuilder Class(string name, List<DAST.Type> superClasses) {
+      return new ClassBuilder(this, name, superClasses);
     }
   }
 
   class ClassBuilder : ClassLike {
     readonly ClassContainer parent;
     readonly string name;
+    readonly List<DAST.Type> superClasses;
     readonly List<ClassItem> body = new();
 
-    public ClassBuilder(ClassContainer parent, string name) {
+    public ClassBuilder(ClassContainer parent, string name, List<DAST.Type> superClasses) {
       this.parent = parent;
       this.name = name;
+      this.superClasses = superClasses;
     }
 
     public void AddMethod(DAST.Method item) {
@@ -84,7 +90,43 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     public object Finish() {
-      parent.AddClass((Class)Class.create(Sequence<Rune>.UnicodeFromString(this.name), Sequence<ClassItem>.FromArray(body.ToArray())));
+      parent.AddClass((Class)Class.create(
+        Sequence<Rune>.UnicodeFromString(this.name),
+        Sequence<DAST.Type>.FromArray(this.superClasses.ToArray()),
+        Sequence<ClassItem>.FromArray(body.ToArray())
+      ));
+      return parent;
+    }
+  }
+
+  interface TraitContainer {
+    void AddTrait(Trait item);
+
+    public TraitBuilder Trait(string name) {
+      return new TraitBuilder(this, name);
+    }
+  }
+
+  class TraitBuilder : ClassLike {
+    readonly TraitContainer parent;
+    readonly string name;
+    readonly List<ClassItem> body = new();
+
+    public TraitBuilder(TraitContainer parent, string name) {
+      this.parent = parent;
+      this.name = name;
+    }
+
+    public void AddMethod(DAST.Method item) {
+      body.Add((ClassItem)ClassItem.create_Method(item));
+    }
+
+    public void AddField(DAST.Formal item) {
+      throw new NotImplementedException();
+    }
+
+    public object Finish() {
+      parent.AddTrait((Trait)Trait.create(Sequence<Rune>.UnicodeFromString(this.name), Sequence<ClassItem>.FromArray(body.ToArray())));
       return parent;
     }
   }
