@@ -44,6 +44,7 @@ macro_rules! impl_print_display {
 
 impl_print_display! { String }
 impl_print_display! { &str }
+impl_print_display! { char }
 impl_print_display! { bool }
 impl_print_display! { u8 }
 impl_print_display! { u16 }

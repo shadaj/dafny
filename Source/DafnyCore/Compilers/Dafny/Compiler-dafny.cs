@@ -240,6 +240,19 @@ namespace Microsoft.Dafny.Compilers {
           NativeType.Selection.ULong => DAST.Type.create_Passthrough(Sequence<Rune>.UnicodeFromString("u64")),
           _ => throw new InvalidOperationException(),
         });
+      } else if (xType is SeqType seq) {
+        var argType = seq.Arg;
+        return (DAST.Type)DAST.Type.create_Seq(GenType(argType));
+      } else if (xType is SetType set) {
+        var argType = set.Arg;
+        return (DAST.Type)DAST.Type.create_Set(GenType(argType));
+      } else if (xType is MultiSetType multiSet) {
+        var argType = multiSet.Arg;
+        return (DAST.Type)DAST.Type.create_Multiset(GenType(argType));
+      } else if (xType is MapType map) {
+        var keyType = map.Domain;
+        var valueType = map.Range;
+        return (DAST.Type)DAST.Type.create_Map(GenType(keyType), GenType(valueType));
       } else {
         throw new NotImplementedException("Type name for " + xType + " (" + typ.GetType() + ")");
       }
@@ -669,6 +682,10 @@ namespace Microsoft.Dafny.Compilers {
       throw new NotImplementedException();
     }
 
+    protected override ILvalue MultiSelectLvalue(MultiSelectExpr ll, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
+      throw new NotImplementedException();
+    }
+
     protected override void EmitPrintStmt(ConcreteSyntaxTree wr, Expression arg) {
       if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
         ExprBuffer buffer = new(null);
@@ -822,7 +839,24 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override void EmitNewArray(Type elementType, IToken tok, List<string> dimensions,
       bool mustInitialize, [CanBeNull] string exampleElement, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
-      throw new NotImplementedException();
+      throw new InvalidOperationException();
+    }
+
+    protected override void EmitNewArray(Type elementType, IToken tok, List<Expression> dimensions, bool mustInitialize, [CanBeNull] string exampleElement, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
+      if (wr is BuilderSyntaxTree<ExprContainer> builder) {
+        var dimensionsAST = dimensions.Select(d => {
+          var buf = new ExprBuffer(null);
+          var localWriter = new BuilderSyntaxTree<ExprContainer>(buf);
+          EmitExpr(d, false, localWriter, wStmts);
+          return buf.Finish();
+        }).ToArray();
+        
+        builder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_NewArray(
+          Sequence<DAST.Expression>.FromArray(dimensionsAST)
+        ));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitIdentifier(string ident, ConcreteSyntaxTree wr) {
@@ -839,8 +873,12 @@ namespace Microsoft.Dafny.Compilers {
       if (wr is BuilderSyntaxTree<ExprContainer> builder) {
         DAST.Expression baseExpr;
         switch (e) {
-          case CharLiteralExpr:
-            throw new NotImplementedException();
+          case CharLiteralExpr c:
+            var codePoint = Util.UnescapedCharacters(Options, (string) c.Value, false).Single();
+            baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_CharLiteral(
+              new Rune(codePoint)
+            ));
+            break;
           case StringLiteralExpr str:
             baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_StringLiteral(
               Sequence<Rune>.UnicodeFromString(str.AsStringLiteral())
@@ -851,7 +889,8 @@ namespace Microsoft.Dafny.Compilers {
           default:
             switch (e.Value) {
               case null:
-                throw new NotImplementedException();
+                baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_Null());
+                break;
               case bool value:
                 baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_BoolLiteral(value));
                 break;
@@ -930,7 +969,7 @@ namespace Microsoft.Dafny.Compilers {
         case TypeParameter:
           return (DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(udt.GetCompileName(Options))));
         case ArrayClassDecl:
-          throw new NotImplementedException();
+          return (DAST.Type)DAST.Type.create_Array(GenType(udt.TypeArgs[0]));
         case TupleTypeDecl:
           return (DAST.Type)DAST.Type.create_Tuple(Sequence<DAST.Type>.FromArray(
             udt.TypeArgs.Select(m => GenType(m)).ToArray()

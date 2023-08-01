@@ -344,6 +344,27 @@ module {:extern "DCOMP"} DCOMP {
 
           s := s + ")";
         }
+        case Array(element) => {
+          var elemStr := GenType(element, inBinding);
+          s := "::std::vec::Vec<" + elemStr + ">";
+        }
+        case Seq(element) => {
+          var elemStr := GenType(element, inBinding);
+          s := "::std::vec::Vec<" + elemStr + ">";
+        }
+        case Set(element) => {
+          var elemStr := GenType(element, inBinding);
+          s := "::std::collections::HashSet<" + elemStr + ">";
+        }
+        case Multiset(element) => {
+          var elemStr := GenType(element, inBinding);
+          s := "::std::collections::HashMap<" + elemStr + ", u64>";
+        }
+        case Map(key, value) => {
+          var keyStr := GenType(key, inBinding);
+          var valueStr := GenType(value, inBinding);
+          s := "::std::collections::HashMap<" + keyStr + ", " + valueStr + ">";
+        }
         case TypeArg(Ident(name)) => s := name;
         case Primitive(p) => {
           match p {
@@ -654,6 +675,16 @@ module {:extern "DCOMP"} DCOMP {
           isOwned := true;
           readIdents := {};
         }
+        case Literal(CharLiteral(c)) => {
+          s := "::std::primitive::char::from_u32(" + natToString(c as nat) + ").unwrap()";
+          isOwned := true;
+          readIdents := {};
+        }
+        case Literal(Null) => {
+          s := "None";
+          isOwned := true;
+          readIdents := {};
+        }
         case Ident(name) => {
           s := "r#" + name;
 
@@ -721,6 +752,20 @@ module {:extern "DCOMP"} DCOMP {
             i := i + 1;
           }
           s := s + "))";
+          isOwned := true;
+        }
+        case NewArray(dims) => {
+          var i := |dims| - 1;
+          s := "::std::default::Default::default()";
+          readIdents := {};
+          while i >= 0 {
+            var recursiveGen, _, recIdents := GenExpr(dims[i], params, true);
+            s := "vec![" + s + "; (" + recursiveGen + ") as usize]";
+            readIdents := readIdents + recIdents;
+
+            i := i - 1;
+          }
+
           isOwned := true;
         }
         case DatatypeValue(path, variant, isCo, values) => {
