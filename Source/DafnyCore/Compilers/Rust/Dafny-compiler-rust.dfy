@@ -365,6 +365,26 @@ module {:extern "DCOMP"} DCOMP {
           var valueStr := GenType(value, inBinding);
           s := "::std::collections::HashMap<" + keyStr + ", " + valueStr + ">";
         }
+        case Arrow(args, result) => {
+          if inBinding {
+            s := "_";
+          } else {
+            s := "impl Fn(";
+            var i := 0;
+            while i < |args| {
+              if i > 0 {
+                s := s + ", ";
+              }
+
+              var generated := GenType(args[i], inBinding);
+              s := s + "&" + generated;
+              i := i + 1;
+            }
+
+            var resultType := GenType(result, inBinding);
+            s := s + ") -> " + resultType;
+          }
+        }
         case TypeArg(Ident(name)) => s := name;
         case Primitive(p) => {
           match p {
@@ -901,6 +921,25 @@ module {:extern "DCOMP"} DCOMP {
           isOwned := true;
           readIdents := recIdentsL + recIdentsR;
         }
+        case SelectFn(on, field, isDatatype) => {
+          var onString, _, recIdents := GenExpr(on, params, false);
+
+          match on {
+            case Companion(_) => {
+              s := onString + "::" + field;
+              isOwned := true;
+
+              readIdents := recIdents;
+            }
+            case _ => {
+              // TODO(shadaj): pass in information about the params
+              s := onString + "." + field;
+              isOwned := true;
+
+              readIdents := recIdents;
+            }
+          }
+        }
         case Select(on, field, isDatatype) => {
           var onString, _, recIdents := GenExpr(on, params, false);
 
@@ -982,6 +1021,27 @@ module {:extern "DCOMP"} DCOMP {
           }
 
           s := enclosingString + "r#" + name + typeArgString + "(" + argString + ")";
+          isOwned := true;
+        }
+        case Apply(func, args) => {
+          var funcString, _, recIdents := GenExpr(func, params, false);
+          readIdents := recIdents;
+
+          var argString := "";
+          var i := 0;
+          while i < |args| {
+            if i > 0 {
+              argString := argString + ", ";
+            }
+
+            var argExpr, isOwned, recIdents := GenExpr(args[i], params, false);
+            readIdents := readIdents + recIdents;
+            argString := argString + (if isOwned then "&" else "") + argExpr;
+
+            i := i + 1;
+          }
+
+          s := "((" + funcString + ")" + "(" + argString + "))";
           isOwned := true;
         }
         case TypeTest(on, dType, variant) => {
