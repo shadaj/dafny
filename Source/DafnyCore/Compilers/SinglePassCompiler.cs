@@ -706,7 +706,7 @@ namespace Microsoft.Dafny.Compilers {
     /// <summary>
     /// Same as the EmitNewArray overload above, except that "dimensions" is "List<Expression>" instead of "List<string>".
     /// </summary>
-    protected void EmitNewArray(Type elementType, IToken tok, List<Expression> dimensions,
+    protected virtual void EmitNewArray(Type elementType, IToken tok, List<Expression> dimensions,
       bool mustInitialize, [CanBeNull] string exampleElement, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
 
       var dimStrings = dimensions.ConvertAll(expr => {
@@ -1473,7 +1473,7 @@ namespace Microsoft.Dafny.Compilers {
             // writing the trait
             var w = CreateTrait(trait.GetCompileName(Options), trait.IsExtern(Options, out _, out _), trait.TypeArgs, trait, trait.ParentTypeInformation.UniqueParentTraits(), trait.tok, wr);
             CompileClassMembers(program, trait, w);
-
+            w.Finish();
           } else if (d is DefaultClassDecl defaultClassDecl) {
             Contract.Assert(defaultClassDecl.InheritedMembers.Count == 0);
             Predicate<MemberDecl> compilationMaterial = x =>
@@ -1976,7 +1976,10 @@ namespace Microsoft.Dafny.Compilers {
             if (!Attributes.Contains(method.Attributes, "extern")) {
               Contract.Assert(method.Body != null);
               var w = classWriter.CreateMethod(method, CombineAllTypeArguments(member), true, true, false);
-              EmitCallToInheritedMethod(method, null, w);
+              var wBefore = w.Fork();
+              var wCall = w.Fork();
+              var wAfter = w;
+              EmitCallToInheritedMethod(method, null, wCall, wBefore, wAfter);
             }
           } else {
             Contract.Assert(false);  // unexpected member
@@ -2141,7 +2144,10 @@ namespace Microsoft.Dafny.Compilers {
           } else if (c is NewtypeDecl && m != m.Original) {
             CompileMethod(program, m, classWriter, false);
             var w = classWriter.CreateMethod(m, CombineAllTypeArguments(member), true, true, false);
-            EmitCallToInheritedMethod(m, c, w);
+            var wBefore = w.Fork();
+            var wCall = w.Fork();
+            var wAfter = w;
+            EmitCallToInheritedMethod(m, c, wCall, wBefore, wAfter);
           } else {
             CompileMethod(program, m, classWriter, false);
           }
@@ -2274,11 +2280,26 @@ namespace Microsoft.Dafny.Compilers {
       wr.Write("{0} = ", Util.Comma(outTmps));
     }
 
+    protected virtual void EmitMultiReturnTuple(List<Formal> outs, List<Type> outTypes, List<string> outTmps, IToken methodToken, ConcreteSyntaxTree wr) {
+      var wrReturn = EmitReturnExpr(wr);
+      var sep = "";
+      for (int j = 0, l = 0; j < outs.Count; j++) {
+        var p = outs[j];
+        if (!p.IsGhost) {
+          wrReturn.Write(sep);
+          var w = EmitCoercionIfNecessary(outs[j].Type, outTypes[l], methodToken, wrReturn);
+          w.Write(outTmps[l]);
+          sep = ", ";
+          l++;
+        }
+      }
+    }
+
     /// <summary>
     /// "heir" is the type declaration that inherits the method. Or, it can be "null" to indicate that the method is declared in
     /// the type itself, in which case the "call to inherited" is actually a call from the dynamically dispatched method to its implementation.
     /// </summary>
-    protected void EmitCallToInheritedMethod(Method method, [CanBeNull] TopLevelDeclWithMembers heir, ConcreteSyntaxTree wr) {
+    protected virtual void EmitCallToInheritedMethod(Method method, [CanBeNull] TopLevelDeclWithMembers heir, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts, ConcreteSyntaxTree wStmtsAfterCall) {
       Contract.Requires(method != null);
       Contract.Requires(!method.IsStatic);
       Contract.Requires(method.EnclosingClass is TraitDecl);
@@ -2300,7 +2321,7 @@ namespace Microsoft.Dafny.Compilers {
           var target = returnStyleOutCollector != null ? IdName(p) : ProtectedFreshId("_out");
           outTmps.Add(target);
           outTypes.Add(p.Type);
-          DeclareLocalVar(target, p.Type, p.tok, false, null, wr);
+          DeclareLocalVar(target, p.Type, p.tok, false, null, wStmts);
         }
       }
       Contract.Assert(outTmps.Count == nonGhostOutParameterCount && outTypes.Count == nonGhostOutParameterCount);
@@ -2313,7 +2334,7 @@ namespace Microsoft.Dafny.Compilers {
 
       var companionName = CompanionMemberIdName(method);
       var calleeReceiverType = UserDefinedType.FromTopLevelDecl(method.tok, method.EnclosingClass).Subst(thisContext.ParentFormalTypeParametersToActuals);
-      wr.Write(TypeName_Companion(calleeReceiverType, wr, method.tok, method));
+      EmitTypeName_Companion(calleeReceiverType, wr, wr, method.tok, method);
       wr.Write(ClassAccessor);
 
       var typeArgs = CombineAllTypeArguments(method, thisContext);
@@ -2332,7 +2353,7 @@ namespace Microsoft.Dafny.Compilers {
         if (!p.IsGhost) {
           wr.Write(sep);
           w = EmitCoercionIfNecessary(method.Original.Ins[j].Type, method.Ins[j].Type, method.tok, wr);
-          w.Write(IdName(p));
+          EmitIdentifier(IdName(p), w);
           sep = ", ";
           l++;
         }
@@ -2349,29 +2370,18 @@ namespace Microsoft.Dafny.Compilers {
       EndStmt(wr);
 
       if (returnStyleOutCollector != null) {
-        EmitCastOutParameterSplits(returnStyleOutCollector, outTmps, wr, outTypes, outTypes, method.tok);
-        EmitReturn(method.Outs, wr);
+        EmitCastOutParameterSplits(returnStyleOutCollector, outTmps, wStmtsAfterCall, outTypes, outTypes, method.tok);
+        EmitReturn(method.Outs, wStmtsAfterCall);
       } else if (!returnStyleOuts) {
         for (int j = 0, l = 0; j < method.Outs.Count; j++) {
           var p = method.Outs[j];
           if (!p.IsGhost) {
-            EmitAssignment(IdName(p), method.Outs[j].Type, outTmps[l], outTypes[l], wr);
+            EmitAssignment(IdName(p), method.Outs[j].Type, outTmps[l], outTypes[l], wStmtsAfterCall);
             l++;
           }
         }
       } else {
-        var wrReturn = EmitReturnExpr(wr);
-        sep = "";
-        for (int j = 0, l = 0; j < method.Outs.Count; j++) {
-          var p = method.Outs[j];
-          if (!p.IsGhost) {
-            wrReturn.Write(sep);
-            w = EmitCoercionIfNecessary(method.Outs[j].Type, outTypes[l], method.tok, wrReturn);
-            w.Write(outTmps[l]);
-            sep = ", ";
-            l++;
-          }
-        }
+        EmitMultiReturnTuple(method.Outs, outTypes, outTmps, method.tok, wStmtsAfterCall);
       }
     }
 
@@ -2631,11 +2641,11 @@ namespace Microsoft.Dafny.Compilers {
       TrCasePatternOpt(pat, rhs, null, rhs.Type, rhs.tok, wr, inLetExprBody);
     }
 
-    void TrCasePatternOpt<VT>(CasePattern<VT> pat, Expression rhs, string rhs_string, Type rhsType, IToken rhsTok, ConcreteSyntaxTree wr, bool inLetExprBody)
+    void TrCasePatternOpt<VT>(CasePattern<VT> pat, Expression rhs, Action<ConcreteSyntaxTree> emitRhs, Type rhsType, IToken rhsTok, ConcreteSyntaxTree wr, bool inLetExprBody)
       where VT : class, IVariable {
       Contract.Requires(pat != null);
-      Contract.Requires(pat.Var != null || rhs != null || rhs_string != null);
-      Contract.Requires(rhs != null || rhs_string != null);
+      Contract.Requires(pat.Var != null || rhs != null || emitRhs != null);
+      Contract.Requires(rhs != null || emitRhs != null);
       Contract.Requires(rhsType != null && rhsTok != null);
 
       if (pat.Var != null) {
@@ -2651,7 +2661,7 @@ namespace Microsoft.Dafny.Compilers {
             w = EmitCoercionIfNecessary(from: rhs.Type, to: bv.Type, tok: rhsTok, wr: w);
             EmitExpr(rhs, inLetExprBody, w, wStmts);
           } else {
-            w.Write(rhs_string);
+            emitRhs(w);
           }
         }
       } else if (pat.Arguments != null) {
@@ -2670,7 +2680,8 @@ namespace Microsoft.Dafny.Compilers {
         if (rhs != null) {
           DeclareLocalVar(tmp_name, rhs.Type, rhs.tok, rhs, inLetExprBody, wr);
         } else {
-          DeclareLocalVar(tmp_name, rhsType, rhsTok, false, rhs_string, wr);
+          var w = DeclareLocalVar(tmp_name, rhsType, rhsTok, wr);
+          emitRhs(w);
         }
 
         var dtv = (DatatypeValue)pat.Expr;
@@ -2683,10 +2694,8 @@ namespace Microsoft.Dafny.Compilers {
             // nothing to compile, but do a sanity check
             Contract.Assert(Contract.ForAll(arg.Vars, bv => bv.IsGhost));
           } else {
-            var sw = new ConcreteSyntaxTree(wr.RelativeIndentLevel);
-            EmitDestructor(tmp_name, formal, k, ctor, dtv.InferredTypeArgs, arg.Expr.Type, sw);
             Type targetType = formal.Type.Subst(substMap);
-            TrCasePatternOpt(arg, null, sw.ToString(), targetType, pat.Expr.tok, wr, inLetExprBody);
+            TrCasePatternOpt(arg, null, sw => EmitDestructor(tmp_name, formal, k, ctor, dtv.InferredTypeArgs, arg.Expr.Type, sw), targetType, pat.Expr.tok, wr, inLetExprBody);
             k++;
           }
         }
@@ -3970,6 +3979,19 @@ namespace Microsoft.Dafny.Compilers {
       return new ArrayLvalueImpl(this, arr, new List<string>() { index }, ll.Type);
     }
 
+    protected virtual ILvalue MultiSelectLvalue(MultiSelectExpr ll, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
+      string arr = StabilizeExpr(ll.Array, "_arr", wr, wStmts);
+      var indices = new List<string>();
+      int i = 0;
+      foreach (var idx in ll.Indices) {
+        var index = StabilizeExpr(idx, "_index" + i + "_", wr, wStmts);
+        index = ArrayIndexToNativeInt(index, idx.Type);
+        indices.Add(index);
+        i++;
+      }
+      return new ArrayLvalueImpl(this, arr, indices, ll.Type);
+    }
+
     protected ILvalue StringLvalue(string str) {
       return new SimpleLvalueImpl(this, wr => wr.Write(str));
     }
@@ -4118,16 +4140,7 @@ namespace Microsoft.Dafny.Compilers {
         return SeqSelectLvalue(ll, wr, wStmts);
       } else {
         var ll = (MultiSelectExpr)lhs;
-        string arr = StabilizeExpr(ll.Array, "_arr", wr, wStmts);
-        var indices = new List<string>();
-        int i = 0;
-        foreach (var idx in ll.Indices) {
-          var index = StabilizeExpr(idx, "_index" + i + "_", wr, wStmts);
-          index = ArrayIndexToNativeInt(index, idx.Type);
-          indices.Add(index);
-          i++;
-        }
-        return new ArrayLvalueImpl(this, arr, indices, ll.Type);
+        return MultiSelectLvalue(ll, wr, wStmts);
       }
     }
 
@@ -4221,7 +4234,7 @@ namespace Microsoft.Dafny.Compilers {
       } else if (typeRhs.ArrayDimensions != null) {
         var nw = ProtectedFreshId("_nw");
         TrRhsArray(typeRhs, nw, wr, wStmts);
-        wr.Write(nw);
+        EmitIdentifier(nw, wr);
 
       } else {
         // Allocate and initialize a new object
@@ -4780,7 +4793,11 @@ namespace Microsoft.Dafny.Compilers {
         // Need to avoid if (true) because some languages (Go, someday Java)
         // pretend that an if (true) isn't a certainty, leading to a complaint
         // about a missing return statement
-        w = EmitBlock(wr);
+        if (caseCount > 1) {
+          w = EmitBlock(wr);
+        } else {
+          w = wr;
+        }
       } else {
         w = EmitIf(out var guardWriter, !lastCase, wr);
         EmitConstructorCheck(source, ctor, guardWriter);
