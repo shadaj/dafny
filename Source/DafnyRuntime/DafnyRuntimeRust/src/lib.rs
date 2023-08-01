@@ -30,6 +30,12 @@ impl <T: DafnyPrint> Display for DafnyPrintWrapper<&T> {
 
 pub trait DafnyPrint {
     fn fmt_print(&self, f: &mut Formatter<'_>) -> std::fmt::Result;
+
+    // Vec<char> gets special treatment so we carry that information here
+    #[inline]
+    fn is_char() -> bool {
+        false
+    }
 }
 
 macro_rules! impl_print_display {
@@ -64,9 +70,42 @@ impl DafnyPrint for () {
     }
 }
 
+impl DafnyPrint for char {
+    fn fmt_print(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
+    }
+
+    #[inline]
+    fn is_char() -> bool {
+        true
+    }
+}
+
 impl <T: DafnyPrint> DafnyPrint for Rc<T> {
     fn fmt_print(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.as_ref().fmt_print(f)
+    }
+}
+
+impl <T: DafnyPrint> DafnyPrint for Vec<T> {
+    fn fmt_print(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if !T::is_char() {
+            write!(f, "[")?;
+        }
+
+        for (i, item) in self.iter().enumerate() {
+            if !T::is_char() && i > 0 {
+                write!(f, ", ")?;
+            }
+
+            item.fmt_print(f)?;
+        }
+
+        if !T::is_char() {
+            write!(f, "]")
+        } else {
+            Ok(())
+        }
     }
 }
 
