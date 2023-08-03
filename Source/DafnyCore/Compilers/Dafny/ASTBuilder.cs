@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Dafny;
 using DAST;
+using Microsoft.Dafny.Compilers;
 
 namespace Microsoft.Dafny.Compilers {
 
@@ -148,8 +149,8 @@ namespace Microsoft.Dafny.Compilers {
   interface NewtypeContainer {
     void AddNewtype(Newtype item);
 
-    public NewtypeBuilder Newtype(string name, DAST.Type baseType) {
-      return new NewtypeBuilder(this, name, baseType);
+    public NewtypeBuilder Newtype(string name, DAST.Type baseType, DAST.Expression witness) {
+      return new NewtypeBuilder(this, name, baseType, witness);
     }
   }
 
@@ -157,11 +158,13 @@ namespace Microsoft.Dafny.Compilers {
     readonly NewtypeContainer parent;
     readonly string name;
     readonly DAST.Type baseType;
+    readonly DAST.Expression witness;
 
-    public NewtypeBuilder(NewtypeContainer parent, string name, DAST.Type baseType) {
+    public NewtypeBuilder(NewtypeContainer parent, string name, DAST.Type baseType, DAST.Expression witness) {
       this.parent = parent;
       this.name = name;
       this.baseType = baseType;
+      this.witness = witness;
     }
 
     public void AddMethod(DAST.Method item) {
@@ -173,7 +176,11 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     public object Finish() {
-      parent.AddNewtype((Newtype)Newtype.create(Sequence<Rune>.UnicodeFromString(this.name), this.baseType));
+      parent.AddNewtype((Newtype)Newtype.create(
+        Sequence<Rune>.UnicodeFromString(this.name),
+        this.baseType,
+        this.witness == null ? Optional<DAST._IExpression>.create_None() : Optional<DAST._IExpression>.create_Some(this.witness)
+      ));
       return parent;
     }
   }
@@ -367,7 +374,7 @@ namespace Microsoft.Dafny.Compilers {
       return ret;
     }
 
-    public ReturnBuilder Return() {
+    public virtual ReturnBuilder Return() {
       var ret = new ReturnBuilder();
       AddBuildable(ret);
       return ret;
@@ -754,6 +761,12 @@ namespace Microsoft.Dafny.Compilers {
       return ret;
     }
 
+    LambdaExprBuilder Lambda(List<DAST.Formal> formals) {
+      var ret = new LambdaExprBuilder(formals);
+      AddBuildable(ret);
+      return ret;
+    }
+
     protected static void RecursivelyBuild(List<object> body, List<DAST.Expression> builtExprs) {
       foreach (var maybeBuilt in body) {
         if (maybeBuilt is DAST.Expression built) {
@@ -863,4 +876,37 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
+}
+
+class LambdaExprBuilder : StatementContainer, BuildableExpr {
+  readonly List<DAST.Formal> formals;
+  readonly List<object> body = new();
+
+  public LambdaExprBuilder(List<DAST.Formal> formals) {
+    this.formals = formals;
+  }
+
+  public void AddStatement(DAST.Statement item) {
+    body.Add(item);
+  }
+
+  public void AddBuildable(BuildableStatement item) {
+    body.Add(item);
+  }
+
+  public List<object> ForkList() {
+    var ret = new List<object>();
+    body.Add(ret);
+    return ret;
+  }
+
+  public DAST.Expression Build() {
+    var builtBody = new List<DAST.Statement>();
+    StatementContainer.RecursivelyBuild(body, builtBody);
+
+    return (DAST.Expression)DAST.Expression.create_Lambda(
+      Sequence<DAST.Formal>.FromArray(formals.ToArray()),
+      Sequence<DAST.Statement>.FromArray(builtBody.ToArray())
+    );
+  }
 }
