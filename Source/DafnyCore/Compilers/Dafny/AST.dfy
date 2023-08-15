@@ -3,7 +3,7 @@ module {:extern "DAST"} DAST {
 
   datatype ModuleItem = Module(Module) | Class(Class) | Trait(Trait) | Newtype(Newtype) | Datatype(Datatype)
 
-  datatype Newtype = Newtype(name: string, base: Type, witnessExpr: Optional<Expression>)
+  datatype Newtype = Newtype(name: string, base: Type, witnessStmts: seq<Statement>, witnessExpr: Optional<Expression>)
 
   datatype Type =
     Path(seq<Ident>, typeArgs: seq<Type>, resolved: ResolvedType) |
@@ -58,7 +58,8 @@ module {:extern "DAST"} DAST {
     New(path: seq<Ident>, args: seq<Expression>) |
     NewArray(dims: seq<Expression>) |
     DatatypeValue(path: seq<Ident>, variant: string, isCo: bool, contents: seq<(string, Expression)>) |
-    NewtypeValue(tpe: Type, value: Expression) |
+    SubsetUpgrade(value: Expression, typ: Type) |
+    SubsetDowngrade(value: Expression) |
     SeqValue(elements: seq<Expression>) |
     SetValue(elements: seq<Expression>) |
     This() |

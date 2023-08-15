@@ -139,6 +139,24 @@ namespace Microsoft.Dafny.Compilers {
       return name;
     }
 
+    protected override ConcreteSyntaxTree EmitCoercionIfNecessary(Type from, Type to, IToken tok, ConcreteSyntaxTree wr) {
+      if (from.AsSubsetType == null && to.AsSubsetType != null) {
+        if (wr is BuilderSyntaxTree<ExprContainer> stmt) {
+          return new BuilderSyntaxTree<ExprContainer>(stmt.Builder.SubsetUpgrade(GenType(to)));
+        } else {
+          return base.EmitCoercionIfNecessary(from, to, tok, wr);
+        }
+      } else if (from.AsSubsetType != null && to.AsSubsetType == null) {
+        if (wr is BuilderSyntaxTree<ExprContainer> stmt) {
+          return new BuilderSyntaxTree<ExprContainer>(stmt.Builder.SubsetDowngrade());
+        } else {
+          return base.EmitCoercionIfNecessary(from, to, tok, wr);
+        }
+      } else {
+        return base.EmitCoercionIfNecessary(from, to, tok, wr);
+      }
+    }
+
     protected override IClassWriter CreateClass(string moduleName, string name, bool isExtern, string fullPrintName,
       List<TypeParameter> typeParameters, TopLevelDecl cls, List<Type> superClasses, IToken tok, ConcreteSyntaxTree wr) {
       if (currentBuilder is ClassContainer builder) {
@@ -198,14 +216,17 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override IClassWriter DeclareNewtype(NewtypeDecl nt, ConcreteSyntaxTree wr) {
       if (currentBuilder is NewtypeContainer builder) {
+        List<DAST.Statement> witnessStmts = new();
         DAST.Expression witness = null;
         if (nt.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
           var buf = new ExprBuffer(null);
-          EmitExpr(nt.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), null);
+          var statementBuf = new StatementBuffer();
+          EmitExpr(nt.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), new BuilderSyntaxTree<StatementContainer>(statementBuf));
           witness = buf.Finish();
+          witnessStmts = statementBuf.PopAll();
         }
 
-        return new ClassWriter(this, builder.Newtype(nt.GetCompileName(Options), GenType(nt.BaseType), witness));
+        return new ClassWriter(this, builder.Newtype(nt.GetCompileName(Options), GenType(nt.BaseType), witnessStmts, witness));
       } else {
         throw new InvalidOperationException();
       }
@@ -213,7 +234,7 @@ namespace Microsoft.Dafny.Compilers {
 
     private DAST.Type GenType(Type typ) {
       // TODO(shadaj): this is leaking Rust types into the AST, but we do need native types
-      var xType = DatatypeWrapperEraser.SimplifyType(Options, typ);
+      var xType = DatatypeWrapperEraser.SimplifyType(Options, typ, true);
 
       if (xType is BoolType) {
         return (DAST.Type)DAST.Type.create_Primitive(DAST.Primitive.create_Bool());
@@ -264,8 +285,21 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override void DeclareSubsetType(SubsetTypeDecl sst, ConcreteSyntaxTree wr) {
-      // TODO(shadaj): currently ignores subset types because they appear in the prelude
-      // throw new NotImplementedException();
+      if (currentBuilder is NewtypeContainer builder) {
+        List<DAST.Statement> witnessStmts = new();
+        DAST.Expression witness = null;
+        if (sst.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
+          var statementBuf = new StatementBuffer();
+          var buf = new ExprBuffer(null);
+          EmitExpr(sst.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), new BuilderSyntaxTree<StatementContainer>(statementBuf));
+          witness = buf.Finish();
+          witnessStmts = statementBuf.PopAll();
+        }
+
+        builder.Newtype(sst.GetCompileName(Options), GenType(sst.Rhs), witnessStmts, witness).Finish();
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void GetNativeInfo(NativeType.Selection sel, out string name, out string literalSuffix, out bool needsCastAfterArithmetic) {
@@ -421,7 +455,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override string TypeDescriptor(Type type, ConcreteSyntaxTree wr, IToken tok) {
-      type = DatatypeWrapperEraser.SimplifyType(Options, type, true);
+      type = DatatypeWrapperEraser.SimplifyType(Options, type);
       return type.ToString();
     }
 
@@ -930,11 +964,8 @@ namespace Microsoft.Dafny.Compilers {
             break;
         }
 
-        if (e.Type.AsNewtype != null) {
-          baseExpr = (DAST.Expression)DAST.Expression.create_NewtypeValue(
-            GenType(e.Type),
-            baseExpr
-          );
+        if (e.Type.AsNewtype != null || e.Type.AsSubsetType != null) {
+          baseExpr = (DAST.Expression)DAST.Expression.create_SubsetUpgrade(baseExpr, GenType(e.Type));
         }
 
         builder.Builder.AddExpr(baseExpr);
@@ -981,7 +1012,8 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     private DAST.Type FullTypeNameAST(UserDefinedType udt, MemberDecl member = null) {
-      if (udt is ArrowType arrow) {
+      if (udt.IsArrowType) {
+        var arrow = udt.AsArrowType;
         return (DAST.Type)DAST.Type.create_Arrow(
           Sequence<DAST.Type>.FromArray(arrow.Args.Select(m => GenType(m)).ToArray()),
           GenType(arrow.Result)
@@ -1013,6 +1045,12 @@ namespace Microsoft.Dafny.Compilers {
     private DAST.Type TypeNameASTFromTopLevel(TopLevelDecl topLevel, List<Type> typeArgs) {
       var path = PathFromTopLevel(topLevel);
 
+      bool nonNull = false;
+      if (topLevel is NonNullTypeDecl non) {
+        nonNull = true;
+        topLevel = non.Rhs.AsTopLevelTypeWithMembers;
+      }
+
       ResolvedType resolvedType;
       if (topLevel is NewtypeDecl) {
         resolvedType = (DAST.ResolvedType)DAST.ResolvedType.create_Newtype();
@@ -1023,6 +1061,8 @@ namespace Microsoft.Dafny.Compilers {
       } else if (topLevel is ClassDecl) {
         // TODO(shadaj): have a separate type when we properly support classes
         resolvedType = (DAST.ResolvedType)DAST.ResolvedType.create_Datatype(path);
+      } else if (topLevel is SubsetTypeDecl) {
+        resolvedType = (DAST.ResolvedType)DAST.ResolvedType.create_Newtype();
       } else {
         throw new InvalidOperationException(topLevel.GetType().ToString());
       }
@@ -1060,7 +1100,7 @@ namespace Microsoft.Dafny.Compilers {
           // sometimes, we don't actually call EmitDatatypeValue
           currentBuilder = origBuilder;
         }
-      } else if (expr is BinaryExpr) {
+      } else if (expr is BinaryExpr bin) {
         var origBuilder = currentBuilder;
         base.EmitExpr(expr, inLetExprBody, actualWr, wStmts);
         currentBuilder = origBuilder;
