@@ -59,21 +59,14 @@ namespace Microsoft.Dafny.Compilers {
 
     public override IReadOnlySet<Feature> UnsupportedFeatures => new HashSet<Feature> {
       Feature.Ordinals,
-      Feature.FunctionValues,
       Feature.Iterators,
-      Feature.CollectionsOfTraits,
-      Feature.AllUnderscoreExternalModuleNames,
       Feature.Multisets,
-      Feature.RuntimeTypeDescriptors,
-      Feature.MultiDimensionalArrays,
       Feature.MapComprehensions,
       Feature.LetSuchThatExpressions,
-      Feature.NonNativeNewtypes,
       Feature.MethodSynthesis,
       Feature.ExternalClasses,
       Feature.NewObject,
       Feature.NonSequentializableForallStatements,
-      Feature.ArrayLength,
       Feature.MapItems,
       Feature.RunAllTests,
       Feature.IntBoundedPool,
@@ -89,7 +82,6 @@ namespace Microsoft.Dafny.Compilers {
       Feature.SequenceUpdateExpressions,
       Feature.SequenceConstructionsWithNonLambdaInitializers,
       Feature.ExternalConstructors,
-      Feature.TupleInitialization,
       Feature.SubtypeConstraintsInQuantifiers,
       Feature.TuplesWiderThan20,
     };
@@ -1595,11 +1587,11 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override void EmitSingleValueGenerator(Expression e, bool inLetExprBody, string type,
       ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
-      throw new NotImplementedException();
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.ExactBoundedPool);
     }
 
     protected override void EmitHaltRecoveryStmt(Statement body, string haltMessageVarName, Statement recoveryBody, ConcreteSyntaxTree wr) {
-      throw new NotImplementedException();
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
     }
 
   }
