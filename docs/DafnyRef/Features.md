@@ -1,7 +1,7 @@
 | Feature | C# | JavaScript | Go | Java | Python | C++ | Dafny Library (.doo) | Rust |
 |-|-|-|-|-|-|-|-|-|
-| [Unbounded integers](#sec-numeric-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
-| [Real numbers](#sec-numeric-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
+| [Unbounded integers](#sec-numeric-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  X  |
+| [Real numbers](#sec-numeric-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  X  |
 | [Ordinals](#sec-ordinals) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
 | [Function values](#sec-arrow-subset-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
 | [Iterators](#sec-iterator-types) |  X  |  X  |  X  |  |  X  |  |  X  |  |
