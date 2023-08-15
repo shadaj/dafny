@@ -81,7 +81,7 @@ module {:extern "DCOMP"} DCOMP {
           var tp := t.typeParams[tpI];
           typeParamsSet := typeParamsSet + {tp};
           var genTp := GenType(tp, false, false);
-          typeParams := typeParams + "r#" + genTp + ", ";
+          typeParams := typeParams + genTp + ", ";
           tpI := tpI + 1;
         }
         typeParams := typeParams + ">";
@@ -94,13 +94,39 @@ module {:extern "DCOMP"} DCOMP {
 
     static method GenNewtype(c: Newtype) returns (s: string) {
       var underlyingType := GenType(c.base, false, false);
-      s := "#[derive(Clone, PartialEq)]\npub struct r#" + c.name + "(pub " + underlyingType +  ");\n";
+      s := "#[derive(Clone, PartialEq)]\n#[repr(transparent)]\npub struct r#" + c.name + "(pub " + underlyingType +  ");\n";
+      s := s + "impl ::dafny_runtime::DafnyErasable for r#" + c.name + " {\n";
+      s := s + "type Erased = " + underlyingType + ";\n";
+      s := s + "#[inline]\nfn erase(&self) -> &Self::Erased {\n";
+      s := s + "&self.0\n";
+      s := s + "}\n";
+      s := s + "#[inline]\nfn erase_owned(self) -> Self::Erased {\n";
+      s := s + "self.0\n";
+      s := s + "}\n";
+      s := s + "}\n";
+      s := s + "impl ::dafny_runtime::DafnyUnerasable<" + underlyingType + "> for r#" + c.name + " {\n";
+      s := s + "#[inline]\nfn unerase(x: &" + underlyingType + ") -> &Self {\n";
+      s := s + "unsafe { &*(x as *const " + underlyingType + " as *const r#" + c.name + ") }\n";
+      s := s + "}\n";
+      s := s + "#[inline]\nfn unerase_owned(x: " + underlyingType + ") -> Self {\n";
+      s := s + "r#" + c.name + "(x)\n";
+      s := s + "}\n";
+      s := s + "}\n";
+      s := s + "impl ::dafny_runtime::DafnyUnerasable<r#" + c.name + "> for r#" + c.name + " {\n";
+      s := s + "#[inline]\nfn unerase(x: &r#" + c.name + ") -> &Self {\n";
+      s := s + "x\n";
+      s := s + "}\n";
+      s := s + "#[inline]\nfn unerase_owned(x: r#" + c.name + ") -> Self {\n";
+      s := s + "x\n";
+      s := s + "}\n";
+      s := s + "}\n";
       s := s + "impl ::std::default::Default for r#" + c.name + " {\n";
       s := s + "fn default() -> Self {\n";
 
       match c.witnessExpr {
         case Some(e) => {
-          var eStr, _, _ := GenExpr(e, [], true);
+          // TODO(shadaj): generate statements
+          var eStr, _, _, _ := GenExpr(e, [], true);
           s := s + "r#" + c.name + "(" + eStr + ")\n";
         }
         case None => {
@@ -113,28 +139,6 @@ module {:extern "DCOMP"} DCOMP {
       s := s + "impl ::dafny_runtime::DafnyPrint for r#" + c.name + " {\n";
       s := s + "fn fmt_print(&self, __fmt_print_formatter: &mut ::std::fmt::Formatter, in_seq: bool) -> ::std::fmt::Result {\n";
       s := s + "::dafny_runtime::DafnyPrint::fmt_print(&self.0, __fmt_print_formatter, in_seq)\n";
-      s := s + "}\n";
-      s := s + "}";
-
-      // inherit common traits
-      var ops := [("::std::ops::Add", "add"), ("::std::ops::Sub", "sub"), ("::std::ops::Mul", "mul"), ("::std::ops::Div", "div")];
-      var i := 0;
-      while i < |ops| {
-        var (traitName, methodName) := ops[i];
-        s := s + "impl " + traitName + "<r#" + c.name + "> for r#" + c.name;
-        s := s + " where " + underlyingType + ": " + traitName + "<" + underlyingType + ", Output = " + underlyingType + "> {\n";
-        s := s + "type Output = r#" + c.name + ";\n";
-        s := s + "fn " + methodName + "(self, other: r#" + c.name + ") -> r#" + c.name + " {\n";
-        s := s + "r#" + c.name + "(" + traitName + "::" + methodName + "(self.0, other.0))\n";
-        s := s + "}\n";
-        s := s + "}\n";
-        i := i + 1;
-      }
-
-      s := s + "impl ::std::cmp::PartialOrd<r#" + c.name + "> for r#" + c.name;
-      s := s + " where " + underlyingType + ": ::std::cmp::PartialOrd<" + underlyingType + "> {\n";
-      s := s + "fn partial_cmp(&self, other: &r#" + c.name + ") -> ::std::option::Option<::std::cmp::Ordering> {\n";
-      s := s + "self.0.partial_cmp(&other.0)\n";
       s := s + "}\n";
       s := s + "}\n";
     }
@@ -149,7 +153,7 @@ module {:extern "DCOMP"} DCOMP {
           var tp := c.typeParams[tpI];
           typeParamsSet := typeParamsSet + {tp};
           var genTp := GenType(tp, false, false);
-          typeParams := typeParams + "r#" + genTp + ", ";
+          typeParams := typeParams + genTp + ", ";
           tpI := tpI + 1;
         }
         typeParams := typeParams + ">";
@@ -244,13 +248,16 @@ module {:extern "DCOMP"} DCOMP {
 
           var tp := c.typeParams[tpI];
           var genTp := GenType(tp, false, false);
-          constrainedTypeParams := constrainedTypeParams + "r#" + genTp + ": Clone + ::std::cmp::PartialEq + ::dafny_runtime::DafnyPrint + ::std::default::Default + 'static";
+          constrainedTypeParams := constrainedTypeParams + genTp + ": ::dafny_runtime::DafnyErasable + ::dafny_runtime::DafnyUnerasable<" + genTp + "> + Clone + ::std::cmp::PartialEq + ::dafny_runtime::DafnyPrint + ::std::default::Default + 'static";
           tpI := tpI + 1;
         }
         constrainedTypeParams := constrainedTypeParams + ">";
       }
 
       var enumBody := "#[derive(PartialEq)]\npub enum r#" + c.name + typeParams + " {\n" + ctors +  "\n}" + "\n" + "impl " + constrainedTypeParams + " r#" + c.name + typeParams + " {\n" + implBody + "\n}";
+
+      var identEraseImpls := "impl " + constrainedTypeParams + " ::dafny_runtime::DafnyErasable for r#" + c.name + typeParams + " {\n" + "type Erased = Self;\nfn erase(&self) -> &Self::Erased { self }\nfn erase_owned(self) -> Self::Erased { self }}\n";
+      identEraseImpls := identEraseImpls + "impl " + constrainedTypeParams + " ::dafny_runtime::DafnyUnerasable<r#" + c.name + typeParams + "> for r#" + c.name + typeParams + " {\n" + "fn unerase(x: &Self) -> &Self { x }\nfn unerase_owned(x: Self) -> Self { x }}\n";
 
       var printImpl := "impl " + constrainedTypeParams + " ::dafny_runtime::DafnyPrint for r#" + c.name + typeParams + " {\n" + "fn fmt_print(&self, __fmt_print_formatter: &mut ::std::fmt::Formatter, _in_seq: bool) -> std::fmt::Result {\n" + "match self {\n";
       i := 0;
@@ -301,7 +308,7 @@ module {:extern "DCOMP"} DCOMP {
         defaultImpl := defaultImpl + "}\n}\n}\n";
       }
 
-      s := enumBody + "\n" + printImpl + "\n" + defaultImpl;
+      s := enumBody + "\n" + identEraseImpls + "\n" + printImpl + "\n" + defaultImpl;
     }
 
     static method GenPath(p: seq<Ident>) returns (s: string) {
@@ -430,7 +437,7 @@ module {:extern "DCOMP"} DCOMP {
             }
           }
         }
-        case TypeArg(Ident(name)) => s := name;
+        case TypeArg(Ident(name)) => s := "r#" + name;
         case Primitive(p) => {
           match p {
             case String => s := "Vec<char>";
@@ -562,7 +569,7 @@ module {:extern "DCOMP"} DCOMP {
           }
 
           var typeString := GenType(typeParamsFiltered[i], false, false);
-          s := s + typeString + ": Clone + ::std::cmp::PartialEq + ::dafny_runtime::DafnyPrint + ::std::default::Default + 'static";
+          s := s + typeString + ": ::dafny_runtime::DafnyErasable + ::dafny_runtime::DafnyUnerasable<" + typeString + "> + Clone + ::std::cmp::PartialEq + ::dafny_runtime::DafnyPrint + ::std::default::Default + 'static";
 
           i := i + 1;
         }
@@ -628,7 +635,11 @@ module {:extern "DCOMP"} DCOMP {
     static method GenStmt(stmt: Statement, params: seq<string>, earlyReturn: string) returns (generated: string, readIdents: set<string>) {
       match stmt {
         case DeclareVar(name, typ, Some(expression)) => {
-          var expr, _, recIdents := GenExpr(expression, params, true);
+          var expr, _, recErased, recIdents := GenExpr(expression, params, true);
+          if recErased {
+            expr := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + expr + ")";
+          }
+
           var typeString := GenType(typ, true, false);
           generated := "let mut r#" + name + ": " + typeString + " = " + expr + ";";
           readIdents := recIdents;
@@ -639,12 +650,20 @@ module {:extern "DCOMP"} DCOMP {
           readIdents := {};
         }
         case Assign(name, expression) => {
-          var expr, _, recIdents := GenExpr(expression, params, true);
+          var expr, _, recErased, recIdents := GenExpr(expression, params, true);
+          if recErased {
+            expr := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + expr + ")";
+          }
+
           generated := "r#" + name + " = " + expr + ";";
           readIdents := recIdents;
         }
         case If(cond, thn, els) => {
-          var condString, _, recIdents := GenExpr(cond, params, true);
+          var condString, _, condErased, recIdents := GenExpr(cond, params, true);
+          if !condErased {
+            condString := "::dafny_runtime::DafnyErasable::erase_owned(" + condString + ")";
+          }
+
           readIdents := recIdents;
           var thnString, thnIdents := GenStmts(thn, params, earlyReturn);
           readIdents := readIdents + thnIdents;
@@ -653,7 +672,11 @@ module {:extern "DCOMP"} DCOMP {
           generated := "if " + condString + " {\n" + thnString + "\n} else {\n" + elsString + "\n}";
         }
         case While(cond, body) => {
-          var condString, _, recIdents := GenExpr(cond, params, true);
+          var condString, _, condErased, recIdents := GenExpr(cond, params, true);
+          if !condErased {
+            condString := "::dafny_runtime::DafnyErasable::erase(" + condString + ")";
+          }
+
           readIdents := recIdents;
           var bodyString, bodyIdents := GenStmts(body, params, earlyReturn);
           readIdents := readIdents + bodyIdents;
@@ -686,14 +709,24 @@ module {:extern "DCOMP"} DCOMP {
               argString := argString + ", ";
             }
 
-            var argExpr, isOwned, argIdents := GenExpr(args[i], params, false);
-            argString := argString + (if isOwned then "&" else "") + argExpr;
+            var argExpr, isOwned, argErased, argIdents := GenExpr(args[i], params, false);
+            if isOwned {
+              argExpr := "&" + argExpr;
+            }
+
+            // always unerase because we know the target type and an upgrade may be necessary
+            // if !argErased {
+            //   argExpr := "::dafny_runtime::DafnyErasable::erase(" + argExpr + ")";
+            // }
+            // argExpr := "::dafny_runtime::DafnyUnerasable::<_>::unerase(" + argExpr + ")";
+
+            argString := argString + argExpr;
             readIdents := readIdents + argIdents;
 
             i := i + 1;
           }
 
-          var enclosingString, _, enclosingIdents := GenExpr(on, params, true);
+          var enclosingString, _, _, enclosingIdents := GenExpr(on, params, true);
           readIdents := readIdents + enclosingIdents;
           match on {
             case Companion(_) => {
@@ -733,7 +766,8 @@ module {:extern "DCOMP"} DCOMP {
             enclosingString + "r#" + name + typeArgString + "(" + argString + ");";
         }
         case Return(expr) => {
-          var exprString, _, recIdents := GenExpr(expr, params, true);
+          var exprString, _, recErased, recIdents := GenExpr(expr, params, true);
+          exprString := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + exprString + ")";
           readIdents := recIdents;
           generated := "return " + exprString + ";";
         }
@@ -746,23 +780,25 @@ module {:extern "DCOMP"} DCOMP {
           readIdents := {};
         }
         case Print(e) => {
-          var printedExpr, isOwned, recIdents := GenExpr(e, params, false);
+          var printedExpr, isOwned, _, recIdents := GenExpr(e, params, false);
           generated := "print!(\"{}\", ::dafny_runtime::DafnyPrintWrapper(" + (if isOwned then "&" else "") + printedExpr + "));";
           readIdents := recIdents;
         }
       }
     }
 
-    static method GenExpr(e: Expression, params: seq<string>, mustOwn: bool) returns (s: string, isOwned: bool, readIdents: set<string>) {
+    static method GenExpr(e: Expression, params: seq<string>, mustOwn: bool) returns (s: string, isOwned: bool, isErased: bool, readIdents: set<string>) {
       match e {
         case Literal(BoolLiteral(false)) => {
           s := "false";
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(BoolLiteral(true)) => {
           s := "true";
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(IntLiteral(i)) => {
@@ -773,71 +809,87 @@ module {:extern "DCOMP"} DCOMP {
           }
 
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(DecLiteral(l)) => {
           s := l;
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(StringLiteral(l)) => {
           // TODO(shadaj): handle unicode properly
           s := "\"" + l + "\".chars().collect::<Vec<char>>()";
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(CharLiteral(c)) => {
           s := "::std::primitive::char::from_u32(" + natToString(c as nat) + ").unwrap()";
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Literal(Null) => {
           s := "None";
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case Ident(name) => {
           s := "r#" + name;
-
-          if name in params {
-            if mustOwn {
-              s := s + ".clone()";
-              isOwned := true;
-            } else {
-              isOwned := false;
-            }
-          } else {
-            if mustOwn {
-              s := s + ".clone()";
-              isOwned := true;
-            } else {
-              s := "&" + s;
-              isOwned := false;
-            }
+          if !(name in params) {
+            s := "(&" + s + ")";
           }
+
+          if mustOwn {
+            s := s + ".clone()";
+            isOwned := true;
+          } else {
+            isOwned := false;
+          }
+
+          isErased := false;
 
           readIdents := {name};
         }
         case Companion(path) => {
           s := GenPath(path);
           isOwned := true;
+          isErased := true;
           readIdents := {};
         }
         case InitializationValue(typ) => {
-          s := "std::default::Default::default()";
+          var typString := GenType(typ, false, false);
+          s := "<" + typString + " as std::default::Default>::default()";
           isOwned := true;
+          isErased := false;
           readIdents := {};
         }
         case Tuple(values) => {
           s := "(";
           readIdents := {};
           var i := 0;
+
+          var allErased := true;
+          while i < |values| {
+            var _, _, isErased, _ := GenExpr(values[i], params, true);
+            allErased := allErased && isErased;
+            i := i + 1;
+          }
+
+          i := 0;
           while i < |values| {
             if i > 0 {
               s := s + " ";
             }
 
-            var recursiveGen, _, recIdents := GenExpr(values[i], params, true);
+            var recursiveGen, _, isErased, recIdents := GenExpr(values[i], params, true);
+            if isErased && !allErased {
+              recursiveGen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + recursiveGen + ")";
+            }
+
             s := s + recursiveGen + ",";
             readIdents := readIdents + recIdents;
 
@@ -845,6 +897,7 @@ module {:extern "DCOMP"} DCOMP {
           }
           s := s + ")";
           isOwned := true;
+          isErased := allErased;
         }
         case New(path, args) => {
           var path := GenPath(path);
@@ -856,7 +909,10 @@ module {:extern "DCOMP"} DCOMP {
               s := s + ", ";
             }
 
-            var recursiveGen, _, recIdents := GenExpr(args[i], params, true);
+            var recursiveGen, _, isErased, recIdents := GenExpr(args[i], params, true);
+            if isErased {
+              recursiveGen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + recursiveGen + ")";
+            }
             s := s + recursiveGen;
             readIdents := readIdents + recIdents;
 
@@ -864,13 +920,18 @@ module {:extern "DCOMP"} DCOMP {
           }
           s := s + "))";
           isOwned := true;
+          isErased := true;
         }
         case NewArray(dims) => {
           var i := |dims| - 1;
           s := "::std::default::Default::default()";
           readIdents := {};
           while i >= 0 {
-            var recursiveGen, _, recIdents := GenExpr(dims[i], params, true);
+            var recursiveGen, _, isErased, recIdents := GenExpr(dims[i], params, true);
+            if !isErased {
+              recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+            }
+
             s := "vec![" + s + "; (" + recursiveGen + ") as usize]";
             readIdents := readIdents + recIdents;
 
@@ -878,6 +939,7 @@ module {:extern "DCOMP"} DCOMP {
           }
 
           isOwned := true;
+          isErased := true;
         }
         case DatatypeValue(path, variant, isCo, values) => {
           var path := GenPath(path);
@@ -893,7 +955,12 @@ module {:extern "DCOMP"} DCOMP {
             }
 
             if isCo {
-              var recursiveGen, _, recIdents := GenExpr(value, [], true);
+              var recursiveGen, _, isErased, recIdents := GenExpr(value, [], true);
+              if !isErased {
+                recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+              }
+              recursiveGen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + recursiveGen + ")";
+
               readIdents := readIdents + recIdents;
               var allReadCloned := "";
               while recIdents != {} decreases recIdents {
@@ -903,29 +970,48 @@ module {:extern "DCOMP"} DCOMP {
               }
               s := s + "r#" + name + ": ::dafny_runtime::LazyFieldWrapper(::dafny_runtime::Lazy::new(Box::new({\n" + allReadCloned + "move || (" + recursiveGen + ")})))";
             } else {
-              var recursiveGen, _, recIdents := GenExpr(value, params, true);
-              s := s + "r#" + name + ": " + recursiveGen;
+              var recursiveGen, _, isErased, recIdents := GenExpr(value, params, true);
+              if !isErased {
+                recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+              }
+              recursiveGen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + recursiveGen + ")";
+
+              s := s + "r#" + name + ": " + "(" + recursiveGen + ")";
               readIdents := readIdents + recIdents;
             }
             i := i + 1;
           }
           s := s + " })";
           isOwned := true;
+          isErased := true;
         }
-        case NewtypeValue(tpe, expr) => {
-          var typeString := GenType(tpe, false, false);
-          var recursiveGen, _, recIdents := GenExpr(expr, params, true);
-          s := typeString + "(" + recursiveGen + ")";
-          isOwned := true;
+        case SubsetUpgrade(expr, tpe) => {
+          var tpeGen := GenType(tpe, true, false);
+          var recursiveGen, recOwned, recErased, recIdents := GenExpr(expr, params, false);
+          var uneraseFn := if recOwned then "unerase_owned" else "unerase";
+          s := "<" + tpeGen + " as ::dafny_runtime::DafnyUnerasable<_>>::" + uneraseFn + "(" + recursiveGen + ")";
+          isOwned := recOwned;
+          isErased := false;
+          readIdents := recIdents;
+        }
+        case SubsetDowngrade(expr) => {
+          var recursiveGen, recOwned, recErased, recIdents := GenExpr(expr, params, false);
+          var eraseFn := if recOwned then "erase_owned" else "erase";
+          s := "::dafny_runtime::DafnyErasable::" + eraseFn + "(" + recursiveGen + ")";
+          isOwned := recOwned;
+          isErased := true;
           readIdents := recIdents;
         }
         case SeqValue(exprs) => {
           var generatedValues := [];
           readIdents := {};
           var i := 0;
+          var allErased := true;
           while i < |exprs| {
-            var recursiveGen, _, recIdents := GenExpr(exprs[i], params, true);
-            generatedValues := generatedValues + [recursiveGen];
+            var recursiveGen, _, isErased, recIdents := GenExpr(exprs[i], params, true);
+            allErased := allErased && isErased;
+
+            generatedValues := generatedValues + [(recursiveGen, isErased)];
             readIdents := readIdents + recIdents;
             i := i + 1;
           }
@@ -936,20 +1022,30 @@ module {:extern "DCOMP"} DCOMP {
             if i > 0 {
               s := s + ", ";
             }
-            s := s + generatedValues[i];
+
+            var gen := generatedValues[i].0;
+            if generatedValues[i].1 && !allErased {
+              gen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + gen + ")";
+            }
+
+            s := s + gen;
             i := i + 1;
           }
           s := s + "]";
 
           isOwned := true;
+          isErased := allErased;
         }
         case SetValue(exprs) => {
           var generatedValues := [];
           readIdents := {};
           var i := 0;
+          var allErased := true;
           while i < |exprs| {
-            var recursiveGen, _, recIdents := GenExpr(exprs[i], params, true);
-            generatedValues := generatedValues + [recursiveGen];
+            var recursiveGen, _, isErased, recIdents := GenExpr(exprs[i], params, true);
+            allErased := allErased && isErased;
+
+            generatedValues := generatedValues + [(recursiveGen, isErased)];
             readIdents := readIdents + recIdents;
             i := i + 1;
           }
@@ -960,12 +1056,19 @@ module {:extern "DCOMP"} DCOMP {
             if i > 0 {
               s := s + ", ";
             }
-            s := s + generatedValues[i];
+
+            var gen := generatedValues[i].0;
+            if generatedValues[i].1 && !allErased {
+              gen := "::dafny_runtime::DafnyUnerasable::<_>::unerase_owned(" + gen + ")";
+            }
+
+            s := s + gen;
             i := i + 1;
           }
           s := s + "].into_iter().collect::<std::collections::HashSet<_>>()";
 
           isOwned := true;
+          isErased := true;
         }
         case This() => {
           if mustOwn {
@@ -977,43 +1080,85 @@ module {:extern "DCOMP"} DCOMP {
           }
 
           readIdents := {"self"};
+          isErased := false;
         }
         case Ite(cond, t, f) => {
-          var condString, _, recIdentsCond := GenExpr(cond, params, true);
-          var _, tHasToBeOwned, _ := GenExpr(t, params, mustOwn); // check if t has to be owned even if not requested
-          var fString, fOwned, recIdentsF := GenExpr(f, params, tHasToBeOwned);
-          var tString, _, recIdentsT := GenExpr(t, params, fOwned); // there's a chance that f forced ownership
+          var condString, _, condErased, recIdentsCond := GenExpr(cond, params, true);
+          if !condErased {
+            condString := "::dafny_runtime::DafnyErasable::erase_owned(" + condString + ")";
+          }
+
+          var _, tHasToBeOwned, _, _ := GenExpr(t, params, mustOwn); // check if t has to be owned even if not requested
+          var fString, fOwned, fErased, recIdentsF := GenExpr(f, params, tHasToBeOwned);
+          var tString, _, tErased, recIdentsT := GenExpr(t, params, fOwned); // there's a chance that f forced ownership
+
+          if !fErased || !tErased {
+            if fErased {
+              fString := "::dafny_runtime::DafnyErasable::erase_owned(" + fString + ")";
+            }
+
+            if tErased {
+              tString := "::dafny_runtime::DafnyErasable::erase_owned(" + tString + ")";
+            }
+          }
+
           s := "(if " + condString + " {\n" + tString + "\n} else {\n" + fString + "\n})";
           isOwned := fOwned;
           readIdents := recIdentsCond + recIdentsT + recIdentsF;
+          isErased := fErased || tErased;
         }
         case UnOp(Not, e) => {
-          var recursiveGen, _, recIdents := GenExpr(e, params, true);
+          var recursiveGen, _, recErased, recIdents := GenExpr(e, params, true);
+          if !recErased {
+            recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+          }
+
           s := "!(" + recursiveGen + ")";
           isOwned := true;
           readIdents := recIdents;
+          isErased := true;
         }
         case UnOp(BitwiseNot, e) => {
-          var recursiveGen, _, recIdents := GenExpr(e, params, true);
+          var recursiveGen, _, recErased, recIdents := GenExpr(e, params, true);
+          if !recErased {
+            recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+          }
+
           s := "~(" + recursiveGen + ")";
           isOwned := true;
           readIdents := recIdents;
+          isErased := true;
         }
         case UnOp(Cardinality, e) => {
-          var recursiveGen, _, recIdents := GenExpr(e, params, false);
+          var recursiveGen, _, recErased, recIdents := GenExpr(e, params, false);
+          if !recErased {
+            recursiveGen := "::dafny_runtime::DafnyErasable::erase_owned(" + recursiveGen + ")";
+          }
+
           s := "(" + recursiveGen + ").len()";
           isOwned := true;
           readIdents := recIdents;
+          isErased := true;
         }
         case BinOp(op, l, r) => {
-          var left, _, recIdentsL := GenExpr(l, params, true);
-          var right, _, recIdentsR := GenExpr(r, params, true);
+          var left, _, leftErased, recIdentsL := GenExpr(l, params, true);
+          var right, _, rightErased, recIdentsR := GenExpr(r, params, true);
+
+          if !leftErased {
+            left := "::dafny_runtime::DafnyErasable::erase_owned(" + left + ")";
+          }
+
+          if !rightErased {
+            right := "::dafny_runtime::DafnyErasable::erase_owned(" + right + ")";
+          }
+
           s := "(" + left + " " + op + " " + right + ")";
           isOwned := true;
           readIdents := recIdentsL + recIdentsR;
+          isErased := true;
         }
         case SelectFn(on, field, isDatatype, isStatic, arity) => {
-          var onString, onOwned, recIdents := GenExpr(on, params, false);
+          var onString, onOwned, _, recIdents := GenExpr(on, params, false);
 
           if isStatic {
             s := onString + "::" + field;
@@ -1038,10 +1183,15 @@ module {:extern "DCOMP"} DCOMP {
           s := "::dafny_runtime::FunctionWrapper(" + s + ")";
 
           isOwned := true;
+          isErased := true;
           readIdents := recIdents;
         }
         case Select(on, field, isDatatype) => {
-          var onString, _, recIdents := GenExpr(on, params, false);
+          var onString, onOwned, onErased, recIdents := GenExpr(on, params, false);
+          if !onErased {
+            var eraseFn := if onOwned then "erase_owned" else "erase";
+            onString := "::dafny_runtime::DafnyErasable::" + eraseFn + "(" + onString + ")";
+          }
 
           if isDatatype {
             s := "(" + onString + ")" + ".r#" + field + "()";
@@ -1061,10 +1211,11 @@ module {:extern "DCOMP"} DCOMP {
             }
           }
 
+          isErased := false;
           readIdents := recIdents;
         }
         case TupleSelect(on, idx) => {
-          var onString, _, recIdents := GenExpr(on, params, false);
+          var onString, _, tupErased, recIdents := GenExpr(on, params, false);
           s := "(" + onString + ")." + natToString(idx);
           if mustOwn {
             s := "(" + s + ")" + ".clone()";
@@ -1073,6 +1224,7 @@ module {:extern "DCOMP"} DCOMP {
             s := "&" + s;
             isOwned := false;
           }
+          isErased := tupErased;
           readIdents := recIdents;
         }
         case Call(on, name, typeArgs, args) => {
@@ -1102,14 +1254,24 @@ module {:extern "DCOMP"} DCOMP {
               argString := argString + ", ";
             }
 
-            var argExpr, isOwned, recIdents := GenExpr(args[i], params, false);
-            readIdents := readIdents + recIdents;
-            argString := argString + (if isOwned then "&" else "") + argExpr;
+            var argExpr, isOwned, argErased, argIdents := GenExpr(args[i], params, false);
+            if isOwned {
+              argExpr := "&" + argExpr;
+            }
+
+            // always unerase because we know the target type and an upgrade may be necessary
+            // if !argErased {
+            //   argExpr := "::dafny_runtime::DafnyErasable::erase(" + argExpr + ")";
+            // }
+            // argExpr := "::dafny_runtime::DafnyUnerasable::<_>::unerase(" + argExpr + ")";
+
+            argString := argString + argExpr;
+            readIdents := readIdents + argIdents;
 
             i := i + 1;
           }
 
-          var enclosingString, _, recIdents := GenExpr(on, params, false);
+          var enclosingString, _, _, recIdents := GenExpr(on, params, false);
           readIdents := readIdents + recIdents;
           match on {
             case Companion(_) => {
@@ -1122,6 +1284,7 @@ module {:extern "DCOMP"} DCOMP {
 
           s := enclosingString + "r#" + name.id + typeArgString + "(" + argString + ")";
           isOwned := true;
+          isErased := false;
         }
         case Lambda(params, body) => {
           var paramNames := [];
@@ -1160,19 +1323,28 @@ module {:extern "DCOMP"} DCOMP {
 
           s := "::dafny_runtime::FunctionWrapper({\n" + allReadCloned + "Box::new(move |" + paramsString + "| {\n" + recursiveGen + "\n})})";
           isOwned := true;
+          isErased := true;
         }
         case IIFE(name, tpe, value, iifeBody) => {
-          var valueGen, valueOwned, recIdents := GenExpr(value, params, false);
+          var valueGen, valueOwned, valueErased, recIdents := GenExpr(value, params, false);
+          if valueErased {
+            var eraseFn := if valueOwned then "unerase_owned" else "unerase";
+            valueGen := "::dafny_runtime::DafnyUnerasable::<_>::" + eraseFn + "(" + valueGen + ")";
+          }
+
           readIdents := recIdents;
           var valueTypeGen := GenType(tpe, false, true);
-          var bodyGen, bodyOwned, bodyIdents := GenExpr(iifeBody, params + if valueOwned then [] else [name.id], mustOwn);
+          var bodyGen, bodyOwned, bodyErased, bodyIdents := GenExpr(iifeBody, params + if valueOwned then [] else [name.id], mustOwn);
           readIdents := readIdents + bodyIdents;
+
+          var eraseFn := if valueOwned then "unerase_owned" else "unerase";
 
           s := "{\nlet r#" + name.id + ": " + (if valueOwned then "" else "&") + valueTypeGen + " = " + valueGen + ";\n" + bodyGen + "\n}";
           isOwned := bodyOwned;
+          isErased := bodyErased;
         }
         case Apply(func, args) => {
-          var funcString, _, recIdents := GenExpr(func, params, false);
+          var funcString, _, funcErased, recIdents := GenExpr(func, params, false);
           readIdents := recIdents;
 
           var argString := "";
@@ -1182,21 +1354,30 @@ module {:extern "DCOMP"} DCOMP {
               argString := argString + ", ";
             }
 
-            var argExpr, isOwned, recIdents := GenExpr(args[i], params, false);
-            readIdents := readIdents + recIdents;
-            argString := argString + (if isOwned then "&" else "") + argExpr;
+            var argExpr, isOwned, argErased, argIdents := GenExpr(args[i], params, false);
+            if isOwned {
+              argExpr := "&" + argExpr;
+            }
+
+            // always unerase because we know the target type and an upgrade may be necessary
+            // argExpr := "::dafny_runtime::DafnyUnerasable::<_>::unerase(" + argExpr + ")";
+
+            argString := argString + argExpr;
+            readIdents := readIdents + argIdents;
 
             i := i + 1;
           }
 
           s := "((" + funcString + ").0" + "(" + argString + "))";
           isOwned := true;
+          isErased := false;
         }
         case TypeTest(on, dType, variant) => {
-          var exprGen, _, recIdents := GenExpr(on, params, false);
+          var exprGen, _, exprErased, recIdents := GenExpr(on, params, false);
           var dTypePath := GenPath(dType);
           s := "matches!(" + exprGen + ".as_ref(), " + dTypePath + "::r#" + variant + "{ .. })";
           isOwned := true;
+          isErased := true;
           readIdents := recIdents;
         }
       }
