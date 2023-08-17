@@ -831,8 +831,8 @@ namespace Microsoft.Dafny.Compilers {
       return ret;
     }
 
-    SubsetUpgradeBuilder SubsetUpgrade(DAST.Type tpe) {
-      var ret = new SubsetUpgradeBuilder(tpe);
+    ConvertBuilder Convert(DAST.Type fromType, DAST.Type toType) {
+      var ret = new ConvertBuilder(fromType, toType);
       AddBuildable(ret);
       return ret;
     }
@@ -1062,12 +1062,14 @@ class IIFEExprRhs : ExprContainer {
   }
 }
 
-class SubsetUpgradeBuilder : ExprContainer, BuildableExpr {
-  readonly DAST.Type tpe;
+class ConvertBuilder : ExprContainer, BuildableExpr {
+  readonly DAST.Type fromType;
+  readonly DAST.Type toType;
   object value = null;
 
-  public SubsetUpgradeBuilder(DAST.Type tpe) {
-    this.tpe = tpe;
+  public ConvertBuilder(DAST.Type fromType, DAST.Type toType) {
+    this.fromType = fromType;
+    this.toType = toType;
   }
 
   public void AddExpr(DAST.Expression item) {
@@ -1090,9 +1092,10 @@ class SubsetUpgradeBuilder : ExprContainer, BuildableExpr {
     var builtValue = new List<DAST.Expression>();
     ExprContainer.RecursivelyBuild(new List<object> { value }, builtValue);
 
-    return (DAST.Expression)DAST.Expression.create_SubsetUpgrade(
+    return (DAST.Expression)DAST.Expression.create_Convert(
       builtValue[0],
-      tpe
+      fromType,
+      toType
     );
   }
 }
