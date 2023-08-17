@@ -150,7 +150,12 @@ namespace Microsoft.Dafny.Compilers {
     protected override IClassWriter CreateClass(string moduleName, string name, bool isExtern, string fullPrintName,
       List<TypeParameter> typeParameters, TopLevelDecl cls, List<Type> superClasses, IToken tok, ConcreteSyntaxTree wr) {
       if (currentBuilder is ClassContainer builder) {
-        return new ClassWriter(this, builder.Class(name, superClasses.Select(t => GenType(t)).ToList()));
+        List<DAST.Type> typeParams = new();
+        foreach (var tp in typeParameters) {
+          typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
+        }
+
+        return new ClassWriter(this, builder.Class(name, typeParams, superClasses.Select(t => GenType(t)).ToList()));
       } else {
         throw new InvalidOperationException();
       }
@@ -316,8 +321,10 @@ namespace Microsoft.Dafny.Compilers {
       public ConcreteSyntaxTree CreateMethod(Method m, List<TypeArgumentInstantiation> typeArgs, bool createBody,
         bool forBodyInheritance, bool lookasideBody) {
         List<DAST.Type> astTypeArgs = new();
-        foreach (var typeArg in typeArgs) {
-          astTypeArgs.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(compiler.IdProtect(typeArg.Formal.GetCompileName(compiler.Options)))));
+        if (m.IsStatic) {
+          foreach (var typeArg in typeArgs) {
+            astTypeArgs.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(compiler.IdProtect(typeArg.Formal.GetCompileName(compiler.Options)))));
+          }
         }
 
         List<DAST.Formal> params_ = new();
@@ -415,15 +422,10 @@ namespace Microsoft.Dafny.Compilers {
           }
         }
 
-        if (rhsExpr != null) {
-          // TODO(shadaj): do something with rhsExpr
-          throw new NotImplementedException();
-        }
-
         builder.AddField((DAST.Formal)DAST.Formal.create_Formal(
           Sequence<Rune>.UnicodeFromString(name),
           compiler.GenType(type)
-        ));
+        ), rhsExpr);
       }
 
       public void InitializeField(Field field, Type instantiatedFieldType, TopLevelDeclWithMembers enclosingClass) {
@@ -585,8 +587,7 @@ namespace Microsoft.Dafny.Compilers {
 
         if (rhs == null) {
           // we expect an initializer to come *after* this declaration
-          var variable = stmtContainer.Builder.DeclareAndAssign(typ);
-          variable.SetName(name);
+          var variable = stmtContainer.Builder.DeclareAndAssign(typ, name);
 
           if (leaveRoomForRhs) {
             throw new InvalidOperationException();
@@ -614,8 +615,7 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override ConcreteSyntaxTree DeclareLocalVar(string name, Type type, IToken tok, ConcreteSyntaxTree wr) {
       if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
-        var variable = stmtContainer.Builder.DeclareAndAssign(GenType(type));
-        variable.SetName(name);
+        var variable = stmtContainer.Builder.DeclareAndAssign(GenType(type), name);
         return new BuilderSyntaxTree<ExprContainer>(variable);
       } else {
         throw new InvalidOperationException();
@@ -681,11 +681,9 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     private class BuilderLvalue : ILvalue {
-      readonly DafnyCompiler compiler;
       readonly string name;
 
-      public BuilderLvalue(DafnyCompiler compiler, string name) {
-        this.compiler = compiler;
+      public BuilderLvalue(string name) {
         this.name = name;
       }
 
@@ -696,7 +694,7 @@ namespace Microsoft.Dafny.Compilers {
       public ConcreteSyntaxTree EmitWrite(ConcreteSyntaxTree wr) {
         if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
           var assign = stmtContainer.Builder.Assign();
-          assign.SetName(name);
+          assign.SetLhs((DAST.AssignLhs)DAST.AssignLhs.create_Ident(Sequence<Rune>.UnicodeFromString(name)));
           return new BuilderSyntaxTree<ExprContainer>(assign);
         } else {
           throw new InvalidOperationException();
@@ -706,9 +704,11 @@ namespace Microsoft.Dafny.Compilers {
 
     private class ExprLvalue : ILvalue {
       readonly DAST.Expression expr;
+      readonly DAST.AssignLhs assignExpr;
 
-      public ExprLvalue(DAST.Expression expr) {
+      public ExprLvalue(DAST.Expression expr, DAST.AssignLhs assignExpr) {
         this.expr = expr;
+        this.assignExpr = assignExpr;
       }
 
       public void EmitRead(ConcreteSyntaxTree wr) {
@@ -720,12 +720,22 @@ namespace Microsoft.Dafny.Compilers {
       }
 
       public ConcreteSyntaxTree EmitWrite(ConcreteSyntaxTree wr) {
-        throw new NotImplementedException();
+        if (assignExpr == null) {
+          throw new NotImplementedException();
+        }
+
+        if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
+          var assign = stmtContainer.Builder.Assign();
+          assign.SetLhs(assignExpr);
+          return new BuilderSyntaxTree<ExprContainer>(assign);
+        } else {
+          throw new InvalidOperationException();
+        }
       }
     }
 
     protected override ILvalue IdentLvalue(string var) {
-      return new BuilderLvalue(this, var);
+      return new BuilderLvalue(var);
     }
 
     protected override ILvalue SeqSelectLvalue(SeqSelectExpr ll, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
@@ -1184,20 +1194,23 @@ namespace Microsoft.Dafny.Compilers {
       var memberStatus = DatatypeWrapperEraser.GetMemberStatus(Options, member);
 
       if (memberStatus == DatatypeWrapperEraser.MemberCompileStatus.Identity) {
-        return new ExprLvalue(objExpr);
+        return new ExprLvalue(objExpr, null);
       } else if (memberStatus == DatatypeWrapperEraser.MemberCompileStatus.AlwaysTrue) {
-        return new ExprLvalue((DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_BoolLiteral(true)));
+        return new ExprLvalue((DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_BoolLiteral(true)), null);
       } else if (member is DatatypeDestructor dtor) {
         if (dtor.EnclosingClass is TupleTypeDecl) {
           return new ExprLvalue((DAST.Expression)DAST.Expression.create_TupleSelect(
             objExpr,
             int.Parse(dtor.CorrespondingFormals[0].NameForCompilation)
-          ));
+          ), null);
         } else {
           return new ExprLvalue((DAST.Expression)DAST.Expression.create_Select(
             objExpr,
             Sequence<Rune>.UnicodeFromString(member.GetCompileName(Options)),
             member.EnclosingClass is DatatypeDecl
+          ), (DAST.AssignLhs)DAST.AssignLhs.create_Select(
+            objExpr,
+            Sequence<Rune>.UnicodeFromString(member.GetCompileName(Options))
           ));
         }
       } else if (member is SpecialField sf && sf.SpecialId != SpecialField.ID.UseIdParam) {
@@ -1206,13 +1219,16 @@ namespace Microsoft.Dafny.Compilers {
           objExpr,
           Sequence<Rune>.UnicodeFromString(compiledName),
           member.EnclosingClass is DatatypeDecl
+        ), (DAST.AssignLhs)DAST.AssignLhs.create_Select(
+          objExpr,
+          Sequence<Rune>.UnicodeFromString(compiledName)
         ));
       } else if (member is SpecialField sf2 && sf2.SpecialId == SpecialField.ID.UseIdParam && sf2.IdParam is string fieldName && fieldName.StartsWith("is_")) {
         return new ExprLvalue((DAST.Expression)DAST.Expression.create_TypeTest(
           objExpr,
           PathFromTopLevel(objType.AsTopLevelTypeWithMembers),
           Sequence<Rune>.UnicodeFromString(fieldName.Substring(3))
-        ));
+        ), null);
       } else {
         if (expectedType.IsArrowType) {
           return new ExprLvalue((DAST.Expression)DAST.Expression.create_SelectFn(
@@ -1221,12 +1237,15 @@ namespace Microsoft.Dafny.Compilers {
             member.EnclosingClass is DatatypeDecl,
             member.IsStatic,
             expectedType.AsArrowType.Arity
-          ));
+          ), null);
         } else {
           return new ExprLvalue((DAST.Expression)DAST.Expression.create_Select(
             objExpr,
             Sequence<Rune>.UnicodeFromString(member.GetCompileName(Options)),
             member.EnclosingClass is DatatypeDecl
+          ), (DAST.AssignLhs)DAST.AssignLhs.create_Select(
+            objExpr,
+            Sequence<Rune>.UnicodeFromString(member.GetCompileName(Options))
           ));
         }
       }
