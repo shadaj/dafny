@@ -152,6 +152,10 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is ClassContainer builder) {
         List<DAST.Type> typeParams = new();
         foreach (var tp in typeParameters) {
+          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+            throw new NotImplementedException("Contravariance in type parameters");
+          }
+
           typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
         }
 
@@ -183,6 +187,10 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is DatatypeContainer builder) {
         List<DAST.Type> typeParams = new();
         foreach (var tp in dt.TypeArgs) {
+          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+            throw new NotImplementedException("Contravariance in type parameters");
+          }
+
           typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
         }
 
@@ -295,6 +303,10 @@ namespace Microsoft.Dafny.Compilers {
 
         List<DAST.Type> typeParams = new();
         foreach (var tp in sst.TypeArgs) {
+          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+            throw new NotImplementedException("Contravariance in type parameters");
+          }
+
           typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(tp.Name)));
         }
 
@@ -325,6 +337,10 @@ namespace Microsoft.Dafny.Compilers {
         List<DAST.Type> astTypeArgs = new();
         if (m.IsStatic) {
           foreach (var typeArg in typeArgs) {
+            if (typeArg.Formal.Variance == TypeParameter.TPVariance.Contra) {
+              throw new NotImplementedException("Contravariance in type parameters");
+            }
+
             astTypeArgs.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(compiler.IdProtect(typeArg.Formal.GetCompileName(compiler.Options)))));
           }
         }
@@ -372,6 +388,10 @@ namespace Microsoft.Dafny.Compilers {
           bool forBodyInheritance, bool lookasideBody) {
         List<DAST.Type> astTypeArgs = new();
         foreach (var typeArg in typeArgs) {
+          if (typeArg.Formal.Variance == TypeParameter.TPVariance.Contra) {
+            throw new NotImplementedException("Contravariance in type parameters");
+          }
+
           astTypeArgs.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(compiler.IdProtect(typeArg.Formal.GetCompileName(compiler.Options)))));
         }
 
