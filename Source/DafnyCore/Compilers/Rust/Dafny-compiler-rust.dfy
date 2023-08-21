@@ -90,10 +90,18 @@ module {:extern "DCOMP"} DCOMP {
         fieldI := fieldI + 1;
       }
 
-      s := "#[derive(Default)]\npub struct r#" + c.name + typeParams + " {\n" + fields +  "\n}";
+      var typeParamI := 0;
+      while typeParamI < |c.typeParams| {
+        var tpeGen := GenType(c.typeParams[typeParamI], false, false);
+        fields := fields + "_phantom_type_param_" + natToString(typeParamI) + ": ::std::marker::PhantomData<" + tpeGen + ">,\n";
+
+        typeParamI := typeParamI + 1;
+      }
+
+      s := "#[derive(::std::default::Default)]\npub struct r#" + c.name + typeParams + " {\n" + fields +  "\n}";
 
       var implBody, traitBodies := GenClassImplBody(c.body, false, Type.Path([], [], ResolvedType.Datatype(path)), {});
-      implBody := "pub fn new() -> Self {\n" + "r#" + c.name + " {\n" + fieldInits + "\n}\n}\n" + implBody;
+      implBody := "pub fn new() -> Self {\n::std::default::Default::default()\n}\n" + implBody;
 
       s := s + "\n" + "impl " + constrainedTypeParams + " r#" + c.name + typeParams + " {\n" + implBody + "\n}";
       if (|c.superClasses| > 0) {
@@ -284,6 +292,10 @@ module {:extern "DCOMP"} DCOMP {
               k := k + 1;
             }
 
+            if |c.typeParams| > 0 {
+              methodBody := methodBody + "r#" + c.name + "::_PhantomVariant(..) => panic!(),\n";
+            }
+
             methodBody := methodBody + "}\n";
 
             implBody := implBody + "pub fn r#" + formal.name + "(&self) -> &" + formalType + " {\n" + methodBody + "}\n";
@@ -292,6 +304,21 @@ module {:extern "DCOMP"} DCOMP {
         }
 
         i := i + 1;
+      }
+
+      if |c.typeParams| > 0 {
+        ctors := ctors + "_PhantomVariant(";
+        var typeI := 0;
+        while typeI < |c.typeParams| {
+          if typeI > 0 {
+            ctors := ctors + ", ";
+          }
+
+          var genTp := GenType(c.typeParams[typeI], false, false);
+          ctors := ctors + "::std::marker::PhantomData::<" + genTp + ">";
+          typeI := typeI + 1;
+        }
+        ctors := ctors + ")";
       }
 
       var enumBody := "#[derive(PartialEq)]\npub enum r#" + c.name + typeParams + " {\n" + ctors +  "\n}" + "\n" + "impl " + constrainedTypeParams + " r#" + c.name + typeParams + " {\n" + implBody + "\n}";
@@ -331,6 +358,10 @@ module {:extern "DCOMP"} DCOMP {
 
         printImpl := printImpl + "r#" + c.name + "::" + ctorMatch + " => {\n" + printRhs + "\n}\n";
         i := i + 1;
+      }
+
+      if |c.typeParams| > 0 {
+        printImpl := printImpl + "r#" + c.name + "::_PhantomVariant(..) => {panic!()\n}\n";
       }
 
       printImpl := printImpl + "}\n}\n}\n";
