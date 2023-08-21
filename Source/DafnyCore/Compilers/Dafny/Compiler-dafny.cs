@@ -1310,6 +1310,16 @@ namespace Microsoft.Dafny.Compilers {
             member.IsStatic,
             expectedType.AsArrowType.Arity
           ), null);
+        } else if (internalAccess && (member is ConstantField || member.EnclosingClass is TraitDecl)) {
+          return new ExprLvalue((DAST.Expression)DAST.Expression.create_Select(
+            objExpr,
+            Sequence<Rune>.UnicodeFromString("_" + member.GetCompileName(Options)),
+            false,
+            member.EnclosingClass is DatatypeDecl
+          ), (DAST.AssignLhs)DAST.AssignLhs.create_Select(
+            objExpr,
+            Sequence<Rune>.UnicodeFromString("_" + member.GetCompileName(Options))
+          ));
         } else {
           return new ExprLvalue((DAST.Expression)DAST.Expression.create_Select(
             objExpr,
