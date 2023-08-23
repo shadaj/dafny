@@ -1101,6 +1101,7 @@ namespace DAST {
   public interface _IClass {
     bool is_Class { get; }
     Dafny.ISequence<Dafny.Rune> dtor_name { get; }
+    Dafny.ISequence<Dafny.Rune> dtor_enclosingModule { get; }
     Dafny.ISequence<DAST._IType> dtor_typeParams { get; }
     Dafny.ISequence<DAST._IType> dtor_superClasses { get; }
     Dafny.ISequence<DAST._IField> dtor_fields { get; }
@@ -1109,12 +1110,14 @@ namespace DAST {
   }
   public class Class : _IClass {
     public readonly Dafny.ISequence<Dafny.Rune> _name;
+    public readonly Dafny.ISequence<Dafny.Rune> _enclosingModule;
     public readonly Dafny.ISequence<DAST._IType> _typeParams;
     public readonly Dafny.ISequence<DAST._IType> _superClasses;
     public readonly Dafny.ISequence<DAST._IField> _fields;
     public readonly Dafny.ISequence<DAST._IMethod> _body;
-    public Class(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
+    public Class(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<Dafny.Rune> enclosingModule, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
       this._name = name;
+      this._enclosingModule = enclosingModule;
       this._typeParams = typeParams;
       this._superClasses = superClasses;
       this._fields = fields;
@@ -1122,16 +1125,17 @@ namespace DAST {
     }
     public _IClass DowncastClone() {
       if (this is _IClass dt) { return dt; }
-      return new Class(_name, _typeParams, _superClasses, _fields, _body);
+      return new Class(_name, _enclosingModule, _typeParams, _superClasses, _fields, _body);
     }
     public override bool Equals(object other) {
       var oth = other as DAST.Class;
-      return oth != null && object.Equals(this._name, oth._name) && object.Equals(this._typeParams, oth._typeParams) && object.Equals(this._superClasses, oth._superClasses) && object.Equals(this._fields, oth._fields) && object.Equals(this._body, oth._body);
+      return oth != null && object.Equals(this._name, oth._name) && object.Equals(this._enclosingModule, oth._enclosingModule) && object.Equals(this._typeParams, oth._typeParams) && object.Equals(this._superClasses, oth._superClasses) && object.Equals(this._fields, oth._fields) && object.Equals(this._body, oth._body);
     }
     public override int GetHashCode() {
       ulong hash = 5381;
       hash = ((hash << 5) + hash) + 0;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._name));
+      hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._enclosingModule));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._typeParams));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._superClasses));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._fields));
@@ -1143,6 +1147,8 @@ namespace DAST {
       s += "(";
       s += this._name.ToVerbatimString(true);
       s += ", ";
+      s += Dafny.Helpers.ToString(this._enclosingModule);
+      s += ", ";
       s += Dafny.Helpers.ToString(this._typeParams);
       s += ", ";
       s += Dafny.Helpers.ToString(this._superClasses);
@@ -1153,7 +1159,7 @@ namespace DAST {
       s += ")";
       return s;
     }
-    private static readonly DAST._IClass theDefault = create(Dafny.Sequence<Dafny.Rune>.Empty, Dafny.Sequence<DAST._IType>.Empty, Dafny.Sequence<DAST._IType>.Empty, Dafny.Sequence<DAST._IField>.Empty, Dafny.Sequence<DAST._IMethod>.Empty);
+    private static readonly DAST._IClass theDefault = create(Dafny.Sequence<Dafny.Rune>.Empty, Dafny.Sequence<Dafny.Rune>.Empty, Dafny.Sequence<DAST._IType>.Empty, Dafny.Sequence<DAST._IType>.Empty, Dafny.Sequence<DAST._IField>.Empty, Dafny.Sequence<DAST._IMethod>.Empty);
     public static DAST._IClass Default() {
       return theDefault;
     }
@@ -1161,16 +1167,21 @@ namespace DAST {
     public static Dafny.TypeDescriptor<DAST._IClass> _TypeDescriptor() {
       return _TYPE;
     }
-    public static _IClass create(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
-      return new Class(name, typeParams, superClasses, fields, body);
+    public static _IClass create(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<Dafny.Rune> enclosingModule, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
+      return new Class(name, enclosingModule, typeParams, superClasses, fields, body);
     }
-    public static _IClass create_Class(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
-      return create(name, typeParams, superClasses, fields, body);
+    public static _IClass create_Class(Dafny.ISequence<Dafny.Rune> name, Dafny.ISequence<Dafny.Rune> enclosingModule, Dafny.ISequence<DAST._IType> typeParams, Dafny.ISequence<DAST._IType> superClasses, Dafny.ISequence<DAST._IField> fields, Dafny.ISequence<DAST._IMethod> body) {
+      return create(name, enclosingModule, typeParams, superClasses, fields, body);
     }
     public bool is_Class { get { return true; } }
     public Dafny.ISequence<Dafny.Rune> dtor_name {
       get {
         return this._name;
+      }
+    }
+    public Dafny.ISequence<Dafny.Rune> dtor_enclosingModule {
+      get {
+        return this._enclosingModule;
       }
     }
     public Dafny.ISequence<DAST._IType> dtor_typeParams {
@@ -2403,9 +2414,11 @@ namespace DAST {
   public interface _IAssignLhs {
     bool is_Ident { get; }
     bool is_Select { get; }
+    bool is_Index { get; }
     Dafny.ISequence<Dafny.Rune> dtor_Ident_a0 { get; }
     DAST._IExpression dtor_expr { get; }
     Dafny.ISequence<Dafny.Rune> dtor_field { get; }
+    DAST._IExpression dtor_idx { get; }
     _IAssignLhs DowncastClone();
   }
   public abstract class AssignLhs : _IAssignLhs {
@@ -2425,8 +2438,12 @@ namespace DAST {
     public static _IAssignLhs create_Select(DAST._IExpression expr, Dafny.ISequence<Dafny.Rune> field) {
       return new AssignLhs_Select(expr, field);
     }
+    public static _IAssignLhs create_Index(DAST._IExpression expr, DAST._IExpression idx) {
+      return new AssignLhs_Index(expr, idx);
+    }
     public bool is_Ident { get { return this is AssignLhs_Ident; } }
     public bool is_Select { get { return this is AssignLhs_Select; } }
+    public bool is_Index { get { return this is AssignLhs_Index; } }
     public Dafny.ISequence<Dafny.Rune> dtor_Ident_a0 {
       get {
         var d = this;
@@ -2436,13 +2453,20 @@ namespace DAST {
     public DAST._IExpression dtor_expr {
       get {
         var d = this;
-        return ((AssignLhs_Select)d)._expr;
+        if (d is AssignLhs_Select) { return ((AssignLhs_Select)d)._expr; }
+        return ((AssignLhs_Index)d)._expr;
       }
     }
     public Dafny.ISequence<Dafny.Rune> dtor_field {
       get {
         var d = this;
         return ((AssignLhs_Select)d)._field;
+      }
+    }
+    public DAST._IExpression dtor_idx {
+      get {
+        var d = this;
+        return ((AssignLhs_Index)d)._idx;
       }
     }
     public abstract _IAssignLhs DowncastClone();
@@ -2506,6 +2530,38 @@ namespace DAST {
       return s;
     }
   }
+  public class AssignLhs_Index : AssignLhs {
+    public readonly DAST._IExpression _expr;
+    public readonly DAST._IExpression _idx;
+    public AssignLhs_Index(DAST._IExpression expr, DAST._IExpression idx) : base() {
+      this._expr = expr;
+      this._idx = idx;
+    }
+    public override _IAssignLhs DowncastClone() {
+      if (this is _IAssignLhs dt) { return dt; }
+      return new AssignLhs_Index(_expr, _idx);
+    }
+    public override bool Equals(object other) {
+      var oth = other as DAST.AssignLhs_Index;
+      return oth != null && object.Equals(this._expr, oth._expr) && object.Equals(this._idx, oth._idx);
+    }
+    public override int GetHashCode() {
+      ulong hash = 5381;
+      hash = ((hash << 5) + hash) + 2;
+      hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._expr));
+      hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._idx));
+      return (int)hash;
+    }
+    public override string ToString() {
+      string s = "DAST.AssignLhs.Index";
+      s += "(";
+      s += Dafny.Helpers.ToString(this._expr);
+      s += ", ";
+      s += Dafny.Helpers.ToString(this._idx);
+      s += ")";
+      return s;
+    }
+  }
 
   public interface _IExpression {
     bool is_Literal { get; }
@@ -2524,6 +2580,7 @@ namespace DAST {
     bool is_BinOp { get; }
     bool is_Select { get; }
     bool is_SelectFn { get; }
+    bool is_Index { get; }
     bool is_TupleSelect { get; }
     bool is_Call { get; }
     bool is_Lambda { get; }
@@ -2558,6 +2615,7 @@ namespace DAST {
     bool dtor_onDatatype { get; }
     bool dtor_isStatic { get; }
     BigInteger dtor_arity { get; }
+    DAST._IExpression dtor_idx { get; }
     BigInteger dtor_index { get; }
     DAST._IExpression dtor_on { get; }
     Dafny.ISequence<Dafny.Rune> dtor_name { get; }
@@ -2628,6 +2686,9 @@ namespace DAST {
     public static _IExpression create_SelectFn(DAST._IExpression expr, Dafny.ISequence<Dafny.Rune> field, bool onDatatype, bool isStatic, BigInteger arity) {
       return new Expression_SelectFn(expr, field, onDatatype, isStatic, arity);
     }
+    public static _IExpression create_Index(DAST._IExpression expr, DAST._IExpression idx) {
+      return new Expression_Index(expr, idx);
+    }
     public static _IExpression create_TupleSelect(DAST._IExpression expr, BigInteger index) {
       return new Expression_TupleSelect(expr, index);
     }
@@ -2665,6 +2726,7 @@ namespace DAST {
     public bool is_BinOp { get { return this is Expression_BinOp; } }
     public bool is_Select { get { return this is Expression_Select; } }
     public bool is_SelectFn { get { return this is Expression_SelectFn; } }
+    public bool is_Index { get { return this is Expression_Index; } }
     public bool is_TupleSelect { get { return this is Expression_TupleSelect; } }
     public bool is_Call { get { return this is Expression_Call; } }
     public bool is_Lambda { get { return this is Expression_Lambda; } }
@@ -2794,6 +2856,7 @@ namespace DAST {
         if (d is Expression_UnOp) { return ((Expression_UnOp)d)._expr; }
         if (d is Expression_Select) { return ((Expression_Select)d)._expr; }
         if (d is Expression_SelectFn) { return ((Expression_SelectFn)d)._expr; }
+        if (d is Expression_Index) { return ((Expression_Index)d)._expr; }
         if (d is Expression_TupleSelect) { return ((Expression_TupleSelect)d)._expr; }
         return ((Expression_Apply)d)._expr;
       }
@@ -2846,6 +2909,12 @@ namespace DAST {
       get {
         var d = this;
         return ((Expression_SelectFn)d)._arity;
+      }
+    }
+    public DAST._IExpression dtor_idx {
+      get {
+        var d = this;
+        return ((Expression_Index)d)._idx;
       }
     }
     public BigInteger dtor_index {
@@ -3422,6 +3491,38 @@ namespace DAST {
       return s;
     }
   }
+  public class Expression_Index : Expression {
+    public readonly DAST._IExpression _expr;
+    public readonly DAST._IExpression _idx;
+    public Expression_Index(DAST._IExpression expr, DAST._IExpression idx) : base() {
+      this._expr = expr;
+      this._idx = idx;
+    }
+    public override _IExpression DowncastClone() {
+      if (this is _IExpression dt) { return dt; }
+      return new Expression_Index(_expr, _idx);
+    }
+    public override bool Equals(object other) {
+      var oth = other as DAST.Expression_Index;
+      return oth != null && object.Equals(this._expr, oth._expr) && object.Equals(this._idx, oth._idx);
+    }
+    public override int GetHashCode() {
+      ulong hash = 5381;
+      hash = ((hash << 5) + hash) + 16;
+      hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._expr));
+      hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._idx));
+      return (int)hash;
+    }
+    public override string ToString() {
+      string s = "DAST.Expression.Index";
+      s += "(";
+      s += Dafny.Helpers.ToString(this._expr);
+      s += ", ";
+      s += Dafny.Helpers.ToString(this._idx);
+      s += ")";
+      return s;
+    }
+  }
   public class Expression_TupleSelect : Expression {
     public readonly DAST._IExpression _expr;
     public readonly BigInteger _index;
@@ -3439,7 +3540,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 16;
+      hash = ((hash << 5) + hash) + 17;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._expr));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._index));
       return (int)hash;
@@ -3475,7 +3576,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 17;
+      hash = ((hash << 5) + hash) + 18;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._on));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._name));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._typeArgs));
@@ -3515,7 +3616,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 18;
+      hash = ((hash << 5) + hash) + 19;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._params));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._retType));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._body));
@@ -3554,7 +3655,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 19;
+      hash = ((hash << 5) + hash) + 20;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._name));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._typ));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._value));
@@ -3592,7 +3693,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 20;
+      hash = ((hash << 5) + hash) + 21;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._expr));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._args));
       return (int)hash;
@@ -3626,7 +3727,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 21;
+      hash = ((hash << 5) + hash) + 22;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._on));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._dType));
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._variant));
@@ -3659,7 +3760,7 @@ namespace DAST {
     }
     public override int GetHashCode() {
       ulong hash = 5381;
-      hash = ((hash << 5) + hash) + 22;
+      hash = ((hash << 5) + hash) + 23;
       hash = ((hash << 5) + hash) + ((ulong)Dafny.Helpers.GetHashCode(this._typ));
       return (int)hash;
     }
@@ -4325,7 +4426,7 @@ namespace DCOMP {
       _60_defaultImpl = Dafny.Sequence<Dafny.Rune>.Concat(_60_defaultImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("}\n"));
       Dafny.ISequence<Dafny.Rune> _61_printImpl;
       _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("impl "), _18_constrainedTypeParams), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ::dafny_runtime::DafnyPrint for r#")), (c).dtor_name), _17_typeParams), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("fn fmt_print(&self, __fmt_print_formatter: &mut ::std::fmt::Formatter, _in_seq: bool) -> std::fmt::Result {\n"));
-      _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("write!(__fmt_print_formatter, \"r#")), (c).dtor_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), (((new BigInteger(((c).dtor_fields).Count)).Sign == 1) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\")?;"));
+      _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("write!(__fmt_print_formatter, \"")), ((c).dtor_enclosingModule)), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".")), (c).dtor_name), (((new BigInteger(((c).dtor_fields).Count)).Sign == 1) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\")?;"));
       BigInteger _62_i;
       _62_i = BigInteger.Zero;
       while ((_62_i) < (new BigInteger(((c).dtor_fields).Count))) {
@@ -4337,7 +4438,10 @@ namespace DCOMP {
         _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n::dafny_runtime::DafnyPrint::fmt_print(::std::ops::Deref::deref(&(self.r#")), ((_63_field).dtor_formal).dtor_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow())), __fmt_print_formatter, false)?;"));
         _62_i = (_62_i) + (BigInteger.One);
       }
-      _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\nwrite!(__fmt_print_formatter, \")\")?;\nOk(())\n}\n}\n"));
+      if ((new BigInteger(((c).dtor_fields).Count)).Sign == 1) {
+        _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\nwrite!(__fmt_print_formatter, \")\")?;"));
+      }
+      _61_printImpl = Dafny.Sequence<Dafny.Rune>.Concat(_61_printImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\nOk(())\n}\n}\n"));
       Dafny.ISequence<Dafny.Rune> _64_ptrPartialEqImpl;
       _64_ptrPartialEqImpl = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("impl "), _18_constrainedTypeParams), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ::std::cmp::PartialEq for r#")), (c).dtor_name), _17_typeParams), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n"));
       _64_ptrPartialEqImpl = Dafny.Sequence<Dafny.Rune>.Concat(_64_ptrPartialEqImpl, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("fn eq(&self, other: &Self) -> bool {\n"));
@@ -4752,7 +4856,7 @@ namespace DCOMP {
           Dafny.ISequence<Dafny.Rune> _out44;
           _out44 = DCOMP.COMP.GenType(_140_element, inBinding, inFn);
           _141_elemStr = _out44;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::vec::Vec<"), _141_elemStr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">"));
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc<::std::cell::RefCell<::std::vec::Vec<"), _141_elemStr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">>>"));
         }
       } else if (_source5.is_Seq) {
         DAST._IType _142___mcc_h5 = _source5.dtor_element;
@@ -5085,7 +5189,7 @@ namespace DCOMP {
         _203_i = (_203_i) + (BigInteger.One);
       }
     }
-    public static void GenAssignLhs(DAST._IAssignLhs lhs, Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> @params, out Dafny.ISequence<Dafny.Rune> generated, out bool needsIIFE, out Dafny.ISet<Dafny.ISequence<Dafny.Rune>> readIdents) {
+    public static void GenAssignLhs(DAST._IAssignLhs lhs, Dafny.ISequence<Dafny.Rune> rhs, Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> @params, out Dafny.ISequence<Dafny.Rune> generated, out bool needsIIFE, out Dafny.ISet<Dafny.ISequence<Dafny.Rune>> readIdents) {
       generated = Dafny.Sequence<Dafny.Rune>.Empty;
       needsIIFE = false;
       readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Empty;
@@ -5104,7 +5208,7 @@ namespace DCOMP {
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_209_id);
           needsIIFE = false;
         }
-      } else {
+      } else if (_source13.is_Select) {
         DAST._IExpression _210___mcc_h2 = _source13.dtor_expr;
         Dafny.ISequence<Dafny.Rune> _211___mcc_h3 = _source13.dtor_field;
         Dafny.ISequence<Dafny.Rune> _212_field = _211___mcc_h3;
@@ -5128,8 +5232,53 @@ namespace DCOMP {
             _218_eraseFn = ((_215_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
             _214_onExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _218_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _214_onExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           }
-          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("*("), _214_onExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".")), _212_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow_mut())"));
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("*("), _214_onExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".")), _212_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow_mut()) = ")), rhs), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
           readIdents = _217_recIdents;
+          needsIIFE = true;
+        }
+      } else {
+        DAST._IExpression _219___mcc_h4 = _source13.dtor_expr;
+        DAST._IExpression _220___mcc_h5 = _source13.dtor_idx;
+        DAST._IExpression _221_idx = _220___mcc_h5;
+        DAST._IExpression _222_on = _219___mcc_h4;
+        {
+          Dafny.ISequence<Dafny.Rune> _223_onExpr;
+          bool _224_onOwned;
+          bool _225_onErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _226_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out67;
+          bool _out68;
+          bool _out69;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out70;
+          DCOMP.COMP.GenExpr(_222_on, @params, false, out _out67, out _out68, out _out69, out _out70);
+          _223_onExpr = _out67;
+          _224_onOwned = _out68;
+          _225_onErased = _out69;
+          _226_recIdents = _out70;
+          if (!(_225_onErased)) {
+            Dafny.ISequence<Dafny.Rune> _227_eraseFn;
+            _227_eraseFn = ((_224_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+            _223_onExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _227_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _223_onExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          Dafny.ISequence<Dafny.Rune> _228_idxString;
+          bool _229___v13;
+          bool _230_idxErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _231_idxIdents;
+          Dafny.ISequence<Dafny.Rune> _out71;
+          bool _out72;
+          bool _out73;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out74;
+          DCOMP.COMP.GenExpr(_221_idx, @params, true, out _out71, out _out72, out _out73, out _out74);
+          _228_idxString = _out71;
+          _229___v13 = _out72;
+          _230_idxErased = _out73;
+          _231_idxIdents = _out74;
+          if (!(_230_idxErased)) {
+            _228_idxString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _228_idxString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{\nlet __idx = <usize as ::dafny_runtime::NumCast>::from("), _228_idxString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap();\n"));
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(generated, _223_onExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow_mut()[__idx] = ")), rhs), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n}"));
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_226_recIdents, _231_idxIdents);
           needsIIFE = true;
         }
       }
@@ -5139,438 +5288,444 @@ namespace DCOMP {
       readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Empty;
       DAST._IStatement _source15 = stmt;
       if (_source15.is_DeclareVar) {
-        Dafny.ISequence<Dafny.Rune> _219___mcc_h0 = _source15.dtor_name;
-        DAST._IType _220___mcc_h1 = _source15.dtor_typ;
-        DAST._IOptional<DAST._IExpression> _221___mcc_h2 = _source15.dtor_maybeValue;
-        DAST._IOptional<DAST._IExpression> _source16 = _221___mcc_h2;
+        Dafny.ISequence<Dafny.Rune> _232___mcc_h0 = _source15.dtor_name;
+        DAST._IType _233___mcc_h1 = _source15.dtor_typ;
+        DAST._IOptional<DAST._IExpression> _234___mcc_h2 = _source15.dtor_maybeValue;
+        DAST._IOptional<DAST._IExpression> _source16 = _234___mcc_h2;
         if (_source16.is_Some) {
-          DAST._IExpression _222___mcc_h3 = _source16.dtor_Some_a0;
-          DAST._IExpression _223_expression = _222___mcc_h3;
-          DAST._IType _224_typ = _220___mcc_h1;
-          Dafny.ISequence<Dafny.Rune> _225_name = _219___mcc_h0;
+          DAST._IExpression _235___mcc_h3 = _source16.dtor_Some_a0;
+          DAST._IExpression _236_expression = _235___mcc_h3;
+          DAST._IType _237_typ = _233___mcc_h1;
+          Dafny.ISequence<Dafny.Rune> _238_name = _232___mcc_h0;
           {
-            Dafny.ISequence<Dafny.Rune> _226_expr;
-            bool _227___v13;
-            bool _228_recErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _229_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out67;
-            bool _out68;
-            bool _out69;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out70;
-            DCOMP.COMP.GenExpr(_223_expression, @params, true, out _out67, out _out68, out _out69, out _out70);
-            _226_expr = _out67;
-            _227___v13 = _out68;
-            _228_recErased = _out69;
-            _229_recIdents = _out70;
-            if (_228_recErased) {
-              _226_expr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _226_expr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            Dafny.ISequence<Dafny.Rune> _239_expr;
+            bool _240___v14;
+            bool _241_recErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _242_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out75;
+            bool _out76;
+            bool _out77;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out78;
+            DCOMP.COMP.GenExpr(_236_expression, @params, true, out _out75, out _out76, out _out77, out _out78);
+            _239_expr = _out75;
+            _240___v14 = _out76;
+            _241_recErased = _out77;
+            _242_recIdents = _out78;
+            if (_241_recErased) {
+              _239_expr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _239_expr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            Dafny.ISequence<Dafny.Rune> _230_typeString;
-            Dafny.ISequence<Dafny.Rune> _out71;
-            _out71 = DCOMP.COMP.GenType(_224_typ, true, false);
-            _230_typeString = _out71;
-            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let mut r#"), _225_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), _230_typeString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _226_expr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
-            readIdents = _229_recIdents;
+            Dafny.ISequence<Dafny.Rune> _243_typeString;
+            Dafny.ISequence<Dafny.Rune> _out79;
+            _out79 = DCOMP.COMP.GenType(_237_typ, true, false);
+            _243_typeString = _out79;
+            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let mut r#"), _238_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), _243_typeString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _239_expr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
+            readIdents = _242_recIdents;
           }
         } else {
-          DAST._IType _231_typ = _220___mcc_h1;
-          Dafny.ISequence<Dafny.Rune> _232_name = _219___mcc_h0;
+          DAST._IType _244_typ = _233___mcc_h1;
+          Dafny.ISequence<Dafny.Rune> _245_name = _232___mcc_h0;
           {
-            Dafny.ISequence<Dafny.Rune> _233_typeString;
-            Dafny.ISequence<Dafny.Rune> _out72;
-            _out72 = DCOMP.COMP.GenType(_231_typ, true, false);
-            _233_typeString = _out72;
-            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let mut r#"), _232_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), _233_typeString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
+            Dafny.ISequence<Dafny.Rune> _246_typeString;
+            Dafny.ISequence<Dafny.Rune> _out80;
+            _out80 = DCOMP.COMP.GenType(_244_typ, true, false);
+            _246_typeString = _out80;
+            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let mut r#"), _245_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), _246_typeString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
             readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
           }
         }
       } else if (_source15.is_Assign) {
-        DAST._IAssignLhs _234___mcc_h4 = _source15.dtor_lhs;
-        DAST._IExpression _235___mcc_h5 = _source15.dtor_value;
-        DAST._IExpression _236_expression = _235___mcc_h5;
-        DAST._IAssignLhs _237_lhs = _234___mcc_h4;
+        DAST._IAssignLhs _247___mcc_h4 = _source15.dtor_lhs;
+        DAST._IExpression _248___mcc_h5 = _source15.dtor_value;
+        DAST._IExpression _249_expression = _248___mcc_h5;
+        DAST._IAssignLhs _250_lhs = _247___mcc_h4;
         {
-          Dafny.ISequence<Dafny.Rune> _238_lhsGen;
-          bool _239_needsIIFE;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _240_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out73;
-          bool _out74;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out75;
-          DCOMP.COMP.GenAssignLhs(_237_lhs, @params, out _out73, out _out74, out _out75);
-          _238_lhsGen = _out73;
-          _239_needsIIFE = _out74;
-          _240_recIdents = _out75;
-          Dafny.ISequence<Dafny.Rune> _241_exprGen;
-          bool _242___v14;
-          bool _243_exprErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _244_exprIdents;
-          Dafny.ISequence<Dafny.Rune> _out76;
-          bool _out77;
-          bool _out78;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out79;
-          DCOMP.COMP.GenExpr(_236_expression, @params, true, out _out76, out _out77, out _out78, out _out79);
-          _241_exprGen = _out76;
-          _242___v14 = _out77;
-          _243_exprErased = _out78;
-          _244_exprIdents = _out79;
-          if (_243_exprErased) {
-            _241_exprGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _241_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          if (_239_needsIIFE) {
-            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{ let __rhs = "), _241_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("; ")), _238_lhsGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = __rhs; }"));
-          } else {
-            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_238_lhsGen, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _241_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
-          }
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_240_recIdents, _244_exprIdents);
-        }
-      } else if (_source15.is_If) {
-        DAST._IExpression _245___mcc_h6 = _source15.dtor_cond;
-        Dafny.ISequence<DAST._IStatement> _246___mcc_h7 = _source15.dtor_thn;
-        Dafny.ISequence<DAST._IStatement> _247___mcc_h8 = _source15.dtor_els;
-        Dafny.ISequence<DAST._IStatement> _248_els = _247___mcc_h8;
-        Dafny.ISequence<DAST._IStatement> _249_thn = _246___mcc_h7;
-        DAST._IExpression _250_cond = _245___mcc_h6;
-        {
-          Dafny.ISequence<Dafny.Rune> _251_condString;
-          bool _252___v15;
-          bool _253_condErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _254_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out80;
-          bool _out81;
+          Dafny.ISequence<Dafny.Rune> _251_lhsGen;
+          bool _252_needsIIFE;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _253_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out81;
           bool _out82;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out83;
-          DCOMP.COMP.GenExpr(_250_cond, @params, true, out _out80, out _out81, out _out82, out _out83);
-          _251_condString = _out80;
-          _252___v15 = _out81;
-          _253_condErased = _out82;
-          _254_recIdents = _out83;
-          if (!(_253_condErased)) {
-            _251_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _251_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          readIdents = _254_recIdents;
-          Dafny.ISequence<Dafny.Rune> _255_thnString;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _256_thnIdents;
+          DCOMP.COMP.GenAssignLhs(_250_lhs, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("__rhs"), @params, out _out81, out _out82, out _out83);
+          _251_lhsGen = _out81;
+          _252_needsIIFE = _out82;
+          _253_recIdents = _out83;
+          Dafny.ISequence<Dafny.Rune> _254_exprGen;
+          bool _255___v15;
+          bool _256_exprErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _257_exprIdents;
           Dafny.ISequence<Dafny.Rune> _out84;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out85;
-          DCOMP.COMP.GenStmts(_249_thn, @params, isLast, earlyReturn, out _out84, out _out85);
-          _255_thnString = _out84;
-          _256_thnIdents = _out85;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _256_thnIdents);
-          Dafny.ISequence<Dafny.Rune> _257_elsString;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _258_elsIdents;
-          Dafny.ISequence<Dafny.Rune> _out86;
+          bool _out85;
+          bool _out86;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out87;
-          DCOMP.COMP.GenStmts(_248_els, @params, isLast, earlyReturn, out _out86, out _out87);
-          _257_elsString = _out86;
-          _258_elsIdents = _out87;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _258_elsIdents);
-          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("if "), _251_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _255_thnString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n} else {\n")), _257_elsString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
+          DCOMP.COMP.GenExpr(_249_expression, @params, true, out _out84, out _out85, out _out86, out _out87);
+          _254_exprGen = _out84;
+          _255___v15 = _out85;
+          _256_exprErased = _out86;
+          _257_exprIdents = _out87;
+          if (_256_exprErased) {
+            _254_exprGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _254_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          if (_252_needsIIFE) {
+            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{\nlet __rhs = "), _254_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n")), _251_lhsGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
+          } else {
+            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_251_lhsGen, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _254_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
+          }
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_253_recIdents, _257_exprIdents);
         }
-      } else if (_source15.is_While) {
-        DAST._IExpression _259___mcc_h9 = _source15.dtor_cond;
-        Dafny.ISequence<DAST._IStatement> _260___mcc_h10 = _source15.dtor_body;
-        Dafny.ISequence<DAST._IStatement> _261_body = _260___mcc_h10;
-        DAST._IExpression _262_cond = _259___mcc_h9;
+      } else if (_source15.is_If) {
+        DAST._IExpression _258___mcc_h6 = _source15.dtor_cond;
+        Dafny.ISequence<DAST._IStatement> _259___mcc_h7 = _source15.dtor_thn;
+        Dafny.ISequence<DAST._IStatement> _260___mcc_h8 = _source15.dtor_els;
+        Dafny.ISequence<DAST._IStatement> _261_els = _260___mcc_h8;
+        Dafny.ISequence<DAST._IStatement> _262_thn = _259___mcc_h7;
+        DAST._IExpression _263_cond = _258___mcc_h6;
         {
-          Dafny.ISequence<Dafny.Rune> _263_condString;
-          bool _264___v16;
-          bool _265_condErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _266_recIdents;
+          Dafny.ISequence<Dafny.Rune> _264_condString;
+          bool _265___v16;
+          bool _266_condErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _267_recIdents;
           Dafny.ISequence<Dafny.Rune> _out88;
           bool _out89;
           bool _out90;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out91;
-          DCOMP.COMP.GenExpr(_262_cond, @params, true, out _out88, out _out89, out _out90, out _out91);
-          _263_condString = _out88;
-          _264___v16 = _out89;
-          _265_condErased = _out90;
-          _266_recIdents = _out91;
-          if (!(_265_condErased)) {
-            _263_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase("), _263_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          DCOMP.COMP.GenExpr(_263_cond, @params, true, out _out88, out _out89, out _out90, out _out91);
+          _264_condString = _out88;
+          _265___v16 = _out89;
+          _266_condErased = _out90;
+          _267_recIdents = _out91;
+          if (!(_266_condErased)) {
+            _264_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _264_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           }
-          readIdents = _266_recIdents;
-          Dafny.ISequence<Dafny.Rune> _267_bodyString;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _268_bodyIdents;
+          readIdents = _267_recIdents;
+          Dafny.ISequence<Dafny.Rune> _268_thnString;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _269_thnIdents;
           Dafny.ISequence<Dafny.Rune> _out92;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out93;
-          DCOMP.COMP.GenStmts(_261_body, @params, false, earlyReturn, out _out92, out _out93);
-          _267_bodyString = _out92;
-          _268_bodyIdents = _out93;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _268_bodyIdents);
-          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("while "), _263_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _267_bodyString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
+          DCOMP.COMP.GenStmts(_262_thn, @params, isLast, earlyReturn, out _out92, out _out93);
+          _268_thnString = _out92;
+          _269_thnIdents = _out93;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _269_thnIdents);
+          Dafny.ISequence<Dafny.Rune> _270_elsString;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _271_elsIdents;
+          Dafny.ISequence<Dafny.Rune> _out94;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out95;
+          DCOMP.COMP.GenStmts(_261_els, @params, isLast, earlyReturn, out _out94, out _out95);
+          _270_elsString = _out94;
+          _271_elsIdents = _out95;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _271_elsIdents);
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("if "), _264_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _268_thnString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n} else {\n")), _270_elsString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
+        }
+      } else if (_source15.is_While) {
+        DAST._IExpression _272___mcc_h9 = _source15.dtor_cond;
+        Dafny.ISequence<DAST._IStatement> _273___mcc_h10 = _source15.dtor_body;
+        Dafny.ISequence<DAST._IStatement> _274_body = _273___mcc_h10;
+        DAST._IExpression _275_cond = _272___mcc_h9;
+        {
+          Dafny.ISequence<Dafny.Rune> _276_condString;
+          bool _277___v17;
+          bool _278_condErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _279_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out96;
+          bool _out97;
+          bool _out98;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out99;
+          DCOMP.COMP.GenExpr(_275_cond, @params, true, out _out96, out _out97, out _out98, out _out99);
+          _276_condString = _out96;
+          _277___v17 = _out97;
+          _278_condErased = _out98;
+          _279_recIdents = _out99;
+          if (!(_278_condErased)) {
+            _276_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase("), _276_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          readIdents = _279_recIdents;
+          Dafny.ISequence<Dafny.Rune> _280_bodyString;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _281_bodyIdents;
+          Dafny.ISequence<Dafny.Rune> _out100;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out101;
+          DCOMP.COMP.GenStmts(_274_body, @params, false, earlyReturn, out _out100, out _out101);
+          _280_bodyString = _out100;
+          _281_bodyIdents = _out101;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _281_bodyIdents);
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("while "), _276_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _280_bodyString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
         }
       } else if (_source15.is_Call) {
-        DAST._IExpression _269___mcc_h11 = _source15.dtor_on;
-        Dafny.ISequence<Dafny.Rune> _270___mcc_h12 = _source15.dtor_name;
-        Dafny.ISequence<DAST._IType> _271___mcc_h13 = _source15.dtor_typeArgs;
-        Dafny.ISequence<DAST._IExpression> _272___mcc_h14 = _source15.dtor_args;
-        DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _273___mcc_h15 = _source15.dtor_outs;
-        DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _274_maybeOutVars = _273___mcc_h15;
-        Dafny.ISequence<DAST._IExpression> _275_args = _272___mcc_h14;
-        Dafny.ISequence<DAST._IType> _276_typeArgs = _271___mcc_h13;
-        Dafny.ISequence<Dafny.Rune> _277_name = _270___mcc_h12;
-        DAST._IExpression _278_on = _269___mcc_h11;
+        DAST._IExpression _282___mcc_h11 = _source15.dtor_on;
+        Dafny.ISequence<Dafny.Rune> _283___mcc_h12 = _source15.dtor_name;
+        Dafny.ISequence<DAST._IType> _284___mcc_h13 = _source15.dtor_typeArgs;
+        Dafny.ISequence<DAST._IExpression> _285___mcc_h14 = _source15.dtor_args;
+        DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _286___mcc_h15 = _source15.dtor_outs;
+        DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _287_maybeOutVars = _286___mcc_h15;
+        Dafny.ISequence<DAST._IExpression> _288_args = _285___mcc_h14;
+        Dafny.ISequence<DAST._IType> _289_typeArgs = _284___mcc_h13;
+        Dafny.ISequence<Dafny.Rune> _290_name = _283___mcc_h12;
+        DAST._IExpression _291_on = _282___mcc_h11;
         {
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          Dafny.ISequence<Dafny.Rune> _279_typeArgString;
-          _279_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          if ((new BigInteger((_276_typeArgs).Count)) >= (BigInteger.One)) {
-            BigInteger _280_typeI;
-            _280_typeI = BigInteger.Zero;
-            _279_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::<");
-            while ((_280_typeI) < (new BigInteger((_276_typeArgs).Count))) {
-              if ((_280_typeI).Sign == 1) {
-                _279_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_279_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _292_typeArgString;
+          _292_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          if ((new BigInteger((_289_typeArgs).Count)) >= (BigInteger.One)) {
+            BigInteger _293_typeI;
+            _293_typeI = BigInteger.Zero;
+            _292_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::<");
+            while ((_293_typeI) < (new BigInteger((_289_typeArgs).Count))) {
+              if ((_293_typeI).Sign == 1) {
+                _292_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_292_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
               }
-              Dafny.ISequence<Dafny.Rune> _281_typeString;
-              Dafny.ISequence<Dafny.Rune> _out94;
-              _out94 = DCOMP.COMP.GenType((_276_typeArgs).Select(_280_typeI), false, false);
-              _281_typeString = _out94;
-              _279_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_279_typeArgString, _281_typeString);
-              _280_typeI = (_280_typeI) + (BigInteger.One);
+              Dafny.ISequence<Dafny.Rune> _294_typeString;
+              Dafny.ISequence<Dafny.Rune> _out102;
+              _out102 = DCOMP.COMP.GenType((_289_typeArgs).Select(_293_typeI), false, false);
+              _294_typeString = _out102;
+              _292_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_292_typeArgString, _294_typeString);
+              _293_typeI = (_293_typeI) + (BigInteger.One);
             }
-            _279_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_279_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">"));
+            _292_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_292_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">"));
           }
-          Dafny.ISequence<Dafny.Rune> _282_argString;
-          _282_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          BigInteger _283_i;
-          _283_i = BigInteger.Zero;
-          while ((_283_i) < (new BigInteger((_275_args).Count))) {
-            if ((_283_i).Sign == 1) {
-              _282_argString = Dafny.Sequence<Dafny.Rune>.Concat(_282_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _295_argString;
+          _295_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          BigInteger _296_i;
+          _296_i = BigInteger.Zero;
+          while ((_296_i) < (new BigInteger((_288_args).Count))) {
+            if ((_296_i).Sign == 1) {
+              _295_argString = Dafny.Sequence<Dafny.Rune>.Concat(_295_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _284_argExpr;
-            bool _285_isOwned;
-            bool _286_argErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _287_argIdents;
-            Dafny.ISequence<Dafny.Rune> _out95;
-            bool _out96;
-            bool _out97;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out98;
-            DCOMP.COMP.GenExpr((_275_args).Select(_283_i), @params, false, out _out95, out _out96, out _out97, out _out98);
-            _284_argExpr = _out95;
-            _285_isOwned = _out96;
-            _286_argErased = _out97;
-            _287_argIdents = _out98;
-            if (_285_isOwned) {
-              _284_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _284_argExpr);
+            Dafny.ISequence<Dafny.Rune> _297_argExpr;
+            bool _298_isOwned;
+            bool _299_argErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _300_argIdents;
+            Dafny.ISequence<Dafny.Rune> _out103;
+            bool _out104;
+            bool _out105;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out106;
+            DCOMP.COMP.GenExpr((_288_args).Select(_296_i), @params, false, out _out103, out _out104, out _out105, out _out106);
+            _297_argExpr = _out103;
+            _298_isOwned = _out104;
+            _299_argErased = _out105;
+            _300_argIdents = _out106;
+            if (_298_isOwned) {
+              _297_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _297_argExpr);
             }
-            _282_argString = Dafny.Sequence<Dafny.Rune>.Concat(_282_argString, _284_argExpr);
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _287_argIdents);
-            _283_i = (_283_i) + (BigInteger.One);
+            _295_argString = Dafny.Sequence<Dafny.Rune>.Concat(_295_argString, _297_argExpr);
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _300_argIdents);
+            _296_i = (_296_i) + (BigInteger.One);
           }
-          Dafny.ISequence<Dafny.Rune> _288_enclosingString;
-          bool _289___v17;
-          bool _290___v18;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _291_enclosingIdents;
-          Dafny.ISequence<Dafny.Rune> _out99;
-          bool _out100;
-          bool _out101;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out102;
-          DCOMP.COMP.GenExpr(_278_on, @params, false, out _out99, out _out100, out _out101, out _out102);
-          _288_enclosingString = _out99;
-          _289___v17 = _out100;
-          _290___v18 = _out101;
-          _291_enclosingIdents = _out102;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _291_enclosingIdents);
-          DAST._IExpression _source17 = _278_on;
+          Dafny.ISequence<Dafny.Rune> _301_enclosingString;
+          bool _302___v18;
+          bool _303___v19;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _304_enclosingIdents;
+          Dafny.ISequence<Dafny.Rune> _out107;
+          bool _out108;
+          bool _out109;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out110;
+          DCOMP.COMP.GenExpr(_291_on, @params, false, out _out107, out _out108, out _out109, out _out110);
+          _301_enclosingString = _out107;
+          _302___v18 = _out108;
+          _303___v19 = _out109;
+          _304_enclosingIdents = _out110;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _304_enclosingIdents);
+          DAST._IExpression _source17 = _291_on;
           if (_source17.is_Literal) {
-            DAST._ILiteral _292___mcc_h18 = _source17.dtor_Literal_a0;
+            DAST._ILiteral _305___mcc_h18 = _source17.dtor_Literal_a0;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Ident) {
-            Dafny.ISequence<Dafny.Rune> _293___mcc_h20 = _source17.dtor_Ident_a0;
+            Dafny.ISequence<Dafny.Rune> _306___mcc_h20 = _source17.dtor_Ident_a0;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Companion) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _294___mcc_h22 = _source17.dtor_Companion_a0;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _307___mcc_h22 = _source17.dtor_Companion_a0;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(_288_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::"));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(_301_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::"));
             }
           } else if (_source17.is_Tuple) {
-            Dafny.ISequence<DAST._IExpression> _295___mcc_h24 = _source17.dtor_Tuple_a0;
+            Dafny.ISequence<DAST._IExpression> _308___mcc_h24 = _source17.dtor_Tuple_a0;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_New) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _296___mcc_h26 = _source17.dtor_path;
-            Dafny.ISequence<DAST._IExpression> _297___mcc_h27 = _source17.dtor_args;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _309___mcc_h26 = _source17.dtor_path;
+            Dafny.ISequence<DAST._IExpression> _310___mcc_h27 = _source17.dtor_args;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_NewArray) {
-            Dafny.ISequence<DAST._IExpression> _298___mcc_h30 = _source17.dtor_dims;
+            Dafny.ISequence<DAST._IExpression> _311___mcc_h30 = _source17.dtor_dims;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_DatatypeValue) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _299___mcc_h32 = _source17.dtor_path;
-            Dafny.ISequence<Dafny.Rune> _300___mcc_h33 = _source17.dtor_variant;
-            bool _301___mcc_h34 = _source17.dtor_isCo;
-            Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _302___mcc_h35 = _source17.dtor_contents;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _312___mcc_h32 = _source17.dtor_path;
+            Dafny.ISequence<Dafny.Rune> _313___mcc_h33 = _source17.dtor_variant;
+            bool _314___mcc_h34 = _source17.dtor_isCo;
+            Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _315___mcc_h35 = _source17.dtor_contents;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Convert) {
-            DAST._IExpression _303___mcc_h40 = _source17.dtor_value;
-            DAST._IType _304___mcc_h41 = _source17.dtor_from;
-            DAST._IType _305___mcc_h42 = _source17.dtor_typ;
+            DAST._IExpression _316___mcc_h40 = _source17.dtor_value;
+            DAST._IType _317___mcc_h41 = _source17.dtor_from;
+            DAST._IType _318___mcc_h42 = _source17.dtor_typ;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_SeqValue) {
-            Dafny.ISequence<DAST._IExpression> _306___mcc_h46 = _source17.dtor_elements;
+            Dafny.ISequence<DAST._IExpression> _319___mcc_h46 = _source17.dtor_elements;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_SetValue) {
-            Dafny.ISequence<DAST._IExpression> _307___mcc_h48 = _source17.dtor_elements;
+            Dafny.ISequence<DAST._IExpression> _320___mcc_h48 = _source17.dtor_elements;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_This) {
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Ite) {
-            DAST._IExpression _308___mcc_h50 = _source17.dtor_cond;
-            DAST._IExpression _309___mcc_h51 = _source17.dtor_thn;
-            DAST._IExpression _310___mcc_h52 = _source17.dtor_els;
+            DAST._IExpression _321___mcc_h50 = _source17.dtor_cond;
+            DAST._IExpression _322___mcc_h51 = _source17.dtor_thn;
+            DAST._IExpression _323___mcc_h52 = _source17.dtor_els;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_UnOp) {
-            DAST._IUnaryOp _311___mcc_h56 = _source17.dtor_unOp;
-            DAST._IExpression _312___mcc_h57 = _source17.dtor_expr;
+            DAST._IUnaryOp _324___mcc_h56 = _source17.dtor_unOp;
+            DAST._IExpression _325___mcc_h57 = _source17.dtor_expr;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_BinOp) {
-            Dafny.ISequence<Dafny.Rune> _313___mcc_h60 = _source17.dtor_op;
-            DAST._IExpression _314___mcc_h61 = _source17.dtor_left;
-            DAST._IExpression _315___mcc_h62 = _source17.dtor_right;
+            Dafny.ISequence<Dafny.Rune> _326___mcc_h60 = _source17.dtor_op;
+            DAST._IExpression _327___mcc_h61 = _source17.dtor_left;
+            DAST._IExpression _328___mcc_h62 = _source17.dtor_right;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Select) {
-            DAST._IExpression _316___mcc_h66 = _source17.dtor_expr;
-            Dafny.ISequence<Dafny.Rune> _317___mcc_h67 = _source17.dtor_field;
-            bool _318___mcc_h68 = _source17.dtor_isConstant;
-            bool _319___mcc_h69 = _source17.dtor_onDatatype;
+            DAST._IExpression _329___mcc_h66 = _source17.dtor_expr;
+            Dafny.ISequence<Dafny.Rune> _330___mcc_h67 = _source17.dtor_field;
+            bool _331___mcc_h68 = _source17.dtor_isConstant;
+            bool _332___mcc_h69 = _source17.dtor_onDatatype;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_SelectFn) {
-            DAST._IExpression _320___mcc_h74 = _source17.dtor_expr;
-            Dafny.ISequence<Dafny.Rune> _321___mcc_h75 = _source17.dtor_field;
-            bool _322___mcc_h76 = _source17.dtor_onDatatype;
-            bool _323___mcc_h77 = _source17.dtor_isStatic;
-            BigInteger _324___mcc_h78 = _source17.dtor_arity;
+            DAST._IExpression _333___mcc_h74 = _source17.dtor_expr;
+            Dafny.ISequence<Dafny.Rune> _334___mcc_h75 = _source17.dtor_field;
+            bool _335___mcc_h76 = _source17.dtor_onDatatype;
+            bool _336___mcc_h77 = _source17.dtor_isStatic;
+            BigInteger _337___mcc_h78 = _source17.dtor_arity;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+            }
+          } else if (_source17.is_Index) {
+            DAST._IExpression _338___mcc_h84 = _source17.dtor_expr;
+            DAST._IExpression _339___mcc_h85 = _source17.dtor_idx;
+            {
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_TupleSelect) {
-            DAST._IExpression _325___mcc_h84 = _source17.dtor_expr;
-            BigInteger _326___mcc_h85 = _source17.dtor_index;
+            DAST._IExpression _340___mcc_h88 = _source17.dtor_expr;
+            BigInteger _341___mcc_h89 = _source17.dtor_index;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Call) {
-            DAST._IExpression _327___mcc_h88 = _source17.dtor_on;
-            Dafny.ISequence<Dafny.Rune> _328___mcc_h89 = _source17.dtor_name;
-            Dafny.ISequence<DAST._IType> _329___mcc_h90 = _source17.dtor_typeArgs;
-            Dafny.ISequence<DAST._IExpression> _330___mcc_h91 = _source17.dtor_args;
+            DAST._IExpression _342___mcc_h92 = _source17.dtor_on;
+            Dafny.ISequence<Dafny.Rune> _343___mcc_h93 = _source17.dtor_name;
+            Dafny.ISequence<DAST._IType> _344___mcc_h94 = _source17.dtor_typeArgs;
+            Dafny.ISequence<DAST._IExpression> _345___mcc_h95 = _source17.dtor_args;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Lambda) {
-            Dafny.ISequence<DAST._IFormal> _331___mcc_h96 = _source17.dtor_params;
-            DAST._IType _332___mcc_h97 = _source17.dtor_retType;
-            Dafny.ISequence<DAST._IStatement> _333___mcc_h98 = _source17.dtor_body;
+            Dafny.ISequence<DAST._IFormal> _346___mcc_h100 = _source17.dtor_params;
+            DAST._IType _347___mcc_h101 = _source17.dtor_retType;
+            Dafny.ISequence<DAST._IStatement> _348___mcc_h102 = _source17.dtor_body;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_IIFE) {
-            Dafny.ISequence<Dafny.Rune> _334___mcc_h102 = _source17.dtor_name;
-            DAST._IType _335___mcc_h103 = _source17.dtor_typ;
-            DAST._IExpression _336___mcc_h104 = _source17.dtor_value;
-            DAST._IExpression _337___mcc_h105 = _source17.dtor_iifeBody;
+            Dafny.ISequence<Dafny.Rune> _349___mcc_h106 = _source17.dtor_name;
+            DAST._IType _350___mcc_h107 = _source17.dtor_typ;
+            DAST._IExpression _351___mcc_h108 = _source17.dtor_value;
+            DAST._IExpression _352___mcc_h109 = _source17.dtor_iifeBody;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_Apply) {
-            DAST._IExpression _338___mcc_h110 = _source17.dtor_expr;
-            Dafny.ISequence<DAST._IExpression> _339___mcc_h111 = _source17.dtor_args;
+            DAST._IExpression _353___mcc_h114 = _source17.dtor_expr;
+            Dafny.ISequence<DAST._IExpression> _354___mcc_h115 = _source17.dtor_args;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source17.is_TypeTest) {
-            DAST._IExpression _340___mcc_h114 = _source17.dtor_on;
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _341___mcc_h115 = _source17.dtor_dType;
-            Dafny.ISequence<Dafny.Rune> _342___mcc_h116 = _source17.dtor_variant;
+            DAST._IExpression _355___mcc_h118 = _source17.dtor_on;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _356___mcc_h119 = _source17.dtor_dType;
+            Dafny.ISequence<Dafny.Rune> _357___mcc_h120 = _source17.dtor_variant;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else {
-            DAST._IType _343___mcc_h120 = _source17.dtor_typ;
+            DAST._IType _358___mcc_h124 = _source17.dtor_typ;
             {
-              _288_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _301_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           }
-          Dafny.ISequence<Dafny.Rune> _344_receiver;
-          _344_receiver = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _source18 = _274_maybeOutVars;
+          Dafny.ISequence<Dafny.Rune> _359_receiver;
+          _359_receiver = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          DAST._IOptional<Dafny.ISequence<Dafny.ISequence<Dafny.Rune>>> _source18 = _287_maybeOutVars;
           if (_source18.is_Some) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _345___mcc_h122 = _source18.dtor_Some_a0;
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _346_outVars = _345___mcc_h122;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _360___mcc_h126 = _source18.dtor_Some_a0;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _361_outVars = _360___mcc_h126;
             {
-              if ((new BigInteger((_346_outVars).Count)) > (BigInteger.One)) {
-                _344_receiver = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(");
+              if ((new BigInteger((_361_outVars).Count)) > (BigInteger.One)) {
+                _359_receiver = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(");
               }
-              BigInteger _347_outI;
-              _347_outI = BigInteger.Zero;
-              while ((_347_outI) < (new BigInteger((_346_outVars).Count))) {
-                if ((_347_outI).Sign == 1) {
-                  _344_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_344_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+              BigInteger _362_outI;
+              _362_outI = BigInteger.Zero;
+              while ((_362_outI) < (new BigInteger((_361_outVars).Count))) {
+                if ((_362_outI).Sign == 1) {
+                  _359_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_359_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
                 }
-                Dafny.ISequence<Dafny.Rune> _348_outVar;
-                _348_outVar = (_346_outVars).Select(_347_outI);
-                _344_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_344_receiver, (_348_outVar));
-                _347_outI = (_347_outI) + (BigInteger.One);
+                Dafny.ISequence<Dafny.Rune> _363_outVar;
+                _363_outVar = (_361_outVars).Select(_362_outI);
+                _359_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_359_receiver, (_363_outVar));
+                _362_outI = (_362_outI) + (BigInteger.One);
               }
-              if ((new BigInteger((_346_outVars).Count)) > (BigInteger.One)) {
-                _344_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_344_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+              if ((new BigInteger((_361_outVars).Count)) > (BigInteger.One)) {
+                _359_receiver = Dafny.Sequence<Dafny.Rune>.Concat(_359_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
               }
             }
           } else {
           }
-          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(((!(_344_receiver).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""))) ? (Dafny.Sequence<Dafny.Rune>.Concat(_344_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = "))) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""))), _288_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _277_name), _279_typeArgString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _282_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(");"));
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(((!(_359_receiver).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""))) ? (Dafny.Sequence<Dafny.Rune>.Concat(_359_receiver, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = "))) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""))), _301_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _290_name), _292_typeArgString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _295_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(");"));
         }
       } else if (_source15.is_Return) {
-        DAST._IExpression _349___mcc_h16 = _source15.dtor_expr;
-        DAST._IExpression _350_expr = _349___mcc_h16;
+        DAST._IExpression _364___mcc_h16 = _source15.dtor_expr;
+        DAST._IExpression _365_expr = _364___mcc_h16;
         {
-          Dafny.ISequence<Dafny.Rune> _351_exprString;
-          bool _352___v21;
-          bool _353_recErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _354_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out103;
-          bool _out104;
-          bool _out105;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out106;
-          DCOMP.COMP.GenExpr(_350_expr, @params, true, out _out103, out _out104, out _out105, out _out106);
-          _351_exprString = _out103;
-          _352___v21 = _out104;
-          _353_recErased = _out105;
-          _354_recIdents = _out106;
-          _351_exprString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _351_exprString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          readIdents = _354_recIdents;
+          Dafny.ISequence<Dafny.Rune> _366_exprString;
+          bool _367___v22;
+          bool _368_recErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _369_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out111;
+          bool _out112;
+          bool _out113;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out114;
+          DCOMP.COMP.GenExpr(_365_expr, @params, true, out _out111, out _out112, out _out113, out _out114);
+          _366_exprString = _out111;
+          _367___v22 = _out112;
+          _368_recErased = _out113;
+          _369_recIdents = _out114;
+          _366_exprString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _366_exprString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          readIdents = _369_recIdents;
           if (isLast) {
-            generated = _351_exprString;
+            generated = _366_exprString;
           } else {
-            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("return "), _351_exprString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
+            generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("return "), _366_exprString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";"));
           }
         }
       } else if (_source15.is_EarlyReturn) {
@@ -5584,24 +5739,24 @@ namespace DCOMP {
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
         }
       } else {
-        DAST._IExpression _355___mcc_h17 = _source15.dtor_Print_a0;
-        DAST._IExpression _356_e = _355___mcc_h17;
+        DAST._IExpression _370___mcc_h17 = _source15.dtor_Print_a0;
+        DAST._IExpression _371_e = _370___mcc_h17;
         {
-          Dafny.ISequence<Dafny.Rune> _357_printedExpr;
-          bool _358_isOwned;
-          bool _359___v22;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _360_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out107;
-          bool _out108;
-          bool _out109;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out110;
-          DCOMP.COMP.GenExpr(_356_e, @params, false, out _out107, out _out108, out _out109, out _out110);
-          _357_printedExpr = _out107;
-          _358_isOwned = _out108;
-          _359___v22 = _out109;
-          _360_recIdents = _out110;
-          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("print!(\"{}\", ::dafny_runtime::DafnyPrintWrapper("), ((_358_isOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")))), _357_printedExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("));"));
-          readIdents = _360_recIdents;
+          Dafny.ISequence<Dafny.Rune> _372_printedExpr;
+          bool _373_isOwned;
+          bool _374___v23;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _375_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out115;
+          bool _out116;
+          bool _out117;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out118;
+          DCOMP.COMP.GenExpr(_371_e, @params, false, out _out115, out _out116, out _out117, out _out118);
+          _372_printedExpr = _out115;
+          _373_isOwned = _out116;
+          _374___v23 = _out117;
+          _375_recIdents = _out118;
+          generated = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("print!(\"{}\", ::dafny_runtime::DafnyPrintWrapper("), ((_373_isOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")))), _372_printedExpr), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("));"));
+          readIdents = _375_recIdents;
         }
       }
     }
@@ -5612,11 +5767,11 @@ namespace DCOMP {
       readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Empty;
       DAST._IExpression _source19 = e;
       if (_source19.is_Literal) {
-        DAST._ILiteral _361___mcc_h0 = _source19.dtor_Literal_a0;
-        DAST._ILiteral _source20 = _361___mcc_h0;
+        DAST._ILiteral _376___mcc_h0 = _source19.dtor_Literal_a0;
+        DAST._ILiteral _source20 = _376___mcc_h0;
         if (_source20.is_BoolLiteral) {
-          bool _362___mcc_h1 = _source20.dtor_BoolLiteral_a0;
-          if ((_362___mcc_h1) == (false)) {
+          bool _377___mcc_h1 = _source20.dtor_BoolLiteral_a0;
+          if ((_377___mcc_h1) == (false)) {
             {
               s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("false");
               isOwned = true;
@@ -5632,89 +5787,89 @@ namespace DCOMP {
             }
           }
         } else if (_source20.is_IntLiteral) {
-          Dafny.ISequence<Dafny.Rune> _363___mcc_h2 = _source20.dtor_IntLiteral_a0;
-          DAST._IType _364___mcc_h3 = _source20.dtor_IntLiteral_a1;
-          DAST._IType _365_t = _364___mcc_h3;
-          Dafny.ISequence<Dafny.Rune> _366_i = _363___mcc_h2;
+          Dafny.ISequence<Dafny.Rune> _378___mcc_h2 = _source20.dtor_IntLiteral_a0;
+          DAST._IType _379___mcc_h3 = _source20.dtor_IntLiteral_a1;
+          DAST._IType _380_t = _379___mcc_h3;
+          Dafny.ISequence<Dafny.Rune> _381_i = _378___mcc_h2;
           {
-            DAST._IType _source21 = _365_t;
+            DAST._IType _source21 = _380_t;
             if (_source21.is_Path) {
-              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _367___mcc_h60 = _source21.dtor_Path_a0;
-              Dafny.ISequence<DAST._IType> _368___mcc_h61 = _source21.dtor_typeArgs;
-              DAST._IResolvedType _369___mcc_h62 = _source21.dtor_resolved;
+              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _382___mcc_h62 = _source21.dtor_Path_a0;
+              Dafny.ISequence<DAST._IType> _383___mcc_h63 = _source21.dtor_typeArgs;
+              DAST._IResolvedType _384___mcc_h64 = _source21.dtor_resolved;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Tuple) {
-              Dafny.ISequence<DAST._IType> _370___mcc_h66 = _source21.dtor_Tuple_a0;
+              Dafny.ISequence<DAST._IType> _385___mcc_h68 = _source21.dtor_Tuple_a0;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Array) {
-              DAST._IType _371___mcc_h68 = _source21.dtor_element;
+              DAST._IType _386___mcc_h70 = _source21.dtor_element;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Seq) {
-              DAST._IType _372___mcc_h70 = _source21.dtor_element;
+              DAST._IType _387___mcc_h72 = _source21.dtor_element;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Set) {
-              DAST._IType _373___mcc_h72 = _source21.dtor_element;
+              DAST._IType _388___mcc_h74 = _source21.dtor_element;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Multiset) {
-              DAST._IType _374___mcc_h74 = _source21.dtor_element;
+              DAST._IType _389___mcc_h76 = _source21.dtor_element;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Map) {
-              DAST._IType _375___mcc_h76 = _source21.dtor_key;
-              DAST._IType _376___mcc_h77 = _source21.dtor_value;
+              DAST._IType _390___mcc_h78 = _source21.dtor_key;
+              DAST._IType _391___mcc_h79 = _source21.dtor_value;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Arrow) {
-              Dafny.ISequence<DAST._IType> _377___mcc_h80 = _source21.dtor_args;
-              DAST._IType _378___mcc_h81 = _source21.dtor_result;
+              Dafny.ISequence<DAST._IType> _392___mcc_h82 = _source21.dtor_args;
+              DAST._IType _393___mcc_h83 = _source21.dtor_result;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else if (_source21.is_Primitive) {
-              DAST._IPrimitive _379___mcc_h84 = _source21.dtor_Primitive_a0;
-              DAST._IPrimitive _source22 = _379___mcc_h84;
+              DAST._IPrimitive _394___mcc_h86 = _source21.dtor_Primitive_a0;
+              DAST._IPrimitive _source22 = _394___mcc_h86;
               if (_source22.is_Int) {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::parse_bytes(b\""), _366_i), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap()"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::parse_bytes(b\""), _381_i), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap()"));
                 }
               } else if (_source22.is_Real) {
                 {
-                  s = _366_i;
+                  s = _381_i;
                 }
               } else if (_source22.is_String) {
                 {
-                  s = _366_i;
+                  s = _381_i;
                 }
               } else if (_source22.is_Bool) {
                 {
-                  s = _366_i;
+                  s = _381_i;
                 }
               } else {
                 {
-                  s = _366_i;
+                  s = _381_i;
                 }
               }
             } else if (_source21.is_Passthrough) {
-              Dafny.ISequence<Dafny.Rune> _380___mcc_h86 = _source21.dtor_Passthrough_a0;
+              Dafny.ISequence<Dafny.Rune> _395___mcc_h88 = _source21.dtor_Passthrough_a0;
               {
-                s = _366_i;
+                s = _381_i;
               }
             } else {
-              Dafny.ISequence<Dafny.Rune> _381___mcc_h88 = _source21.dtor_TypeArg_a0;
+              Dafny.ISequence<Dafny.Rune> _396___mcc_h90 = _source21.dtor_TypeArg_a0;
               {
-                s = _366_i;
+                s = _381_i;
               }
             }
             isOwned = true;
@@ -5722,91 +5877,91 @@ namespace DCOMP {
             readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
           }
         } else if (_source20.is_DecLiteral) {
-          Dafny.ISequence<Dafny.Rune> _382___mcc_h4 = _source20.dtor_DecLiteral_a0;
-          Dafny.ISequence<Dafny.Rune> _383___mcc_h5 = _source20.dtor_DecLiteral_a1;
-          DAST._IType _384___mcc_h6 = _source20.dtor_DecLiteral_a2;
-          DAST._IType _385_t = _384___mcc_h6;
-          Dafny.ISequence<Dafny.Rune> _386_d = _383___mcc_h5;
-          Dafny.ISequence<Dafny.Rune> _387_n = _382___mcc_h4;
+          Dafny.ISequence<Dafny.Rune> _397___mcc_h4 = _source20.dtor_DecLiteral_a0;
+          Dafny.ISequence<Dafny.Rune> _398___mcc_h5 = _source20.dtor_DecLiteral_a1;
+          DAST._IType _399___mcc_h6 = _source20.dtor_DecLiteral_a2;
+          DAST._IType _400_t = _399___mcc_h6;
+          Dafny.ISequence<Dafny.Rune> _401_d = _398___mcc_h5;
+          Dafny.ISequence<Dafny.Rune> _402_n = _397___mcc_h4;
           {
-            DAST._IType _source23 = _385_t;
+            DAST._IType _source23 = _400_t;
             if (_source23.is_Path) {
-              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _388___mcc_h90 = _source23.dtor_Path_a0;
-              Dafny.ISequence<DAST._IType> _389___mcc_h91 = _source23.dtor_typeArgs;
-              DAST._IResolvedType _390___mcc_h92 = _source23.dtor_resolved;
+              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _403___mcc_h92 = _source23.dtor_Path_a0;
+              Dafny.ISequence<DAST._IType> _404___mcc_h93 = _source23.dtor_typeArgs;
+              DAST._IResolvedType _405___mcc_h94 = _source23.dtor_resolved;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Tuple) {
-              Dafny.ISequence<DAST._IType> _391___mcc_h96 = _source23.dtor_Tuple_a0;
+              Dafny.ISequence<DAST._IType> _406___mcc_h98 = _source23.dtor_Tuple_a0;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Array) {
-              DAST._IType _392___mcc_h98 = _source23.dtor_element;
+              DAST._IType _407___mcc_h100 = _source23.dtor_element;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Seq) {
-              DAST._IType _393___mcc_h100 = _source23.dtor_element;
+              DAST._IType _408___mcc_h102 = _source23.dtor_element;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Set) {
-              DAST._IType _394___mcc_h102 = _source23.dtor_element;
+              DAST._IType _409___mcc_h104 = _source23.dtor_element;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Multiset) {
-              DAST._IType _395___mcc_h104 = _source23.dtor_element;
+              DAST._IType _410___mcc_h106 = _source23.dtor_element;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Map) {
-              DAST._IType _396___mcc_h106 = _source23.dtor_key;
-              DAST._IType _397___mcc_h107 = _source23.dtor_value;
+              DAST._IType _411___mcc_h108 = _source23.dtor_key;
+              DAST._IType _412___mcc_h109 = _source23.dtor_value;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Arrow) {
-              Dafny.ISequence<DAST._IType> _398___mcc_h110 = _source23.dtor_args;
-              DAST._IType _399___mcc_h111 = _source23.dtor_result;
+              Dafny.ISequence<DAST._IType> _413___mcc_h112 = _source23.dtor_args;
+              DAST._IType _414___mcc_h113 = _source23.dtor_result;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else if (_source23.is_Primitive) {
-              DAST._IPrimitive _400___mcc_h114 = _source23.dtor_Primitive_a0;
-              DAST._IPrimitive _source24 = _400___mcc_h114;
+              DAST._IPrimitive _415___mcc_h116 = _source23.dtor_Primitive_a0;
+              DAST._IPrimitive _source24 = _415___mcc_h116;
               if (_source24.is_Int) {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
                 }
               } else if (_source24.is_Real) {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigRational::new(::dafny_runtime::BigInt::parse_bytes(b\""), _387_n), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap(), ::dafny_runtime::BigInt::parse_bytes(b\"")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap())"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigRational::new(::dafny_runtime::BigInt::parse_bytes(b\""), _402_n), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap(), ::dafny_runtime::BigInt::parse_bytes(b\"")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\", 10).unwrap())"));
                 }
               } else if (_source24.is_String) {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
                 }
               } else if (_source24.is_Bool) {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
                 }
               } else {
                 {
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
                 }
               }
             } else if (_source23.is_Passthrough) {
-              Dafny.ISequence<Dafny.Rune> _401___mcc_h116 = _source23.dtor_Passthrough_a0;
+              Dafny.ISequence<Dafny.Rune> _416___mcc_h118 = _source23.dtor_Passthrough_a0;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             } else {
-              Dafny.ISequence<Dafny.Rune> _402___mcc_h118 = _source23.dtor_TypeArg_a0;
+              Dafny.ISequence<Dafny.Rune> _417___mcc_h120 = _source23.dtor_TypeArg_a0;
               {
-                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_387_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _386_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
+                s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_402_n, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0 / ")), _401_d), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".0"));
               }
             }
             isOwned = true;
@@ -5814,19 +5969,19 @@ namespace DCOMP {
             readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
           }
         } else if (_source20.is_StringLiteral) {
-          Dafny.ISequence<Dafny.Rune> _403___mcc_h7 = _source20.dtor_StringLiteral_a0;
-          Dafny.ISequence<Dafny.Rune> _404_l = _403___mcc_h7;
+          Dafny.ISequence<Dafny.Rune> _418___mcc_h7 = _source20.dtor_StringLiteral_a0;
+          Dafny.ISequence<Dafny.Rune> _419_l = _418___mcc_h7;
           {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\""), _404_l), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\".chars().collect::<Vec<char>>()"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\""), _419_l), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\".chars().collect::<Vec<char>>()"));
             isOwned = true;
             isErased = true;
             readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
           }
         } else if (_source20.is_CharLiteral) {
-          Dafny.Rune _405___mcc_h8 = _source20.dtor_CharLiteral_a0;
-          Dafny.Rune _406_c = _405___mcc_h8;
+          Dafny.Rune _420___mcc_h8 = _source20.dtor_CharLiteral_a0;
+          Dafny.Rune _421_c = _420___mcc_h8;
           {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::primitive::char::from_u32("), DCOMP.__default.natToString(new BigInteger((_406_c).Value))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::primitive::char::from_u32("), DCOMP.__default.natToString(new BigInteger((_421_c).Value))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()"));
             isOwned = true;
             isErased = true;
             readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
@@ -5840,11 +5995,11 @@ namespace DCOMP {
           }
         }
       } else if (_source19.is_Ident) {
-        Dafny.ISequence<Dafny.Rune> _407___mcc_h9 = _source19.dtor_Ident_a0;
-        Dafny.ISequence<Dafny.Rune> _408_name = _407___mcc_h9;
+        Dafny.ISequence<Dafny.Rune> _422___mcc_h9 = _source19.dtor_Ident_a0;
+        Dafny.ISequence<Dafny.Rune> _423_name = _422___mcc_h9;
         {
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#"), _408_name);
-          if (!((@params).Contains(_408_name))) {
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#"), _423_name);
+          if (!((@params).Contains(_423_name))) {
             s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(&"), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           }
           if (mustOwn) {
@@ -5854,1201 +6009,1128 @@ namespace DCOMP {
             isOwned = false;
           }
           isErased = false;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_408_name);
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_423_name);
         }
       } else if (_source19.is_Companion) {
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _409___mcc_h10 = _source19.dtor_Companion_a0;
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _410_path = _409___mcc_h10;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _424___mcc_h10 = _source19.dtor_Companion_a0;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _425_path = _424___mcc_h10;
         {
-          Dafny.ISequence<Dafny.Rune> _out111;
-          _out111 = DCOMP.COMP.GenPath(_410_path);
-          s = _out111;
+          Dafny.ISequence<Dafny.Rune> _out119;
+          _out119 = DCOMP.COMP.GenPath(_425_path);
+          s = _out119;
           isOwned = true;
           isErased = true;
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
         }
       } else if (_source19.is_Tuple) {
-        Dafny.ISequence<DAST._IExpression> _411___mcc_h11 = _source19.dtor_Tuple_a0;
-        Dafny.ISequence<DAST._IExpression> _412_values = _411___mcc_h11;
+        Dafny.ISequence<DAST._IExpression> _426___mcc_h11 = _source19.dtor_Tuple_a0;
+        Dafny.ISequence<DAST._IExpression> _427_values = _426___mcc_h11;
         {
           s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(");
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _413_i;
-          _413_i = BigInteger.Zero;
-          bool _414_allErased;
-          _414_allErased = true;
-          while ((_413_i) < (new BigInteger((_412_values).Count))) {
-            Dafny.ISequence<Dafny.Rune> _415___v25;
-            bool _416___v26;
-            bool _417_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _418___v27;
-            Dafny.ISequence<Dafny.Rune> _out112;
-            bool _out113;
-            bool _out114;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out115;
-            DCOMP.COMP.GenExpr((_412_values).Select(_413_i), @params, true, out _out112, out _out113, out _out114, out _out115);
-            _415___v25 = _out112;
-            _416___v26 = _out113;
-            _417_isErased = _out114;
-            _418___v27 = _out115;
-            _414_allErased = (_414_allErased) && (_417_isErased);
-            _413_i = (_413_i) + (BigInteger.One);
+          BigInteger _428_i;
+          _428_i = BigInteger.Zero;
+          bool _429_allErased;
+          _429_allErased = true;
+          while ((_428_i) < (new BigInteger((_427_values).Count))) {
+            Dafny.ISequence<Dafny.Rune> _430___v26;
+            bool _431___v27;
+            bool _432_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _433___v28;
+            Dafny.ISequence<Dafny.Rune> _out120;
+            bool _out121;
+            bool _out122;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out123;
+            DCOMP.COMP.GenExpr((_427_values).Select(_428_i), @params, true, out _out120, out _out121, out _out122, out _out123);
+            _430___v26 = _out120;
+            _431___v27 = _out121;
+            _432_isErased = _out122;
+            _433___v28 = _out123;
+            _429_allErased = (_429_allErased) && (_432_isErased);
+            _428_i = (_428_i) + (BigInteger.One);
           }
-          _413_i = BigInteger.Zero;
-          while ((_413_i) < (new BigInteger((_412_values).Count))) {
-            if ((_413_i).Sign == 1) {
+          _428_i = BigInteger.Zero;
+          while ((_428_i) < (new BigInteger((_427_values).Count))) {
+            if ((_428_i).Sign == 1) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" "));
             }
-            Dafny.ISequence<Dafny.Rune> _419_recursiveGen;
-            bool _420___v28;
-            bool _421_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _422_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out116;
-            bool _out117;
-            bool _out118;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out119;
-            DCOMP.COMP.GenExpr((_412_values).Select(_413_i), @params, true, out _out116, out _out117, out _out118, out _out119);
-            _419_recursiveGen = _out116;
-            _420___v28 = _out117;
-            _421_isErased = _out118;
-            _422_recIdents = _out119;
-            if ((_421_isErased) && (!(_414_allErased))) {
-              _419_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _419_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            Dafny.ISequence<Dafny.Rune> _434_recursiveGen;
+            bool _435___v29;
+            bool _436_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _437_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out124;
+            bool _out125;
+            bool _out126;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out127;
+            DCOMP.COMP.GenExpr((_427_values).Select(_428_i), @params, true, out _out124, out _out125, out _out126, out _out127);
+            _434_recursiveGen = _out124;
+            _435___v29 = _out125;
+            _436_isErased = _out126;
+            _437_recIdents = _out127;
+            if ((_436_isErased) && (!(_429_allErased))) {
+              _434_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _434_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, _419_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(","));
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _422_recIdents);
-            _413_i = (_413_i) + (BigInteger.One);
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, _434_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(","));
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _437_recIdents);
+            _428_i = (_428_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           isOwned = true;
-          isErased = _414_allErased;
+          isErased = _429_allErased;
         }
       } else if (_source19.is_New) {
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _423___mcc_h12 = _source19.dtor_path;
-        Dafny.ISequence<DAST._IExpression> _424___mcc_h13 = _source19.dtor_args;
-        Dafny.ISequence<DAST._IExpression> _425_args = _424___mcc_h13;
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _426_path = _423___mcc_h12;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _438___mcc_h12 = _source19.dtor_path;
+        Dafny.ISequence<DAST._IExpression> _439___mcc_h13 = _source19.dtor_args;
+        Dafny.ISequence<DAST._IExpression> _440_args = _439___mcc_h13;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _441_path = _438___mcc_h12;
         {
-          Dafny.ISequence<Dafny.Rune> _427_path;
-          Dafny.ISequence<Dafny.Rune> _out120;
-          _out120 = DCOMP.COMP.GenPath(_426_path);
-          _427_path = _out120;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc::new("), _427_path), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::new("));
+          Dafny.ISequence<Dafny.Rune> _442_path;
+          Dafny.ISequence<Dafny.Rune> _out128;
+          _out128 = DCOMP.COMP.GenPath(_441_path);
+          _442_path = _out128;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc::new("), _442_path), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::new("));
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _428_i;
-          _428_i = BigInteger.Zero;
-          while ((_428_i) < (new BigInteger((_425_args).Count))) {
-            if ((_428_i).Sign == 1) {
+          BigInteger _443_i;
+          _443_i = BigInteger.Zero;
+          while ((_443_i) < (new BigInteger((_440_args).Count))) {
+            if ((_443_i).Sign == 1) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _429_recursiveGen;
-            bool _430___v29;
-            bool _431_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _432_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out121;
-            bool _out122;
-            bool _out123;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out124;
-            DCOMP.COMP.GenExpr((_425_args).Select(_428_i), @params, true, out _out121, out _out122, out _out123, out _out124);
-            _429_recursiveGen = _out121;
-            _430___v29 = _out122;
-            _431_isErased = _out123;
-            _432_recIdents = _out124;
-            if (_431_isErased) {
-              _429_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _429_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            Dafny.ISequence<Dafny.Rune> _444_recursiveGen;
+            bool _445___v30;
+            bool _446_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _447_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out129;
+            bool _out130;
+            bool _out131;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out132;
+            DCOMP.COMP.GenExpr((_440_args).Select(_443_i), @params, true, out _out129, out _out130, out _out131, out _out132);
+            _444_recursiveGen = _out129;
+            _445___v30 = _out130;
+            _446_isErased = _out131;
+            _447_recIdents = _out132;
+            if (_446_isErased) {
+              _444_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _444_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _429_recursiveGen);
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _432_recIdents);
-            _428_i = (_428_i) + (BigInteger.One);
+            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _444_recursiveGen);
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _447_recIdents);
+            _443_i = (_443_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("))"));
           isOwned = true;
           isErased = true;
         }
       } else if (_source19.is_NewArray) {
-        Dafny.ISequence<DAST._IExpression> _433___mcc_h14 = _source19.dtor_dims;
-        Dafny.ISequence<DAST._IExpression> _434_dims = _433___mcc_h14;
+        Dafny.ISequence<DAST._IExpression> _448___mcc_h14 = _source19.dtor_dims;
+        Dafny.ISequence<DAST._IExpression> _449_dims = _448___mcc_h14;
         {
-          BigInteger _435_i;
-          _435_i = (new BigInteger((_434_dims).Count)) - (BigInteger.One);
+          BigInteger _450_i;
+          _450_i = (new BigInteger((_449_dims).Count)) - (BigInteger.One);
           s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::default::Default::default()");
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          while ((_435_i).Sign != -1) {
-            Dafny.ISequence<Dafny.Rune> _436_recursiveGen;
-            bool _437___v30;
-            bool _438_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _439_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out125;
-            bool _out126;
-            bool _out127;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out128;
-            DCOMP.COMP.GenExpr((_434_dims).Select(_435_i), @params, true, out _out125, out _out126, out _out127, out _out128);
-            _436_recursiveGen = _out125;
-            _437___v30 = _out126;
-            _438_isErased = _out127;
-            _439_recIdents = _out128;
-            if (!(_438_isErased)) {
-              _436_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _436_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          while ((_450_i).Sign != -1) {
+            Dafny.ISequence<Dafny.Rune> _451_recursiveGen;
+            bool _452___v31;
+            bool _453_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _454_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out133;
+            bool _out134;
+            bool _out135;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out136;
+            DCOMP.COMP.GenExpr((_449_dims).Select(_450_i), @params, true, out _out133, out _out134, out _out135, out _out136);
+            _451_recursiveGen = _out133;
+            _452___v31 = _out134;
+            _453_isErased = _out135;
+            _454_recIdents = _out136;
+            if (!(_453_isErased)) {
+              _451_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _451_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("vec!["), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("; <usize as ::dafny_runtime::NumCast>::from(")), _436_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()]"));
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _439_recIdents);
-            _435_i = (_435_i) - (BigInteger.One);
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc::new(::std::cell::RefCell::new(vec!["), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("; <usize as ::dafny_runtime::NumCast>::from(")), _451_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()]))"));
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _454_recIdents);
+            _450_i = (_450_i) - (BigInteger.One);
           }
           isOwned = true;
           isErased = true;
         }
       } else if (_source19.is_DatatypeValue) {
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _440___mcc_h15 = _source19.dtor_path;
-        Dafny.ISequence<Dafny.Rune> _441___mcc_h16 = _source19.dtor_variant;
-        bool _442___mcc_h17 = _source19.dtor_isCo;
-        Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _443___mcc_h18 = _source19.dtor_contents;
-        Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _444_values = _443___mcc_h18;
-        bool _445_isCo = _442___mcc_h17;
-        Dafny.ISequence<Dafny.Rune> _446_variant = _441___mcc_h16;
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _447_path = _440___mcc_h15;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _455___mcc_h15 = _source19.dtor_path;
+        Dafny.ISequence<Dafny.Rune> _456___mcc_h16 = _source19.dtor_variant;
+        bool _457___mcc_h17 = _source19.dtor_isCo;
+        Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _458___mcc_h18 = _source19.dtor_contents;
+        Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _459_values = _458___mcc_h18;
+        bool _460_isCo = _457___mcc_h17;
+        Dafny.ISequence<Dafny.Rune> _461_variant = _456___mcc_h16;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _462_path = _455___mcc_h15;
         {
-          Dafny.ISequence<Dafny.Rune> _448_path;
-          Dafny.ISequence<Dafny.Rune> _out129;
-          _out129 = DCOMP.COMP.GenPath(_447_path);
-          _448_path = _out129;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc::new("), _448_path), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::r#")), _446_variant);
+          Dafny.ISequence<Dafny.Rune> _463_path;
+          Dafny.ISequence<Dafny.Rune> _out137;
+          _out137 = DCOMP.COMP.GenPath(_462_path);
+          _463_path = _out137;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::rc::Rc::new("), _463_path), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::r#")), _461_variant);
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _449_i;
-          _449_i = BigInteger.Zero;
+          BigInteger _464_i;
+          _464_i = BigInteger.Zero;
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {"));
-          while ((_449_i) < (new BigInteger((_444_values).Count))) {
-            _System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression> _let_tmp_rhs0 = (_444_values).Select(_449_i);
-            Dafny.ISequence<Dafny.Rune> _450_name = _let_tmp_rhs0.dtor__0;
-            DAST._IExpression _451_value = _let_tmp_rhs0.dtor__1;
-            if ((_449_i).Sign == 1) {
+          while ((_464_i) < (new BigInteger((_459_values).Count))) {
+            _System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression> _let_tmp_rhs0 = (_459_values).Select(_464_i);
+            Dafny.ISequence<Dafny.Rune> _465_name = _let_tmp_rhs0.dtor__0;
+            DAST._IExpression _466_value = _let_tmp_rhs0.dtor__1;
+            if ((_464_i).Sign == 1) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            if (_445_isCo) {
-              Dafny.ISequence<Dafny.Rune> _452_recursiveGen;
-              bool _453___v31;
-              bool _454_isErased;
-              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _455_recIdents;
-              Dafny.ISequence<Dafny.Rune> _out130;
-              bool _out131;
-              bool _out132;
-              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out133;
-              DCOMP.COMP.GenExpr(_451_value, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements(), true, out _out130, out _out131, out _out132, out _out133);
-              _452_recursiveGen = _out130;
-              _453___v31 = _out131;
-              _454_isErased = _out132;
-              _455_recIdents = _out133;
-              if (!(_454_isErased)) {
-                _452_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _452_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            if (_460_isCo) {
+              Dafny.ISequence<Dafny.Rune> _467_recursiveGen;
+              bool _468___v32;
+              bool _469_isErased;
+              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _470_recIdents;
+              Dafny.ISequence<Dafny.Rune> _out138;
+              bool _out139;
+              bool _out140;
+              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out141;
+              DCOMP.COMP.GenExpr(_466_value, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements(), true, out _out138, out _out139, out _out140, out _out141);
+              _467_recursiveGen = _out138;
+              _468___v32 = _out139;
+              _469_isErased = _out140;
+              _470_recIdents = _out141;
+              if (!(_469_isErased)) {
+                _467_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _467_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
               }
-              _452_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _452_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _455_recIdents);
-              Dafny.ISequence<Dafny.Rune> _456_allReadCloned;
-              _456_allReadCloned = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-              while (!(_455_recIdents).Equals(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements())) {
-                Dafny.ISequence<Dafny.Rune> _457_next;
-                foreach (Dafny.ISequence<Dafny.Rune> _assign_such_that_0 in (_455_recIdents).Elements) {
-                  _457_next = (Dafny.ISequence<Dafny.Rune>)_assign_such_that_0;
-                  if ((_455_recIdents).Contains(_457_next)) {
+              _467_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _467_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _470_recIdents);
+              Dafny.ISequence<Dafny.Rune> _471_allReadCloned;
+              _471_allReadCloned = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+              while (!(_470_recIdents).Equals(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements())) {
+                Dafny.ISequence<Dafny.Rune> _472_next;
+                foreach (Dafny.ISequence<Dafny.Rune> _assign_such_that_0 in (_470_recIdents).Elements) {
+                  _472_next = (Dafny.ISequence<Dafny.Rune>)_assign_such_that_0;
+                  if ((_470_recIdents).Contains(_472_next)) {
                     goto after__ASSIGN_SUCH_THAT_0;
                   }
                 }
-                throw new System.Exception("assign-such-that search produced no value (line 1091)");
+                throw new System.Exception("assign-such-that search produced no value (line 1113)");
               after__ASSIGN_SUCH_THAT_0:;
-                _456_allReadCloned = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_456_allReadCloned, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let r#")), _457_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = r#")), _457_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".clone();\n"));
-                _455_recIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Difference(_455_recIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_457_next));
+                _471_allReadCloned = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_471_allReadCloned, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let r#")), _472_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = r#")), _472_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".clone();\n"));
+                _470_recIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Difference(_470_recIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_472_next));
               }
-              s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _450_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ::dafny_runtime::LazyFieldWrapper(::dafny_runtime::Lazy::new(::std::boxed::Box::new({\n")), _456_allReadCloned), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("move || (")), _452_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")})))"));
+              s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _465_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ::dafny_runtime::LazyFieldWrapper(::dafny_runtime::Lazy::new(::std::boxed::Box::new({\n")), _471_allReadCloned), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("move || (")), _467_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")})))"));
             } else {
-              Dafny.ISequence<Dafny.Rune> _458_recursiveGen;
-              bool _459___v32;
-              bool _460_isErased;
-              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _461_recIdents;
-              Dafny.ISequence<Dafny.Rune> _out134;
-              bool _out135;
-              bool _out136;
-              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out137;
-              DCOMP.COMP.GenExpr(_451_value, @params, true, out _out134, out _out135, out _out136, out _out137);
-              _458_recursiveGen = _out134;
-              _459___v32 = _out135;
-              _460_isErased = _out136;
-              _461_recIdents = _out137;
-              if (!(_460_isErased)) {
-                _458_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _458_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+              Dafny.ISequence<Dafny.Rune> _473_recursiveGen;
+              bool _474___v33;
+              bool _475_isErased;
+              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _476_recIdents;
+              Dafny.ISequence<Dafny.Rune> _out142;
+              bool _out143;
+              bool _out144;
+              Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out145;
+              DCOMP.COMP.GenExpr(_466_value, @params, true, out _out142, out _out143, out _out144, out _out145);
+              _473_recursiveGen = _out142;
+              _474___v33 = _out143;
+              _475_isErased = _out144;
+              _476_recIdents = _out145;
+              if (!(_475_isErased)) {
+                _473_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _473_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
               }
-              _458_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _458_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-              s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _450_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _458_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _461_recIdents);
+              _473_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _473_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+              s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), _465_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _473_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _476_recIdents);
             }
-            _449_i = (_449_i) + (BigInteger.One);
+            _464_i = (_464_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" })"));
           isOwned = true;
           isErased = true;
         }
       } else if (_source19.is_Convert) {
-        DAST._IExpression _462___mcc_h19 = _source19.dtor_value;
-        DAST._IType _463___mcc_h20 = _source19.dtor_from;
-        DAST._IType _464___mcc_h21 = _source19.dtor_typ;
-        DAST._IType _465_toTpe = _464___mcc_h21;
-        DAST._IType _466_fromTpe = _463___mcc_h20;
-        DAST._IExpression _467_expr = _462___mcc_h19;
+        DAST._IExpression _477___mcc_h19 = _source19.dtor_value;
+        DAST._IType _478___mcc_h20 = _source19.dtor_from;
+        DAST._IType _479___mcc_h21 = _source19.dtor_typ;
+        DAST._IType _480_toTpe = _479___mcc_h21;
+        DAST._IType _481_fromTpe = _478___mcc_h20;
+        DAST._IExpression _482_expr = _477___mcc_h19;
         {
-          if (object.Equals(_466_fromTpe, _465_toTpe)) {
-            Dafny.ISequence<Dafny.Rune> _468_recursiveGen;
-            bool _469_recOwned;
-            bool _470_recErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _471_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out138;
-            bool _out139;
-            bool _out140;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out141;
-            DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out138, out _out139, out _out140, out _out141);
-            _468_recursiveGen = _out138;
-            _469_recOwned = _out139;
-            _470_recErased = _out140;
-            _471_recIdents = _out141;
-            s = _468_recursiveGen;
-            isOwned = _469_recOwned;
-            isErased = _470_recErased;
-            readIdents = _471_recIdents;
+          if (object.Equals(_481_fromTpe, _480_toTpe)) {
+            Dafny.ISequence<Dafny.Rune> _483_recursiveGen;
+            bool _484_recOwned;
+            bool _485_recErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _486_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out146;
+            bool _out147;
+            bool _out148;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out149;
+            DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out146, out _out147, out _out148, out _out149);
+            _483_recursiveGen = _out146;
+            _484_recOwned = _out147;
+            _485_recErased = _out148;
+            _486_recIdents = _out149;
+            s = _483_recursiveGen;
+            isOwned = _484_recOwned;
+            isErased = _485_recErased;
+            readIdents = _486_recIdents;
           } else {
-            _System._ITuple2<DAST._IType, DAST._IType> _source25 = _System.Tuple2<DAST._IType, DAST._IType>.create(_466_fromTpe, _465_toTpe);
-            DAST._IType _472___mcc_h120 = _source25.dtor__0;
-            DAST._IType _473___mcc_h121 = _source25.dtor__1;
-            DAST._IType _source26 = _472___mcc_h120;
+            _System._ITuple2<DAST._IType, DAST._IType> _source25 = _System.Tuple2<DAST._IType, DAST._IType>.create(_481_fromTpe, _480_toTpe);
+            DAST._IType _487___mcc_h122 = _source25.dtor__0;
+            DAST._IType _488___mcc_h123 = _source25.dtor__1;
+            DAST._IType _source26 = _487___mcc_h122;
             if (_source26.is_Path) {
-              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _474___mcc_h124 = _source26.dtor_Path_a0;
-              Dafny.ISequence<DAST._IType> _475___mcc_h125 = _source26.dtor_typeArgs;
-              DAST._IResolvedType _476___mcc_h126 = _source26.dtor_resolved;
-              DAST._IResolvedType _source27 = _476___mcc_h126;
+              Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _489___mcc_h126 = _source26.dtor_Path_a0;
+              Dafny.ISequence<DAST._IType> _490___mcc_h127 = _source26.dtor_typeArgs;
+              DAST._IResolvedType _491___mcc_h128 = _source26.dtor_resolved;
+              DAST._IResolvedType _source27 = _491___mcc_h128;
               if (_source27.is_Datatype) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _477___mcc_h133 = _source27.dtor_path;
-                DAST._IType _source28 = _473___mcc_h121;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _492___mcc_h135 = _source27.dtor_path;
+                DAST._IType _source28 = _488___mcc_h123;
                 if (_source28.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _478___mcc_h136 = _source28.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _479___mcc_h137 = _source28.dtor_typeArgs;
-                  DAST._IResolvedType _480___mcc_h138 = _source28.dtor_resolved;
-                  DAST._IResolvedType _source29 = _480___mcc_h138;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _493___mcc_h138 = _source28.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _494___mcc_h139 = _source28.dtor_typeArgs;
+                  DAST._IResolvedType _495___mcc_h140 = _source28.dtor_resolved;
+                  DAST._IResolvedType _source29 = _495___mcc_h140;
                   if (_source29.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _481___mcc_h142 = _source29.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _496___mcc_h144 = _source29.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _482_recursiveGen;
-                      bool _483_recOwned;
-                      bool _484_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _485_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out142;
-                      bool _out143;
-                      bool _out144;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out145;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out142, out _out143, out _out144, out _out145);
-                      _482_recursiveGen = _out142;
-                      _483_recOwned = _out143;
-                      _484_recErased = _out144;
-                      _485_recIdents = _out145;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _482_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _483_recOwned;
-                      isErased = _484_recErased;
-                      readIdents = _485_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _497_recursiveGen;
+                      bool _498_recOwned;
+                      bool _499_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _500_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out150;
+                      bool _out151;
+                      bool _out152;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out153;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out150, out _out151, out _out152, out _out153);
+                      _497_recursiveGen = _out150;
+                      _498_recOwned = _out151;
+                      _499_recErased = _out152;
+                      _500_recIdents = _out153;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _497_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _498_recOwned;
+                      isErased = _499_recErased;
+                      readIdents = _500_recIdents;
                     }
                   } else if (_source29.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _486___mcc_h144 = _source29.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _501___mcc_h146 = _source29.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _487_recursiveGen;
-                      bool _488_recOwned;
-                      bool _489_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _490_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out146;
-                      bool _out147;
-                      bool _out148;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out149;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out146, out _out147, out _out148, out _out149);
-                      _487_recursiveGen = _out146;
-                      _488_recOwned = _out147;
-                      _489_recErased = _out148;
-                      _490_recIdents = _out149;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _487_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _488_recOwned;
-                      isErased = _489_recErased;
-                      readIdents = _490_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _502_recursiveGen;
+                      bool _503_recOwned;
+                      bool _504_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _505_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out154;
+                      bool _out155;
+                      bool _out156;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out157;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out154, out _out155, out _out156, out _out157);
+                      _502_recursiveGen = _out154;
+                      _503_recOwned = _out155;
+                      _504_recErased = _out156;
+                      _505_recIdents = _out157;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _502_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _503_recOwned;
+                      isErased = _504_recErased;
+                      readIdents = _505_recIdents;
                     }
                   } else {
-                    DAST._IType _491___mcc_h146 = _source29.dtor_Newtype_a0;
-                    DAST._IType _492_b = _491___mcc_h146;
+                    DAST._IType _506___mcc_h148 = _source29.dtor_Newtype_a0;
+                    DAST._IType _507_b = _506___mcc_h148;
                     {
-                      if (object.Equals(_466_fromTpe, _492_b)) {
-                        Dafny.ISequence<Dafny.Rune> _493_recursiveGen;
-                        bool _494_recOwned;
-                        bool _495_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _496_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out150;
-                        bool _out151;
-                        bool _out152;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out153;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out150, out _out151, out _out152, out _out153);
-                        _493_recursiveGen = _out150;
-                        _494_recOwned = _out151;
-                        _495_recErased = _out152;
-                        _496_recIdents = _out153;
-                        Dafny.ISequence<Dafny.Rune> _497_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out154;
-                        _out154 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _497_rhsType = _out154;
-                        Dafny.ISequence<Dafny.Rune> _498_uneraseFn;
-                        _498_uneraseFn = ((_494_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _497_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _498_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _493_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _494_recOwned;
+                      if (object.Equals(_481_fromTpe, _507_b)) {
+                        Dafny.ISequence<Dafny.Rune> _508_recursiveGen;
+                        bool _509_recOwned;
+                        bool _510_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _511_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out158;
+                        bool _out159;
+                        bool _out160;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out161;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out158, out _out159, out _out160, out _out161);
+                        _508_recursiveGen = _out158;
+                        _509_recOwned = _out159;
+                        _510_recErased = _out160;
+                        _511_recIdents = _out161;
+                        Dafny.ISequence<Dafny.Rune> _512_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out162;
+                        _out162 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _512_rhsType = _out162;
+                        Dafny.ISequence<Dafny.Rune> _513_uneraseFn;
+                        _513_uneraseFn = ((_509_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _512_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _513_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _508_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _509_recOwned;
                         isErased = false;
-                        readIdents = _496_recIdents;
+                        readIdents = _511_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out155;
-                        bool _out156;
-                        bool _out157;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out158;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _492_b), _492_b, _465_toTpe), @params, mustOwn, out _out155, out _out156, out _out157, out _out158);
-                        s = _out155;
-                        isOwned = _out156;
-                        isErased = _out157;
-                        readIdents = _out158;
+                        Dafny.ISequence<Dafny.Rune> _out163;
+                        bool _out164;
+                        bool _out165;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out166;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _507_b), _507_b, _480_toTpe), @params, mustOwn, out _out163, out _out164, out _out165, out _out166);
+                        s = _out163;
+                        isOwned = _out164;
+                        isErased = _out165;
+                        readIdents = _out166;
                       }
                     }
                   }
                 } else if (_source28.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _499___mcc_h148 = _source28.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _500_recursiveGen;
-                    bool _501_recOwned;
-                    bool _502_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _503_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out159;
-                    bool _out160;
-                    bool _out161;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out162;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out159, out _out160, out _out161, out _out162);
-                    _500_recursiveGen = _out159;
-                    _501_recOwned = _out160;
-                    _502_recErased = _out161;
-                    _503_recIdents = _out162;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _500_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _501_recOwned;
-                    isErased = _502_recErased;
-                    readIdents = _503_recIdents;
-                  }
-                } else if (_source28.is_Array) {
-                  DAST._IType _504___mcc_h150 = _source28.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _505_recursiveGen;
-                    bool _506_recOwned;
-                    bool _507_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _508_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out163;
-                    bool _out164;
-                    bool _out165;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out166;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out163, out _out164, out _out165, out _out166);
-                    _505_recursiveGen = _out163;
-                    _506_recOwned = _out164;
-                    _507_recErased = _out165;
-                    _508_recIdents = _out166;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _505_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _506_recOwned;
-                    isErased = _507_recErased;
-                    readIdents = _508_recIdents;
-                  }
-                } else if (_source28.is_Seq) {
-                  DAST._IType _509___mcc_h152 = _source28.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _510_recursiveGen;
-                    bool _511_recOwned;
-                    bool _512_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _513_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out167;
-                    bool _out168;
-                    bool _out169;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out170;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out167, out _out168, out _out169, out _out170);
-                    _510_recursiveGen = _out167;
-                    _511_recOwned = _out168;
-                    _512_recErased = _out169;
-                    _513_recIdents = _out170;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _510_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _511_recOwned;
-                    isErased = _512_recErased;
-                    readIdents = _513_recIdents;
-                  }
-                } else if (_source28.is_Set) {
-                  DAST._IType _514___mcc_h154 = _source28.dtor_element;
+                  Dafny.ISequence<DAST._IType> _514___mcc_h150 = _source28.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _515_recursiveGen;
                     bool _516_recOwned;
                     bool _517_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _518_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out171;
-                    bool _out172;
-                    bool _out173;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out174;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out171, out _out172, out _out173, out _out174);
-                    _515_recursiveGen = _out171;
-                    _516_recOwned = _out172;
-                    _517_recErased = _out173;
-                    _518_recIdents = _out174;
+                    Dafny.ISequence<Dafny.Rune> _out167;
+                    bool _out168;
+                    bool _out169;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out170;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out167, out _out168, out _out169, out _out170);
+                    _515_recursiveGen = _out167;
+                    _516_recOwned = _out168;
+                    _517_recErased = _out169;
+                    _518_recIdents = _out170;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _515_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _516_recOwned;
                     isErased = _517_recErased;
                     readIdents = _518_recIdents;
                   }
-                } else if (_source28.is_Multiset) {
-                  DAST._IType _519___mcc_h156 = _source28.dtor_element;
+                } else if (_source28.is_Array) {
+                  DAST._IType _519___mcc_h152 = _source28.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _520_recursiveGen;
                     bool _521_recOwned;
                     bool _522_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _523_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out175;
-                    bool _out176;
-                    bool _out177;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out178;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out175, out _out176, out _out177, out _out178);
-                    _520_recursiveGen = _out175;
-                    _521_recOwned = _out176;
-                    _522_recErased = _out177;
-                    _523_recIdents = _out178;
+                    Dafny.ISequence<Dafny.Rune> _out171;
+                    bool _out172;
+                    bool _out173;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out174;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out171, out _out172, out _out173, out _out174);
+                    _520_recursiveGen = _out171;
+                    _521_recOwned = _out172;
+                    _522_recErased = _out173;
+                    _523_recIdents = _out174;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _520_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _521_recOwned;
                     isErased = _522_recErased;
                     readIdents = _523_recIdents;
                   }
-                } else if (_source28.is_Map) {
-                  DAST._IType _524___mcc_h158 = _source28.dtor_key;
-                  DAST._IType _525___mcc_h159 = _source28.dtor_value;
+                } else if (_source28.is_Seq) {
+                  DAST._IType _524___mcc_h154 = _source28.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _526_recursiveGen;
-                    bool _527_recOwned;
-                    bool _528_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _529_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _525_recursiveGen;
+                    bool _526_recOwned;
+                    bool _527_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _528_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out175;
+                    bool _out176;
+                    bool _out177;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out178;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out175, out _out176, out _out177, out _out178);
+                    _525_recursiveGen = _out175;
+                    _526_recOwned = _out176;
+                    _527_recErased = _out177;
+                    _528_recIdents = _out178;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _525_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _526_recOwned;
+                    isErased = _527_recErased;
+                    readIdents = _528_recIdents;
+                  }
+                } else if (_source28.is_Set) {
+                  DAST._IType _529___mcc_h156 = _source28.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _530_recursiveGen;
+                    bool _531_recOwned;
+                    bool _532_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _533_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out179;
                     bool _out180;
                     bool _out181;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out182;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out179, out _out180, out _out181, out _out182);
-                    _526_recursiveGen = _out179;
-                    _527_recOwned = _out180;
-                    _528_recErased = _out181;
-                    _529_recIdents = _out182;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _526_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _527_recOwned;
-                    isErased = _528_recErased;
-                    readIdents = _529_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out179, out _out180, out _out181, out _out182);
+                    _530_recursiveGen = _out179;
+                    _531_recOwned = _out180;
+                    _532_recErased = _out181;
+                    _533_recIdents = _out182;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _530_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _531_recOwned;
+                    isErased = _532_recErased;
+                    readIdents = _533_recIdents;
                   }
-                } else if (_source28.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _530___mcc_h162 = _source28.dtor_args;
-                  DAST._IType _531___mcc_h163 = _source28.dtor_result;
+                } else if (_source28.is_Multiset) {
+                  DAST._IType _534___mcc_h158 = _source28.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _532_recursiveGen;
-                    bool _533_recOwned;
-                    bool _534_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _535_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _535_recursiveGen;
+                    bool _536_recOwned;
+                    bool _537_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _538_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out183;
                     bool _out184;
                     bool _out185;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out186;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out183, out _out184, out _out185, out _out186);
-                    _532_recursiveGen = _out183;
-                    _533_recOwned = _out184;
-                    _534_recErased = _out185;
-                    _535_recIdents = _out186;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _532_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _533_recOwned;
-                    isErased = _534_recErased;
-                    readIdents = _535_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out183, out _out184, out _out185, out _out186);
+                    _535_recursiveGen = _out183;
+                    _536_recOwned = _out184;
+                    _537_recErased = _out185;
+                    _538_recIdents = _out186;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _535_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _536_recOwned;
+                    isErased = _537_recErased;
+                    readIdents = _538_recIdents;
                   }
-                } else if (_source28.is_Primitive) {
-                  DAST._IPrimitive _536___mcc_h166 = _source28.dtor_Primitive_a0;
+                } else if (_source28.is_Map) {
+                  DAST._IType _539___mcc_h160 = _source28.dtor_key;
+                  DAST._IType _540___mcc_h161 = _source28.dtor_value;
                   {
-                    Dafny.ISequence<Dafny.Rune> _537_recursiveGen;
-                    bool _538_recOwned;
-                    bool _539_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _540_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _541_recursiveGen;
+                    bool _542_recOwned;
+                    bool _543_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _544_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out187;
                     bool _out188;
                     bool _out189;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out190;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out187, out _out188, out _out189, out _out190);
-                    _537_recursiveGen = _out187;
-                    _538_recOwned = _out188;
-                    _539_recErased = _out189;
-                    _540_recIdents = _out190;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _537_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _538_recOwned;
-                    isErased = _539_recErased;
-                    readIdents = _540_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out187, out _out188, out _out189, out _out190);
+                    _541_recursiveGen = _out187;
+                    _542_recOwned = _out188;
+                    _543_recErased = _out189;
+                    _544_recIdents = _out190;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _541_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _542_recOwned;
+                    isErased = _543_recErased;
+                    readIdents = _544_recIdents;
                   }
-                } else if (_source28.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _541___mcc_h168 = _source28.dtor_Passthrough_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _542_recursiveGen;
-                    bool _543_recOwned;
-                    bool _544_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _545_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out191;
-                    bool _out192;
-                    bool _out193;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out194;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out191, out _out192, out _out193, out _out194);
-                    _542_recursiveGen = _out191;
-                    _543_recOwned = _out192;
-                    _544_recErased = _out193;
-                    _545_recIdents = _out194;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _542_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _543_recOwned;
-                    isErased = _544_recErased;
-                    readIdents = _545_recIdents;
-                  }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _546___mcc_h170 = _source28.dtor_TypeArg_a0;
+                } else if (_source28.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _545___mcc_h164 = _source28.dtor_args;
+                  DAST._IType _546___mcc_h165 = _source28.dtor_result;
                   {
                     Dafny.ISequence<Dafny.Rune> _547_recursiveGen;
                     bool _548_recOwned;
                     bool _549_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _550_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out195;
-                    bool _out196;
-                    bool _out197;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out198;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out195, out _out196, out _out197, out _out198);
-                    _547_recursiveGen = _out195;
-                    _548_recOwned = _out196;
-                    _549_recErased = _out197;
-                    _550_recIdents = _out198;
+                    Dafny.ISequence<Dafny.Rune> _out191;
+                    bool _out192;
+                    bool _out193;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out194;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out191, out _out192, out _out193, out _out194);
+                    _547_recursiveGen = _out191;
+                    _548_recOwned = _out192;
+                    _549_recErased = _out193;
+                    _550_recIdents = _out194;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _547_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _548_recOwned;
                     isErased = _549_recErased;
                     readIdents = _550_recIdents;
                   }
+                } else if (_source28.is_Primitive) {
+                  DAST._IPrimitive _551___mcc_h168 = _source28.dtor_Primitive_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _552_recursiveGen;
+                    bool _553_recOwned;
+                    bool _554_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _555_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out195;
+                    bool _out196;
+                    bool _out197;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out198;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out195, out _out196, out _out197, out _out198);
+                    _552_recursiveGen = _out195;
+                    _553_recOwned = _out196;
+                    _554_recErased = _out197;
+                    _555_recIdents = _out198;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _552_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _553_recOwned;
+                    isErased = _554_recErased;
+                    readIdents = _555_recIdents;
+                  }
+                } else if (_source28.is_Passthrough) {
+                  Dafny.ISequence<Dafny.Rune> _556___mcc_h170 = _source28.dtor_Passthrough_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _557_recursiveGen;
+                    bool _558_recOwned;
+                    bool _559_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _560_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out199;
+                    bool _out200;
+                    bool _out201;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out202;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out199, out _out200, out _out201, out _out202);
+                    _557_recursiveGen = _out199;
+                    _558_recOwned = _out200;
+                    _559_recErased = _out201;
+                    _560_recIdents = _out202;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _557_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _558_recOwned;
+                    isErased = _559_recErased;
+                    readIdents = _560_recIdents;
+                  }
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _561___mcc_h172 = _source28.dtor_TypeArg_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _562_recursiveGen;
+                    bool _563_recOwned;
+                    bool _564_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _565_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out203;
+                    bool _out204;
+                    bool _out205;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out206;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out203, out _out204, out _out205, out _out206);
+                    _562_recursiveGen = _out203;
+                    _563_recOwned = _out204;
+                    _564_recErased = _out205;
+                    _565_recIdents = _out206;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _562_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _563_recOwned;
+                    isErased = _564_recErased;
+                    readIdents = _565_recIdents;
+                  }
                 }
               } else if (_source27.is_Trait) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _551___mcc_h172 = _source27.dtor_path;
-                DAST._IType _source30 = _473___mcc_h121;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _566___mcc_h174 = _source27.dtor_path;
+                DAST._IType _source30 = _488___mcc_h123;
                 if (_source30.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _552___mcc_h175 = _source30.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _553___mcc_h176 = _source30.dtor_typeArgs;
-                  DAST._IResolvedType _554___mcc_h177 = _source30.dtor_resolved;
-                  DAST._IResolvedType _source31 = _554___mcc_h177;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _567___mcc_h177 = _source30.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _568___mcc_h178 = _source30.dtor_typeArgs;
+                  DAST._IResolvedType _569___mcc_h179 = _source30.dtor_resolved;
+                  DAST._IResolvedType _source31 = _569___mcc_h179;
                   if (_source31.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _555___mcc_h181 = _source31.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _570___mcc_h183 = _source31.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _556_recursiveGen;
-                      bool _557_recOwned;
-                      bool _558_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _559_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out199;
-                      bool _out200;
-                      bool _out201;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out202;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out199, out _out200, out _out201, out _out202);
-                      _556_recursiveGen = _out199;
-                      _557_recOwned = _out200;
-                      _558_recErased = _out201;
-                      _559_recIdents = _out202;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _556_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _557_recOwned;
-                      isErased = _558_recErased;
-                      readIdents = _559_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _571_recursiveGen;
+                      bool _572_recOwned;
+                      bool _573_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _574_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out207;
+                      bool _out208;
+                      bool _out209;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out210;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out207, out _out208, out _out209, out _out210);
+                      _571_recursiveGen = _out207;
+                      _572_recOwned = _out208;
+                      _573_recErased = _out209;
+                      _574_recIdents = _out210;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _571_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _572_recOwned;
+                      isErased = _573_recErased;
+                      readIdents = _574_recIdents;
                     }
                   } else if (_source31.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _560___mcc_h183 = _source31.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _575___mcc_h185 = _source31.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _561_recursiveGen;
-                      bool _562_recOwned;
-                      bool _563_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _564_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out203;
-                      bool _out204;
-                      bool _out205;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out206;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out203, out _out204, out _out205, out _out206);
-                      _561_recursiveGen = _out203;
-                      _562_recOwned = _out204;
-                      _563_recErased = _out205;
-                      _564_recIdents = _out206;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _561_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _562_recOwned;
-                      isErased = _563_recErased;
-                      readIdents = _564_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _576_recursiveGen;
+                      bool _577_recOwned;
+                      bool _578_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _579_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out211;
+                      bool _out212;
+                      bool _out213;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out214;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out211, out _out212, out _out213, out _out214);
+                      _576_recursiveGen = _out211;
+                      _577_recOwned = _out212;
+                      _578_recErased = _out213;
+                      _579_recIdents = _out214;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _576_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _577_recOwned;
+                      isErased = _578_recErased;
+                      readIdents = _579_recIdents;
                     }
                   } else {
-                    DAST._IType _565___mcc_h185 = _source31.dtor_Newtype_a0;
-                    DAST._IType _566_b = _565___mcc_h185;
+                    DAST._IType _580___mcc_h187 = _source31.dtor_Newtype_a0;
+                    DAST._IType _581_b = _580___mcc_h187;
                     {
-                      if (object.Equals(_466_fromTpe, _566_b)) {
-                        Dafny.ISequence<Dafny.Rune> _567_recursiveGen;
-                        bool _568_recOwned;
-                        bool _569_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _570_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out207;
-                        bool _out208;
-                        bool _out209;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out210;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out207, out _out208, out _out209, out _out210);
-                        _567_recursiveGen = _out207;
-                        _568_recOwned = _out208;
-                        _569_recErased = _out209;
-                        _570_recIdents = _out210;
-                        Dafny.ISequence<Dafny.Rune> _571_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out211;
-                        _out211 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _571_rhsType = _out211;
-                        Dafny.ISequence<Dafny.Rune> _572_uneraseFn;
-                        _572_uneraseFn = ((_568_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _571_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _572_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _567_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _568_recOwned;
+                      if (object.Equals(_481_fromTpe, _581_b)) {
+                        Dafny.ISequence<Dafny.Rune> _582_recursiveGen;
+                        bool _583_recOwned;
+                        bool _584_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _585_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out215;
+                        bool _out216;
+                        bool _out217;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out218;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out215, out _out216, out _out217, out _out218);
+                        _582_recursiveGen = _out215;
+                        _583_recOwned = _out216;
+                        _584_recErased = _out217;
+                        _585_recIdents = _out218;
+                        Dafny.ISequence<Dafny.Rune> _586_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out219;
+                        _out219 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _586_rhsType = _out219;
+                        Dafny.ISequence<Dafny.Rune> _587_uneraseFn;
+                        _587_uneraseFn = ((_583_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _586_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _587_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _582_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _583_recOwned;
                         isErased = false;
-                        readIdents = _570_recIdents;
+                        readIdents = _585_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out212;
-                        bool _out213;
-                        bool _out214;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out215;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _566_b), _566_b, _465_toTpe), @params, mustOwn, out _out212, out _out213, out _out214, out _out215);
-                        s = _out212;
-                        isOwned = _out213;
-                        isErased = _out214;
-                        readIdents = _out215;
+                        Dafny.ISequence<Dafny.Rune> _out220;
+                        bool _out221;
+                        bool _out222;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out223;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _581_b), _581_b, _480_toTpe), @params, mustOwn, out _out220, out _out221, out _out222, out _out223);
+                        s = _out220;
+                        isOwned = _out221;
+                        isErased = _out222;
+                        readIdents = _out223;
                       }
                     }
                   }
                 } else if (_source30.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _573___mcc_h187 = _source30.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _574_recursiveGen;
-                    bool _575_recOwned;
-                    bool _576_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _577_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out216;
-                    bool _out217;
-                    bool _out218;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out219;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out216, out _out217, out _out218, out _out219);
-                    _574_recursiveGen = _out216;
-                    _575_recOwned = _out217;
-                    _576_recErased = _out218;
-                    _577_recIdents = _out219;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _574_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _575_recOwned;
-                    isErased = _576_recErased;
-                    readIdents = _577_recIdents;
-                  }
-                } else if (_source30.is_Array) {
-                  DAST._IType _578___mcc_h189 = _source30.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _579_recursiveGen;
-                    bool _580_recOwned;
-                    bool _581_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _582_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out220;
-                    bool _out221;
-                    bool _out222;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out223;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out220, out _out221, out _out222, out _out223);
-                    _579_recursiveGen = _out220;
-                    _580_recOwned = _out221;
-                    _581_recErased = _out222;
-                    _582_recIdents = _out223;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _579_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _580_recOwned;
-                    isErased = _581_recErased;
-                    readIdents = _582_recIdents;
-                  }
-                } else if (_source30.is_Seq) {
-                  DAST._IType _583___mcc_h191 = _source30.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _584_recursiveGen;
-                    bool _585_recOwned;
-                    bool _586_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _587_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out224;
-                    bool _out225;
-                    bool _out226;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out227;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out224, out _out225, out _out226, out _out227);
-                    _584_recursiveGen = _out224;
-                    _585_recOwned = _out225;
-                    _586_recErased = _out226;
-                    _587_recIdents = _out227;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _584_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _585_recOwned;
-                    isErased = _586_recErased;
-                    readIdents = _587_recIdents;
-                  }
-                } else if (_source30.is_Set) {
-                  DAST._IType _588___mcc_h193 = _source30.dtor_element;
+                  Dafny.ISequence<DAST._IType> _588___mcc_h189 = _source30.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _589_recursiveGen;
                     bool _590_recOwned;
                     bool _591_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _592_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out228;
-                    bool _out229;
-                    bool _out230;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out231;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out228, out _out229, out _out230, out _out231);
-                    _589_recursiveGen = _out228;
-                    _590_recOwned = _out229;
-                    _591_recErased = _out230;
-                    _592_recIdents = _out231;
+                    Dafny.ISequence<Dafny.Rune> _out224;
+                    bool _out225;
+                    bool _out226;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out227;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out224, out _out225, out _out226, out _out227);
+                    _589_recursiveGen = _out224;
+                    _590_recOwned = _out225;
+                    _591_recErased = _out226;
+                    _592_recIdents = _out227;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _589_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _590_recOwned;
                     isErased = _591_recErased;
                     readIdents = _592_recIdents;
                   }
-                } else if (_source30.is_Multiset) {
-                  DAST._IType _593___mcc_h195 = _source30.dtor_element;
+                } else if (_source30.is_Array) {
+                  DAST._IType _593___mcc_h191 = _source30.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _594_recursiveGen;
                     bool _595_recOwned;
                     bool _596_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _597_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out232;
-                    bool _out233;
-                    bool _out234;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out235;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out232, out _out233, out _out234, out _out235);
-                    _594_recursiveGen = _out232;
-                    _595_recOwned = _out233;
-                    _596_recErased = _out234;
-                    _597_recIdents = _out235;
+                    Dafny.ISequence<Dafny.Rune> _out228;
+                    bool _out229;
+                    bool _out230;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out231;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out228, out _out229, out _out230, out _out231);
+                    _594_recursiveGen = _out228;
+                    _595_recOwned = _out229;
+                    _596_recErased = _out230;
+                    _597_recIdents = _out231;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _594_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _595_recOwned;
                     isErased = _596_recErased;
                     readIdents = _597_recIdents;
                   }
-                } else if (_source30.is_Map) {
-                  DAST._IType _598___mcc_h197 = _source30.dtor_key;
-                  DAST._IType _599___mcc_h198 = _source30.dtor_value;
+                } else if (_source30.is_Seq) {
+                  DAST._IType _598___mcc_h193 = _source30.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _600_recursiveGen;
-                    bool _601_recOwned;
-                    bool _602_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _603_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _599_recursiveGen;
+                    bool _600_recOwned;
+                    bool _601_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _602_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out232;
+                    bool _out233;
+                    bool _out234;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out235;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out232, out _out233, out _out234, out _out235);
+                    _599_recursiveGen = _out232;
+                    _600_recOwned = _out233;
+                    _601_recErased = _out234;
+                    _602_recIdents = _out235;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _599_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _600_recOwned;
+                    isErased = _601_recErased;
+                    readIdents = _602_recIdents;
+                  }
+                } else if (_source30.is_Set) {
+                  DAST._IType _603___mcc_h195 = _source30.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _604_recursiveGen;
+                    bool _605_recOwned;
+                    bool _606_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _607_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out236;
                     bool _out237;
                     bool _out238;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out239;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out236, out _out237, out _out238, out _out239);
-                    _600_recursiveGen = _out236;
-                    _601_recOwned = _out237;
-                    _602_recErased = _out238;
-                    _603_recIdents = _out239;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _600_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _601_recOwned;
-                    isErased = _602_recErased;
-                    readIdents = _603_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out236, out _out237, out _out238, out _out239);
+                    _604_recursiveGen = _out236;
+                    _605_recOwned = _out237;
+                    _606_recErased = _out238;
+                    _607_recIdents = _out239;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _604_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _605_recOwned;
+                    isErased = _606_recErased;
+                    readIdents = _607_recIdents;
                   }
-                } else if (_source30.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _604___mcc_h201 = _source30.dtor_args;
-                  DAST._IType _605___mcc_h202 = _source30.dtor_result;
+                } else if (_source30.is_Multiset) {
+                  DAST._IType _608___mcc_h197 = _source30.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _606_recursiveGen;
-                    bool _607_recOwned;
-                    bool _608_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _609_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _609_recursiveGen;
+                    bool _610_recOwned;
+                    bool _611_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _612_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out240;
                     bool _out241;
                     bool _out242;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out243;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out240, out _out241, out _out242, out _out243);
-                    _606_recursiveGen = _out240;
-                    _607_recOwned = _out241;
-                    _608_recErased = _out242;
-                    _609_recIdents = _out243;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _606_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _607_recOwned;
-                    isErased = _608_recErased;
-                    readIdents = _609_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out240, out _out241, out _out242, out _out243);
+                    _609_recursiveGen = _out240;
+                    _610_recOwned = _out241;
+                    _611_recErased = _out242;
+                    _612_recIdents = _out243;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _609_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _610_recOwned;
+                    isErased = _611_recErased;
+                    readIdents = _612_recIdents;
                   }
-                } else if (_source30.is_Primitive) {
-                  DAST._IPrimitive _610___mcc_h205 = _source30.dtor_Primitive_a0;
+                } else if (_source30.is_Map) {
+                  DAST._IType _613___mcc_h199 = _source30.dtor_key;
+                  DAST._IType _614___mcc_h200 = _source30.dtor_value;
                   {
-                    Dafny.ISequence<Dafny.Rune> _611_recursiveGen;
-                    bool _612_recOwned;
-                    bool _613_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _614_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _615_recursiveGen;
+                    bool _616_recOwned;
+                    bool _617_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _618_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out244;
                     bool _out245;
                     bool _out246;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out247;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out244, out _out245, out _out246, out _out247);
-                    _611_recursiveGen = _out244;
-                    _612_recOwned = _out245;
-                    _613_recErased = _out246;
-                    _614_recIdents = _out247;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _611_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _612_recOwned;
-                    isErased = _613_recErased;
-                    readIdents = _614_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out244, out _out245, out _out246, out _out247);
+                    _615_recursiveGen = _out244;
+                    _616_recOwned = _out245;
+                    _617_recErased = _out246;
+                    _618_recIdents = _out247;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _615_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _616_recOwned;
+                    isErased = _617_recErased;
+                    readIdents = _618_recIdents;
                   }
-                } else if (_source30.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _615___mcc_h207 = _source30.dtor_Passthrough_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _616_recursiveGen;
-                    bool _617_recOwned;
-                    bool _618_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _619_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out248;
-                    bool _out249;
-                    bool _out250;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out251;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out248, out _out249, out _out250, out _out251);
-                    _616_recursiveGen = _out248;
-                    _617_recOwned = _out249;
-                    _618_recErased = _out250;
-                    _619_recIdents = _out251;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _616_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _617_recOwned;
-                    isErased = _618_recErased;
-                    readIdents = _619_recIdents;
-                  }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _620___mcc_h209 = _source30.dtor_TypeArg_a0;
+                } else if (_source30.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _619___mcc_h203 = _source30.dtor_args;
+                  DAST._IType _620___mcc_h204 = _source30.dtor_result;
                   {
                     Dafny.ISequence<Dafny.Rune> _621_recursiveGen;
                     bool _622_recOwned;
                     bool _623_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _624_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out252;
-                    bool _out253;
-                    bool _out254;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out255;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out252, out _out253, out _out254, out _out255);
-                    _621_recursiveGen = _out252;
-                    _622_recOwned = _out253;
-                    _623_recErased = _out254;
-                    _624_recIdents = _out255;
+                    Dafny.ISequence<Dafny.Rune> _out248;
+                    bool _out249;
+                    bool _out250;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out251;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out248, out _out249, out _out250, out _out251);
+                    _621_recursiveGen = _out248;
+                    _622_recOwned = _out249;
+                    _623_recErased = _out250;
+                    _624_recIdents = _out251;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _621_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _622_recOwned;
                     isErased = _623_recErased;
                     readIdents = _624_recIdents;
                   }
+                } else if (_source30.is_Primitive) {
+                  DAST._IPrimitive _625___mcc_h207 = _source30.dtor_Primitive_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _626_recursiveGen;
+                    bool _627_recOwned;
+                    bool _628_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _629_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out252;
+                    bool _out253;
+                    bool _out254;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out255;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out252, out _out253, out _out254, out _out255);
+                    _626_recursiveGen = _out252;
+                    _627_recOwned = _out253;
+                    _628_recErased = _out254;
+                    _629_recIdents = _out255;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _626_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _627_recOwned;
+                    isErased = _628_recErased;
+                    readIdents = _629_recIdents;
+                  }
+                } else if (_source30.is_Passthrough) {
+                  Dafny.ISequence<Dafny.Rune> _630___mcc_h209 = _source30.dtor_Passthrough_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _631_recursiveGen;
+                    bool _632_recOwned;
+                    bool _633_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _634_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out256;
+                    bool _out257;
+                    bool _out258;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out259;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out256, out _out257, out _out258, out _out259);
+                    _631_recursiveGen = _out256;
+                    _632_recOwned = _out257;
+                    _633_recErased = _out258;
+                    _634_recIdents = _out259;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _631_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _632_recOwned;
+                    isErased = _633_recErased;
+                    readIdents = _634_recIdents;
+                  }
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _635___mcc_h211 = _source30.dtor_TypeArg_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _636_recursiveGen;
+                    bool _637_recOwned;
+                    bool _638_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _639_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out260;
+                    bool _out261;
+                    bool _out262;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out263;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out260, out _out261, out _out262, out _out263);
+                    _636_recursiveGen = _out260;
+                    _637_recOwned = _out261;
+                    _638_recErased = _out262;
+                    _639_recIdents = _out263;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _636_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _637_recOwned;
+                    isErased = _638_recErased;
+                    readIdents = _639_recIdents;
+                  }
                 }
               } else {
-                DAST._IType _625___mcc_h211 = _source27.dtor_Newtype_a0;
-                DAST._IType _source32 = _473___mcc_h121;
+                DAST._IType _640___mcc_h213 = _source27.dtor_Newtype_a0;
+                DAST._IType _source32 = _488___mcc_h123;
                 if (_source32.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _626___mcc_h214 = _source32.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _627___mcc_h215 = _source32.dtor_typeArgs;
-                  DAST._IResolvedType _628___mcc_h216 = _source32.dtor_resolved;
-                  DAST._IResolvedType _source33 = _628___mcc_h216;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _641___mcc_h216 = _source32.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _642___mcc_h217 = _source32.dtor_typeArgs;
+                  DAST._IResolvedType _643___mcc_h218 = _source32.dtor_resolved;
+                  DAST._IResolvedType _source33 = _643___mcc_h218;
                   if (_source33.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _629___mcc_h223 = _source33.dtor_path;
-                    DAST._IType _630_b = _625___mcc_h211;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _644___mcc_h225 = _source33.dtor_path;
+                    DAST._IType _645_b = _640___mcc_h213;
                     {
-                      if (object.Equals(_630_b, _465_toTpe)) {
-                        Dafny.ISequence<Dafny.Rune> _631_recursiveGen;
-                        bool _632_recOwned;
-                        bool _633_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _634_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out256;
-                        bool _out257;
-                        bool _out258;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out259;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out256, out _out257, out _out258, out _out259);
-                        _631_recursiveGen = _out256;
-                        _632_recOwned = _out257;
-                        _633_recErased = _out258;
-                        _634_recIdents = _out259;
-                        Dafny.ISequence<Dafny.Rune> _635_uneraseFn;
-                        _635_uneraseFn = ((_632_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _635_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _631_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _632_recOwned;
-                        isErased = true;
-                        readIdents = _634_recIdents;
-                      } else {
-                        Dafny.ISequence<Dafny.Rune> _out260;
-                        bool _out261;
-                        bool _out262;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out263;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _630_b), _630_b, _465_toTpe), @params, mustOwn, out _out260, out _out261, out _out262, out _out263);
-                        s = _out260;
-                        isOwned = _out261;
-                        isErased = _out262;
-                        readIdents = _out263;
-                      }
-                    }
-                  } else if (_source33.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _636___mcc_h226 = _source33.dtor_path;
-                    DAST._IType _637_b = _625___mcc_h211;
-                    {
-                      if (object.Equals(_637_b, _465_toTpe)) {
-                        Dafny.ISequence<Dafny.Rune> _638_recursiveGen;
-                        bool _639_recOwned;
-                        bool _640_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _641_recIdents;
+                      if (object.Equals(_645_b, _480_toTpe)) {
+                        Dafny.ISequence<Dafny.Rune> _646_recursiveGen;
+                        bool _647_recOwned;
+                        bool _648_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _649_recIdents;
                         Dafny.ISequence<Dafny.Rune> _out264;
                         bool _out265;
                         bool _out266;
                         Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out267;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out264, out _out265, out _out266, out _out267);
-                        _638_recursiveGen = _out264;
-                        _639_recOwned = _out265;
-                        _640_recErased = _out266;
-                        _641_recIdents = _out267;
-                        Dafny.ISequence<Dafny.Rune> _642_uneraseFn;
-                        _642_uneraseFn = ((_639_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _642_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _638_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _639_recOwned;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out264, out _out265, out _out266, out _out267);
+                        _646_recursiveGen = _out264;
+                        _647_recOwned = _out265;
+                        _648_recErased = _out266;
+                        _649_recIdents = _out267;
+                        Dafny.ISequence<Dafny.Rune> _650_uneraseFn;
+                        _650_uneraseFn = ((_647_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _650_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _646_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _647_recOwned;
                         isErased = true;
-                        readIdents = _641_recIdents;
+                        readIdents = _649_recIdents;
                       } else {
                         Dafny.ISequence<Dafny.Rune> _out268;
                         bool _out269;
                         bool _out270;
                         Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out271;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _637_b), _637_b, _465_toTpe), @params, mustOwn, out _out268, out _out269, out _out270, out _out271);
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _645_b), _645_b, _480_toTpe), @params, mustOwn, out _out268, out _out269, out _out270, out _out271);
                         s = _out268;
                         isOwned = _out269;
                         isErased = _out270;
                         readIdents = _out271;
                       }
                     }
-                  } else {
-                    DAST._IType _643___mcc_h229 = _source33.dtor_Newtype_a0;
-                    DAST._IType _644_b = _643___mcc_h229;
+                  } else if (_source33.is_Trait) {
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _651___mcc_h228 = _source33.dtor_path;
+                    DAST._IType _652_b = _640___mcc_h213;
                     {
-                      if (object.Equals(_466_fromTpe, _644_b)) {
-                        Dafny.ISequence<Dafny.Rune> _645_recursiveGen;
-                        bool _646_recOwned;
-                        bool _647_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _648_recIdents;
+                      if (object.Equals(_652_b, _480_toTpe)) {
+                        Dafny.ISequence<Dafny.Rune> _653_recursiveGen;
+                        bool _654_recOwned;
+                        bool _655_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _656_recIdents;
                         Dafny.ISequence<Dafny.Rune> _out272;
                         bool _out273;
                         bool _out274;
                         Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out275;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out272, out _out273, out _out274, out _out275);
-                        _645_recursiveGen = _out272;
-                        _646_recOwned = _out273;
-                        _647_recErased = _out274;
-                        _648_recIdents = _out275;
-                        Dafny.ISequence<Dafny.Rune> _649_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out276;
-                        _out276 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _649_rhsType = _out276;
-                        Dafny.ISequence<Dafny.Rune> _650_uneraseFn;
-                        _650_uneraseFn = ((_646_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _649_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _650_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _645_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _646_recOwned;
-                        isErased = false;
-                        readIdents = _648_recIdents;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out272, out _out273, out _out274, out _out275);
+                        _653_recursiveGen = _out272;
+                        _654_recOwned = _out273;
+                        _655_recErased = _out274;
+                        _656_recIdents = _out275;
+                        Dafny.ISequence<Dafny.Rune> _657_uneraseFn;
+                        _657_uneraseFn = ((_654_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _657_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _653_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _654_recOwned;
+                        isErased = true;
+                        readIdents = _656_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out277;
+                        Dafny.ISequence<Dafny.Rune> _out276;
+                        bool _out277;
                         bool _out278;
-                        bool _out279;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out280;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _644_b), _644_b, _465_toTpe), @params, mustOwn, out _out277, out _out278, out _out279, out _out280);
-                        s = _out277;
-                        isOwned = _out278;
-                        isErased = _out279;
-                        readIdents = _out280;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out279;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _652_b), _652_b, _480_toTpe), @params, mustOwn, out _out276, out _out277, out _out278, out _out279);
+                        s = _out276;
+                        isOwned = _out277;
+                        isErased = _out278;
+                        readIdents = _out279;
+                      }
+                    }
+                  } else {
+                    DAST._IType _658___mcc_h231 = _source33.dtor_Newtype_a0;
+                    DAST._IType _659_b = _658___mcc_h231;
+                    {
+                      if (object.Equals(_481_fromTpe, _659_b)) {
+                        Dafny.ISequence<Dafny.Rune> _660_recursiveGen;
+                        bool _661_recOwned;
+                        bool _662_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _663_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out280;
+                        bool _out281;
+                        bool _out282;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out283;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out280, out _out281, out _out282, out _out283);
+                        _660_recursiveGen = _out280;
+                        _661_recOwned = _out281;
+                        _662_recErased = _out282;
+                        _663_recIdents = _out283;
+                        Dafny.ISequence<Dafny.Rune> _664_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out284;
+                        _out284 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _664_rhsType = _out284;
+                        Dafny.ISequence<Dafny.Rune> _665_uneraseFn;
+                        _665_uneraseFn = ((_661_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _664_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _665_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _660_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _661_recOwned;
+                        isErased = false;
+                        readIdents = _663_recIdents;
+                      } else {
+                        Dafny.ISequence<Dafny.Rune> _out285;
+                        bool _out286;
+                        bool _out287;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out288;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _659_b), _659_b, _480_toTpe), @params, mustOwn, out _out285, out _out286, out _out287, out _out288);
+                        s = _out285;
+                        isOwned = _out286;
+                        isErased = _out287;
+                        readIdents = _out288;
                       }
                     }
                   }
                 } else if (_source32.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _651___mcc_h232 = _source32.dtor_Tuple_a0;
-                  DAST._IType _652_b = _625___mcc_h211;
+                  Dafny.ISequence<DAST._IType> _666___mcc_h234 = _source32.dtor_Tuple_a0;
+                  DAST._IType _667_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_652_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _653_recursiveGen;
-                      bool _654_recOwned;
-                      bool _655_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _656_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out281;
-                      bool _out282;
-                      bool _out283;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out284;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out281, out _out282, out _out283, out _out284);
-                      _653_recursiveGen = _out281;
-                      _654_recOwned = _out282;
-                      _655_recErased = _out283;
-                      _656_recIdents = _out284;
-                      Dafny.ISequence<Dafny.Rune> _657_uneraseFn;
-                      _657_uneraseFn = ((_654_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _657_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _653_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _654_recOwned;
-                      isErased = true;
-                      readIdents = _656_recIdents;
-                    } else {
-                      Dafny.ISequence<Dafny.Rune> _out285;
-                      bool _out286;
-                      bool _out287;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out288;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _652_b), _652_b, _465_toTpe), @params, mustOwn, out _out285, out _out286, out _out287, out _out288);
-                      s = _out285;
-                      isOwned = _out286;
-                      isErased = _out287;
-                      readIdents = _out288;
-                    }
-                  }
-                } else if (_source32.is_Array) {
-                  DAST._IType _658___mcc_h235 = _source32.dtor_element;
-                  DAST._IType _659_b = _625___mcc_h211;
-                  {
-                    if (object.Equals(_659_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _660_recursiveGen;
-                      bool _661_recOwned;
-                      bool _662_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _663_recIdents;
+                    if (object.Equals(_667_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _668_recursiveGen;
+                      bool _669_recOwned;
+                      bool _670_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _671_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out289;
                       bool _out290;
                       bool _out291;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out292;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out289, out _out290, out _out291, out _out292);
-                      _660_recursiveGen = _out289;
-                      _661_recOwned = _out290;
-                      _662_recErased = _out291;
-                      _663_recIdents = _out292;
-                      Dafny.ISequence<Dafny.Rune> _664_uneraseFn;
-                      _664_uneraseFn = ((_661_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _664_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _660_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _661_recOwned;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out289, out _out290, out _out291, out _out292);
+                      _668_recursiveGen = _out289;
+                      _669_recOwned = _out290;
+                      _670_recErased = _out291;
+                      _671_recIdents = _out292;
+                      Dafny.ISequence<Dafny.Rune> _672_uneraseFn;
+                      _672_uneraseFn = ((_669_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _672_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _668_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _669_recOwned;
                       isErased = true;
-                      readIdents = _663_recIdents;
+                      readIdents = _671_recIdents;
                     } else {
                       Dafny.ISequence<Dafny.Rune> _out293;
                       bool _out294;
                       bool _out295;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out296;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _659_b), _659_b, _465_toTpe), @params, mustOwn, out _out293, out _out294, out _out295, out _out296);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _667_b), _667_b, _480_toTpe), @params, mustOwn, out _out293, out _out294, out _out295, out _out296);
                       s = _out293;
                       isOwned = _out294;
                       isErased = _out295;
                       readIdents = _out296;
                     }
                   }
-                } else if (_source32.is_Seq) {
-                  DAST._IType _665___mcc_h238 = _source32.dtor_element;
-                  DAST._IType _666_b = _625___mcc_h211;
+                } else if (_source32.is_Array) {
+                  DAST._IType _673___mcc_h237 = _source32.dtor_element;
+                  DAST._IType _674_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_666_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _667_recursiveGen;
-                      bool _668_recOwned;
-                      bool _669_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _670_recIdents;
+                    if (object.Equals(_674_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _675_recursiveGen;
+                      bool _676_recOwned;
+                      bool _677_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _678_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out297;
                       bool _out298;
                       bool _out299;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out300;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out297, out _out298, out _out299, out _out300);
-                      _667_recursiveGen = _out297;
-                      _668_recOwned = _out298;
-                      _669_recErased = _out299;
-                      _670_recIdents = _out300;
-                      Dafny.ISequence<Dafny.Rune> _671_uneraseFn;
-                      _671_uneraseFn = ((_668_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _671_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _667_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _668_recOwned;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out297, out _out298, out _out299, out _out300);
+                      _675_recursiveGen = _out297;
+                      _676_recOwned = _out298;
+                      _677_recErased = _out299;
+                      _678_recIdents = _out300;
+                      Dafny.ISequence<Dafny.Rune> _679_uneraseFn;
+                      _679_uneraseFn = ((_676_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _679_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _675_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _676_recOwned;
                       isErased = true;
-                      readIdents = _670_recIdents;
+                      readIdents = _678_recIdents;
                     } else {
                       Dafny.ISequence<Dafny.Rune> _out301;
                       bool _out302;
                       bool _out303;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out304;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _666_b), _666_b, _465_toTpe), @params, mustOwn, out _out301, out _out302, out _out303, out _out304);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _674_b), _674_b, _480_toTpe), @params, mustOwn, out _out301, out _out302, out _out303, out _out304);
                       s = _out301;
                       isOwned = _out302;
                       isErased = _out303;
                       readIdents = _out304;
                     }
                   }
-                } else if (_source32.is_Set) {
-                  DAST._IType _672___mcc_h241 = _source32.dtor_element;
-                  DAST._IType _673_b = _625___mcc_h211;
+                } else if (_source32.is_Seq) {
+                  DAST._IType _680___mcc_h240 = _source32.dtor_element;
+                  DAST._IType _681_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_673_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _674_recursiveGen;
-                      bool _675_recOwned;
-                      bool _676_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _677_recIdents;
+                    if (object.Equals(_681_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _682_recursiveGen;
+                      bool _683_recOwned;
+                      bool _684_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _685_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out305;
                       bool _out306;
                       bool _out307;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out308;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out305, out _out306, out _out307, out _out308);
-                      _674_recursiveGen = _out305;
-                      _675_recOwned = _out306;
-                      _676_recErased = _out307;
-                      _677_recIdents = _out308;
-                      Dafny.ISequence<Dafny.Rune> _678_uneraseFn;
-                      _678_uneraseFn = ((_675_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _678_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _674_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _675_recOwned;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out305, out _out306, out _out307, out _out308);
+                      _682_recursiveGen = _out305;
+                      _683_recOwned = _out306;
+                      _684_recErased = _out307;
+                      _685_recIdents = _out308;
+                      Dafny.ISequence<Dafny.Rune> _686_uneraseFn;
+                      _686_uneraseFn = ((_683_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _686_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _682_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _683_recOwned;
                       isErased = true;
-                      readIdents = _677_recIdents;
+                      readIdents = _685_recIdents;
                     } else {
                       Dafny.ISequence<Dafny.Rune> _out309;
                       bool _out310;
                       bool _out311;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out312;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _673_b), _673_b, _465_toTpe), @params, mustOwn, out _out309, out _out310, out _out311, out _out312);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _681_b), _681_b, _480_toTpe), @params, mustOwn, out _out309, out _out310, out _out311, out _out312);
                       s = _out309;
                       isOwned = _out310;
                       isErased = _out311;
                       readIdents = _out312;
                     }
                   }
-                } else if (_source32.is_Multiset) {
-                  DAST._IType _679___mcc_h244 = _source32.dtor_element;
-                  DAST._IType _680_b = _625___mcc_h211;
+                } else if (_source32.is_Set) {
+                  DAST._IType _687___mcc_h243 = _source32.dtor_element;
+                  DAST._IType _688_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_680_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _681_recursiveGen;
-                      bool _682_recOwned;
-                      bool _683_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _684_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out313;
-                      bool _out314;
-                      bool _out315;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out316;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out313, out _out314, out _out315, out _out316);
-                      _681_recursiveGen = _out313;
-                      _682_recOwned = _out314;
-                      _683_recErased = _out315;
-                      _684_recIdents = _out316;
-                      Dafny.ISequence<Dafny.Rune> _685_uneraseFn;
-                      _685_uneraseFn = ((_682_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _685_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _681_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _682_recOwned;
-                      isErased = true;
-                      readIdents = _684_recIdents;
-                    } else {
-                      Dafny.ISequence<Dafny.Rune> _out317;
-                      bool _out318;
-                      bool _out319;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out320;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _680_b), _680_b, _465_toTpe), @params, mustOwn, out _out317, out _out318, out _out319, out _out320);
-                      s = _out317;
-                      isOwned = _out318;
-                      isErased = _out319;
-                      readIdents = _out320;
-                    }
-                  }
-                } else if (_source32.is_Map) {
-                  DAST._IType _686___mcc_h247 = _source32.dtor_key;
-                  DAST._IType _687___mcc_h248 = _source32.dtor_value;
-                  DAST._IType _688_b = _625___mcc_h211;
-                  {
-                    if (object.Equals(_688_b, _465_toTpe)) {
+                    if (object.Equals(_688_b, _480_toTpe)) {
                       Dafny.ISequence<Dafny.Rune> _689_recursiveGen;
                       bool _690_recOwned;
                       bool _691_recErased;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _692_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out321;
-                      bool _out322;
-                      bool _out323;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out324;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out321, out _out322, out _out323, out _out324);
-                      _689_recursiveGen = _out321;
-                      _690_recOwned = _out322;
-                      _691_recErased = _out323;
-                      _692_recIdents = _out324;
+                      Dafny.ISequence<Dafny.Rune> _out313;
+                      bool _out314;
+                      bool _out315;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out316;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out313, out _out314, out _out315, out _out316);
+                      _689_recursiveGen = _out313;
+                      _690_recOwned = _out314;
+                      _691_recErased = _out315;
+                      _692_recIdents = _out316;
                       Dafny.ISequence<Dafny.Rune> _693_uneraseFn;
                       _693_uneraseFn = ((_690_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
                       s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _693_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _689_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
@@ -7056,72 +7138,72 @@ namespace DCOMP {
                       isErased = true;
                       readIdents = _692_recIdents;
                     } else {
+                      Dafny.ISequence<Dafny.Rune> _out317;
+                      bool _out318;
+                      bool _out319;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out320;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _688_b), _688_b, _480_toTpe), @params, mustOwn, out _out317, out _out318, out _out319, out _out320);
+                      s = _out317;
+                      isOwned = _out318;
+                      isErased = _out319;
+                      readIdents = _out320;
+                    }
+                  }
+                } else if (_source32.is_Multiset) {
+                  DAST._IType _694___mcc_h246 = _source32.dtor_element;
+                  DAST._IType _695_b = _640___mcc_h213;
+                  {
+                    if (object.Equals(_695_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _696_recursiveGen;
+                      bool _697_recOwned;
+                      bool _698_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _699_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out321;
+                      bool _out322;
+                      bool _out323;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out324;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out321, out _out322, out _out323, out _out324);
+                      _696_recursiveGen = _out321;
+                      _697_recOwned = _out322;
+                      _698_recErased = _out323;
+                      _699_recIdents = _out324;
+                      Dafny.ISequence<Dafny.Rune> _700_uneraseFn;
+                      _700_uneraseFn = ((_697_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _700_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _696_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _697_recOwned;
+                      isErased = true;
+                      readIdents = _699_recIdents;
+                    } else {
                       Dafny.ISequence<Dafny.Rune> _out325;
                       bool _out326;
                       bool _out327;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out328;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _688_b), _688_b, _465_toTpe), @params, mustOwn, out _out325, out _out326, out _out327, out _out328);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _695_b), _695_b, _480_toTpe), @params, mustOwn, out _out325, out _out326, out _out327, out _out328);
                       s = _out325;
                       isOwned = _out326;
                       isErased = _out327;
                       readIdents = _out328;
                     }
                   }
-                } else if (_source32.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _694___mcc_h253 = _source32.dtor_args;
-                  DAST._IType _695___mcc_h254 = _source32.dtor_result;
-                  DAST._IType _696_b = _625___mcc_h211;
+                } else if (_source32.is_Map) {
+                  DAST._IType _701___mcc_h249 = _source32.dtor_key;
+                  DAST._IType _702___mcc_h250 = _source32.dtor_value;
+                  DAST._IType _703_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_696_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _697_recursiveGen;
-                      bool _698_recOwned;
-                      bool _699_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _700_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out329;
-                      bool _out330;
-                      bool _out331;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out332;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out329, out _out330, out _out331, out _out332);
-                      _697_recursiveGen = _out329;
-                      _698_recOwned = _out330;
-                      _699_recErased = _out331;
-                      _700_recIdents = _out332;
-                      Dafny.ISequence<Dafny.Rune> _701_uneraseFn;
-                      _701_uneraseFn = ((_698_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _701_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _697_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _698_recOwned;
-                      isErased = true;
-                      readIdents = _700_recIdents;
-                    } else {
-                      Dafny.ISequence<Dafny.Rune> _out333;
-                      bool _out334;
-                      bool _out335;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out336;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _696_b), _696_b, _465_toTpe), @params, mustOwn, out _out333, out _out334, out _out335, out _out336);
-                      s = _out333;
-                      isOwned = _out334;
-                      isErased = _out335;
-                      readIdents = _out336;
-                    }
-                  }
-                } else if (_source32.is_Primitive) {
-                  DAST._IPrimitive _702___mcc_h259 = _source32.dtor_Primitive_a0;
-                  DAST._IType _703_b = _625___mcc_h211;
-                  {
-                    if (object.Equals(_703_b, _465_toTpe)) {
+                    if (object.Equals(_703_b, _480_toTpe)) {
                       Dafny.ISequence<Dafny.Rune> _704_recursiveGen;
                       bool _705_recOwned;
                       bool _706_recErased;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _707_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out337;
-                      bool _out338;
-                      bool _out339;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out340;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out337, out _out338, out _out339, out _out340);
-                      _704_recursiveGen = _out337;
-                      _705_recOwned = _out338;
-                      _706_recErased = _out339;
-                      _707_recIdents = _out340;
+                      Dafny.ISequence<Dafny.Rune> _out329;
+                      bool _out330;
+                      bool _out331;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out332;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out329, out _out330, out _out331, out _out332);
+                      _704_recursiveGen = _out329;
+                      _705_recOwned = _out330;
+                      _706_recErased = _out331;
+                      _707_recIdents = _out332;
                       Dafny.ISequence<Dafny.Rune> _708_uneraseFn;
                       _708_uneraseFn = ((_705_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
                       s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _708_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _704_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
@@ -7129,4794 +7211,4867 @@ namespace DCOMP {
                       isErased = true;
                       readIdents = _707_recIdents;
                     } else {
+                      Dafny.ISequence<Dafny.Rune> _out333;
+                      bool _out334;
+                      bool _out335;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out336;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _703_b), _703_b, _480_toTpe), @params, mustOwn, out _out333, out _out334, out _out335, out _out336);
+                      s = _out333;
+                      isOwned = _out334;
+                      isErased = _out335;
+                      readIdents = _out336;
+                    }
+                  }
+                } else if (_source32.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _709___mcc_h255 = _source32.dtor_args;
+                  DAST._IType _710___mcc_h256 = _source32.dtor_result;
+                  DAST._IType _711_b = _640___mcc_h213;
+                  {
+                    if (object.Equals(_711_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _712_recursiveGen;
+                      bool _713_recOwned;
+                      bool _714_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _715_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out337;
+                      bool _out338;
+                      bool _out339;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out340;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out337, out _out338, out _out339, out _out340);
+                      _712_recursiveGen = _out337;
+                      _713_recOwned = _out338;
+                      _714_recErased = _out339;
+                      _715_recIdents = _out340;
+                      Dafny.ISequence<Dafny.Rune> _716_uneraseFn;
+                      _716_uneraseFn = ((_713_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _716_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _712_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _713_recOwned;
+                      isErased = true;
+                      readIdents = _715_recIdents;
+                    } else {
                       Dafny.ISequence<Dafny.Rune> _out341;
                       bool _out342;
                       bool _out343;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out344;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _703_b), _703_b, _465_toTpe), @params, mustOwn, out _out341, out _out342, out _out343, out _out344);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _711_b), _711_b, _480_toTpe), @params, mustOwn, out _out341, out _out342, out _out343, out _out344);
                       s = _out341;
                       isOwned = _out342;
                       isErased = _out343;
                       readIdents = _out344;
                     }
                   }
-                } else if (_source32.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _709___mcc_h262 = _source32.dtor_Passthrough_a0;
-                  DAST._IType _710_b = _625___mcc_h211;
+                } else if (_source32.is_Primitive) {
+                  DAST._IPrimitive _717___mcc_h261 = _source32.dtor_Primitive_a0;
+                  DAST._IType _718_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_710_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _711_recursiveGen;
-                      bool _712_recOwned;
-                      bool _713_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _714_recIdents;
+                    if (object.Equals(_718_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _719_recursiveGen;
+                      bool _720_recOwned;
+                      bool _721_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _722_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out345;
                       bool _out346;
                       bool _out347;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out348;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out345, out _out346, out _out347, out _out348);
-                      _711_recursiveGen = _out345;
-                      _712_recOwned = _out346;
-                      _713_recErased = _out347;
-                      _714_recIdents = _out348;
-                      Dafny.ISequence<Dafny.Rune> _715_uneraseFn;
-                      _715_uneraseFn = ((_712_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _715_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _711_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _712_recOwned;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out345, out _out346, out _out347, out _out348);
+                      _719_recursiveGen = _out345;
+                      _720_recOwned = _out346;
+                      _721_recErased = _out347;
+                      _722_recIdents = _out348;
+                      Dafny.ISequence<Dafny.Rune> _723_uneraseFn;
+                      _723_uneraseFn = ((_720_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _723_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _719_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _720_recOwned;
                       isErased = true;
-                      readIdents = _714_recIdents;
+                      readIdents = _722_recIdents;
                     } else {
                       Dafny.ISequence<Dafny.Rune> _out349;
                       bool _out350;
                       bool _out351;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out352;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _710_b), _710_b, _465_toTpe), @params, mustOwn, out _out349, out _out350, out _out351, out _out352);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _718_b), _718_b, _480_toTpe), @params, mustOwn, out _out349, out _out350, out _out351, out _out352);
                       s = _out349;
                       isOwned = _out350;
                       isErased = _out351;
                       readIdents = _out352;
                     }
                   }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _716___mcc_h265 = _source32.dtor_TypeArg_a0;
-                  DAST._IType _717_b = _625___mcc_h211;
+                } else if (_source32.is_Passthrough) {
+                  Dafny.ISequence<Dafny.Rune> _724___mcc_h264 = _source32.dtor_Passthrough_a0;
+                  DAST._IType _725_b = _640___mcc_h213;
                   {
-                    if (object.Equals(_717_b, _465_toTpe)) {
-                      Dafny.ISequence<Dafny.Rune> _718_recursiveGen;
-                      bool _719_recOwned;
-                      bool _720_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _721_recIdents;
+                    if (object.Equals(_725_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _726_recursiveGen;
+                      bool _727_recOwned;
+                      bool _728_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _729_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out353;
                       bool _out354;
                       bool _out355;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out356;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out353, out _out354, out _out355, out _out356);
-                      _718_recursiveGen = _out353;
-                      _719_recOwned = _out354;
-                      _720_recErased = _out355;
-                      _721_recIdents = _out356;
-                      Dafny.ISequence<Dafny.Rune> _722_uneraseFn;
-                      _722_uneraseFn = ((_719_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _722_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _718_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _719_recOwned;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out353, out _out354, out _out355, out _out356);
+                      _726_recursiveGen = _out353;
+                      _727_recOwned = _out354;
+                      _728_recErased = _out355;
+                      _729_recIdents = _out356;
+                      Dafny.ISequence<Dafny.Rune> _730_uneraseFn;
+                      _730_uneraseFn = ((_727_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _730_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _726_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _727_recOwned;
                       isErased = true;
-                      readIdents = _721_recIdents;
+                      readIdents = _729_recIdents;
                     } else {
                       Dafny.ISequence<Dafny.Rune> _out357;
                       bool _out358;
                       bool _out359;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out360;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _717_b), _717_b, _465_toTpe), @params, mustOwn, out _out357, out _out358, out _out359, out _out360);
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _725_b), _725_b, _480_toTpe), @params, mustOwn, out _out357, out _out358, out _out359, out _out360);
                       s = _out357;
                       isOwned = _out358;
                       isErased = _out359;
                       readIdents = _out360;
                     }
                   }
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _731___mcc_h267 = _source32.dtor_TypeArg_a0;
+                  DAST._IType _732_b = _640___mcc_h213;
+                  {
+                    if (object.Equals(_732_b, _480_toTpe)) {
+                      Dafny.ISequence<Dafny.Rune> _733_recursiveGen;
+                      bool _734_recOwned;
+                      bool _735_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _736_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out361;
+                      bool _out362;
+                      bool _out363;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out364;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out361, out _out362, out _out363, out _out364);
+                      _733_recursiveGen = _out361;
+                      _734_recOwned = _out362;
+                      _735_recErased = _out363;
+                      _736_recIdents = _out364;
+                      Dafny.ISequence<Dafny.Rune> _737_uneraseFn;
+                      _737_uneraseFn = ((_734_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _737_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _733_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _734_recOwned;
+                      isErased = true;
+                      readIdents = _736_recIdents;
+                    } else {
+                      Dafny.ISequence<Dafny.Rune> _out365;
+                      bool _out366;
+                      bool _out367;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out368;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _732_b), _732_b, _480_toTpe), @params, mustOwn, out _out365, out _out366, out _out367, out _out368);
+                      s = _out365;
+                      isOwned = _out366;
+                      isErased = _out367;
+                      readIdents = _out368;
+                    }
+                  }
                 }
               }
             } else if (_source26.is_Tuple) {
-              Dafny.ISequence<DAST._IType> _723___mcc_h268 = _source26.dtor_Tuple_a0;
-              DAST._IType _source34 = _473___mcc_h121;
+              Dafny.ISequence<DAST._IType> _738___mcc_h270 = _source26.dtor_Tuple_a0;
+              DAST._IType _source34 = _488___mcc_h123;
               if (_source34.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _724___mcc_h271 = _source34.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _725___mcc_h272 = _source34.dtor_typeArgs;
-                DAST._IResolvedType _726___mcc_h273 = _source34.dtor_resolved;
-                DAST._IResolvedType _source35 = _726___mcc_h273;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _739___mcc_h273 = _source34.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _740___mcc_h274 = _source34.dtor_typeArgs;
+                DAST._IResolvedType _741___mcc_h275 = _source34.dtor_resolved;
+                DAST._IResolvedType _source35 = _741___mcc_h275;
                 if (_source35.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _727___mcc_h277 = _source35.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _742___mcc_h279 = _source35.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _728_recursiveGen;
-                    bool _729_recOwned;
-                    bool _730_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _731_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out361;
-                    bool _out362;
-                    bool _out363;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out364;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out361, out _out362, out _out363, out _out364);
-                    _728_recursiveGen = _out361;
-                    _729_recOwned = _out362;
-                    _730_recErased = _out363;
-                    _731_recIdents = _out364;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _728_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _729_recOwned;
-                    isErased = _730_recErased;
-                    readIdents = _731_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _743_recursiveGen;
+                    bool _744_recOwned;
+                    bool _745_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _746_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out369;
+                    bool _out370;
+                    bool _out371;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out372;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out369, out _out370, out _out371, out _out372);
+                    _743_recursiveGen = _out369;
+                    _744_recOwned = _out370;
+                    _745_recErased = _out371;
+                    _746_recIdents = _out372;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _743_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _744_recOwned;
+                    isErased = _745_recErased;
+                    readIdents = _746_recIdents;
                   }
                 } else if (_source35.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _732___mcc_h279 = _source35.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _747___mcc_h281 = _source35.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _733_recursiveGen;
-                    bool _734_recOwned;
-                    bool _735_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _736_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out365;
-                    bool _out366;
-                    bool _out367;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out368;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out365, out _out366, out _out367, out _out368);
-                    _733_recursiveGen = _out365;
-                    _734_recOwned = _out366;
-                    _735_recErased = _out367;
-                    _736_recIdents = _out368;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _733_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _734_recOwned;
-                    isErased = _735_recErased;
-                    readIdents = _736_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _748_recursiveGen;
+                    bool _749_recOwned;
+                    bool _750_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _751_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out373;
+                    bool _out374;
+                    bool _out375;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out376;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out373, out _out374, out _out375, out _out376);
+                    _748_recursiveGen = _out373;
+                    _749_recOwned = _out374;
+                    _750_recErased = _out375;
+                    _751_recIdents = _out376;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _748_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _749_recOwned;
+                    isErased = _750_recErased;
+                    readIdents = _751_recIdents;
                   }
                 } else {
-                  DAST._IType _737___mcc_h281 = _source35.dtor_Newtype_a0;
-                  DAST._IType _738_b = _737___mcc_h281;
+                  DAST._IType _752___mcc_h283 = _source35.dtor_Newtype_a0;
+                  DAST._IType _753_b = _752___mcc_h283;
                   {
-                    if (object.Equals(_466_fromTpe, _738_b)) {
-                      Dafny.ISequence<Dafny.Rune> _739_recursiveGen;
-                      bool _740_recOwned;
-                      bool _741_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _742_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out369;
-                      bool _out370;
-                      bool _out371;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out372;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out369, out _out370, out _out371, out _out372);
-                      _739_recursiveGen = _out369;
-                      _740_recOwned = _out370;
-                      _741_recErased = _out371;
-                      _742_recIdents = _out372;
-                      Dafny.ISequence<Dafny.Rune> _743_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out373;
-                      _out373 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _743_rhsType = _out373;
-                      Dafny.ISequence<Dafny.Rune> _744_uneraseFn;
-                      _744_uneraseFn = ((_740_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _743_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _744_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _739_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _740_recOwned;
+                    if (object.Equals(_481_fromTpe, _753_b)) {
+                      Dafny.ISequence<Dafny.Rune> _754_recursiveGen;
+                      bool _755_recOwned;
+                      bool _756_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _757_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out377;
+                      bool _out378;
+                      bool _out379;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out380;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out377, out _out378, out _out379, out _out380);
+                      _754_recursiveGen = _out377;
+                      _755_recOwned = _out378;
+                      _756_recErased = _out379;
+                      _757_recIdents = _out380;
+                      Dafny.ISequence<Dafny.Rune> _758_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out381;
+                      _out381 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _758_rhsType = _out381;
+                      Dafny.ISequence<Dafny.Rune> _759_uneraseFn;
+                      _759_uneraseFn = ((_755_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _758_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _759_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _754_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _755_recOwned;
                       isErased = false;
-                      readIdents = _742_recIdents;
+                      readIdents = _757_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out374;
-                      bool _out375;
-                      bool _out376;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out377;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _738_b), _738_b, _465_toTpe), @params, mustOwn, out _out374, out _out375, out _out376, out _out377);
-                      s = _out374;
-                      isOwned = _out375;
-                      isErased = _out376;
-                      readIdents = _out377;
+                      Dafny.ISequence<Dafny.Rune> _out382;
+                      bool _out383;
+                      bool _out384;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out385;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _753_b), _753_b, _480_toTpe), @params, mustOwn, out _out382, out _out383, out _out384, out _out385);
+                      s = _out382;
+                      isOwned = _out383;
+                      isErased = _out384;
+                      readIdents = _out385;
                     }
                   }
                 }
               } else if (_source34.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _745___mcc_h283 = _source34.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _746_recursiveGen;
-                  bool _747_recOwned;
-                  bool _748_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _749_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out378;
-                  bool _out379;
-                  bool _out380;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out381;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out378, out _out379, out _out380, out _out381);
-                  _746_recursiveGen = _out378;
-                  _747_recOwned = _out379;
-                  _748_recErased = _out380;
-                  _749_recIdents = _out381;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _746_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _747_recOwned;
-                  isErased = _748_recErased;
-                  readIdents = _749_recIdents;
-                }
-              } else if (_source34.is_Array) {
-                DAST._IType _750___mcc_h285 = _source34.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _751_recursiveGen;
-                  bool _752_recOwned;
-                  bool _753_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _754_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out382;
-                  bool _out383;
-                  bool _out384;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out385;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out382, out _out383, out _out384, out _out385);
-                  _751_recursiveGen = _out382;
-                  _752_recOwned = _out383;
-                  _753_recErased = _out384;
-                  _754_recIdents = _out385;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _751_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _752_recOwned;
-                  isErased = _753_recErased;
-                  readIdents = _754_recIdents;
-                }
-              } else if (_source34.is_Seq) {
-                DAST._IType _755___mcc_h287 = _source34.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _756_recursiveGen;
-                  bool _757_recOwned;
-                  bool _758_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _759_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out386;
-                  bool _out387;
-                  bool _out388;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out389;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out386, out _out387, out _out388, out _out389);
-                  _756_recursiveGen = _out386;
-                  _757_recOwned = _out387;
-                  _758_recErased = _out388;
-                  _759_recIdents = _out389;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _756_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _757_recOwned;
-                  isErased = _758_recErased;
-                  readIdents = _759_recIdents;
-                }
-              } else if (_source34.is_Set) {
-                DAST._IType _760___mcc_h289 = _source34.dtor_element;
+                Dafny.ISequence<DAST._IType> _760___mcc_h285 = _source34.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _761_recursiveGen;
                   bool _762_recOwned;
                   bool _763_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _764_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out390;
-                  bool _out391;
-                  bool _out392;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out393;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out390, out _out391, out _out392, out _out393);
-                  _761_recursiveGen = _out390;
-                  _762_recOwned = _out391;
-                  _763_recErased = _out392;
-                  _764_recIdents = _out393;
+                  Dafny.ISequence<Dafny.Rune> _out386;
+                  bool _out387;
+                  bool _out388;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out389;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out386, out _out387, out _out388, out _out389);
+                  _761_recursiveGen = _out386;
+                  _762_recOwned = _out387;
+                  _763_recErased = _out388;
+                  _764_recIdents = _out389;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _761_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _762_recOwned;
                   isErased = _763_recErased;
                   readIdents = _764_recIdents;
                 }
-              } else if (_source34.is_Multiset) {
-                DAST._IType _765___mcc_h291 = _source34.dtor_element;
+              } else if (_source34.is_Array) {
+                DAST._IType _765___mcc_h287 = _source34.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _766_recursiveGen;
                   bool _767_recOwned;
                   bool _768_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _769_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out394;
-                  bool _out395;
-                  bool _out396;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out397;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out394, out _out395, out _out396, out _out397);
-                  _766_recursiveGen = _out394;
-                  _767_recOwned = _out395;
-                  _768_recErased = _out396;
-                  _769_recIdents = _out397;
+                  Dafny.ISequence<Dafny.Rune> _out390;
+                  bool _out391;
+                  bool _out392;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out393;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out390, out _out391, out _out392, out _out393);
+                  _766_recursiveGen = _out390;
+                  _767_recOwned = _out391;
+                  _768_recErased = _out392;
+                  _769_recIdents = _out393;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _766_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _767_recOwned;
                   isErased = _768_recErased;
                   readIdents = _769_recIdents;
                 }
-              } else if (_source34.is_Map) {
-                DAST._IType _770___mcc_h293 = _source34.dtor_key;
-                DAST._IType _771___mcc_h294 = _source34.dtor_value;
+              } else if (_source34.is_Seq) {
+                DAST._IType _770___mcc_h289 = _source34.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _772_recursiveGen;
-                  bool _773_recOwned;
-                  bool _774_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _775_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _771_recursiveGen;
+                  bool _772_recOwned;
+                  bool _773_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _774_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out394;
+                  bool _out395;
+                  bool _out396;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out397;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out394, out _out395, out _out396, out _out397);
+                  _771_recursiveGen = _out394;
+                  _772_recOwned = _out395;
+                  _773_recErased = _out396;
+                  _774_recIdents = _out397;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _771_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _772_recOwned;
+                  isErased = _773_recErased;
+                  readIdents = _774_recIdents;
+                }
+              } else if (_source34.is_Set) {
+                DAST._IType _775___mcc_h291 = _source34.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _776_recursiveGen;
+                  bool _777_recOwned;
+                  bool _778_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _779_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out398;
                   bool _out399;
                   bool _out400;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out401;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out398, out _out399, out _out400, out _out401);
-                  _772_recursiveGen = _out398;
-                  _773_recOwned = _out399;
-                  _774_recErased = _out400;
-                  _775_recIdents = _out401;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _772_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _773_recOwned;
-                  isErased = _774_recErased;
-                  readIdents = _775_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out398, out _out399, out _out400, out _out401);
+                  _776_recursiveGen = _out398;
+                  _777_recOwned = _out399;
+                  _778_recErased = _out400;
+                  _779_recIdents = _out401;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _776_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _777_recOwned;
+                  isErased = _778_recErased;
+                  readIdents = _779_recIdents;
                 }
-              } else if (_source34.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _776___mcc_h297 = _source34.dtor_args;
-                DAST._IType _777___mcc_h298 = _source34.dtor_result;
+              } else if (_source34.is_Multiset) {
+                DAST._IType _780___mcc_h293 = _source34.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _778_recursiveGen;
-                  bool _779_recOwned;
-                  bool _780_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _781_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _781_recursiveGen;
+                  bool _782_recOwned;
+                  bool _783_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _784_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out402;
                   bool _out403;
                   bool _out404;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out405;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out402, out _out403, out _out404, out _out405);
-                  _778_recursiveGen = _out402;
-                  _779_recOwned = _out403;
-                  _780_recErased = _out404;
-                  _781_recIdents = _out405;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _778_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _779_recOwned;
-                  isErased = _780_recErased;
-                  readIdents = _781_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out402, out _out403, out _out404, out _out405);
+                  _781_recursiveGen = _out402;
+                  _782_recOwned = _out403;
+                  _783_recErased = _out404;
+                  _784_recIdents = _out405;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _781_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _782_recOwned;
+                  isErased = _783_recErased;
+                  readIdents = _784_recIdents;
                 }
-              } else if (_source34.is_Primitive) {
-                DAST._IPrimitive _782___mcc_h301 = _source34.dtor_Primitive_a0;
+              } else if (_source34.is_Map) {
+                DAST._IType _785___mcc_h295 = _source34.dtor_key;
+                DAST._IType _786___mcc_h296 = _source34.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _783_recursiveGen;
-                  bool _784_recOwned;
-                  bool _785_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _786_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _787_recursiveGen;
+                  bool _788_recOwned;
+                  bool _789_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _790_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out406;
                   bool _out407;
                   bool _out408;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out409;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out406, out _out407, out _out408, out _out409);
-                  _783_recursiveGen = _out406;
-                  _784_recOwned = _out407;
-                  _785_recErased = _out408;
-                  _786_recIdents = _out409;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _783_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _784_recOwned;
-                  isErased = _785_recErased;
-                  readIdents = _786_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out406, out _out407, out _out408, out _out409);
+                  _787_recursiveGen = _out406;
+                  _788_recOwned = _out407;
+                  _789_recErased = _out408;
+                  _790_recIdents = _out409;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _787_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _788_recOwned;
+                  isErased = _789_recErased;
+                  readIdents = _790_recIdents;
                 }
-              } else if (_source34.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _787___mcc_h303 = _source34.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _788_recursiveGen;
-                  bool _789_recOwned;
-                  bool _790_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _791_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out410;
-                  bool _out411;
-                  bool _out412;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out413;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out410, out _out411, out _out412, out _out413);
-                  _788_recursiveGen = _out410;
-                  _789_recOwned = _out411;
-                  _790_recErased = _out412;
-                  _791_recIdents = _out413;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _788_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _789_recOwned;
-                  isErased = _790_recErased;
-                  readIdents = _791_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _792___mcc_h305 = _source34.dtor_TypeArg_a0;
+              } else if (_source34.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _791___mcc_h299 = _source34.dtor_args;
+                DAST._IType _792___mcc_h300 = _source34.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _793_recursiveGen;
                   bool _794_recOwned;
                   bool _795_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _796_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out414;
-                  bool _out415;
-                  bool _out416;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out417;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out414, out _out415, out _out416, out _out417);
-                  _793_recursiveGen = _out414;
-                  _794_recOwned = _out415;
-                  _795_recErased = _out416;
-                  _796_recIdents = _out417;
+                  Dafny.ISequence<Dafny.Rune> _out410;
+                  bool _out411;
+                  bool _out412;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out413;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out410, out _out411, out _out412, out _out413);
+                  _793_recursiveGen = _out410;
+                  _794_recOwned = _out411;
+                  _795_recErased = _out412;
+                  _796_recIdents = _out413;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _793_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _794_recOwned;
                   isErased = _795_recErased;
                   readIdents = _796_recIdents;
                 }
+              } else if (_source34.is_Primitive) {
+                DAST._IPrimitive _797___mcc_h303 = _source34.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _798_recursiveGen;
+                  bool _799_recOwned;
+                  bool _800_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _801_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out414;
+                  bool _out415;
+                  bool _out416;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out417;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out414, out _out415, out _out416, out _out417);
+                  _798_recursiveGen = _out414;
+                  _799_recOwned = _out415;
+                  _800_recErased = _out416;
+                  _801_recIdents = _out417;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _798_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _799_recOwned;
+                  isErased = _800_recErased;
+                  readIdents = _801_recIdents;
+                }
+              } else if (_source34.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _802___mcc_h305 = _source34.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _803_recursiveGen;
+                  bool _804_recOwned;
+                  bool _805_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _806_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out418;
+                  bool _out419;
+                  bool _out420;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out421;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out418, out _out419, out _out420, out _out421);
+                  _803_recursiveGen = _out418;
+                  _804_recOwned = _out419;
+                  _805_recErased = _out420;
+                  _806_recIdents = _out421;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _803_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _804_recOwned;
+                  isErased = _805_recErased;
+                  readIdents = _806_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _807___mcc_h307 = _source34.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _808_recursiveGen;
+                  bool _809_recOwned;
+                  bool _810_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _811_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out422;
+                  bool _out423;
+                  bool _out424;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out425;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out422, out _out423, out _out424, out _out425);
+                  _808_recursiveGen = _out422;
+                  _809_recOwned = _out423;
+                  _810_recErased = _out424;
+                  _811_recIdents = _out425;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _808_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _809_recOwned;
+                  isErased = _810_recErased;
+                  readIdents = _811_recIdents;
+                }
               }
             } else if (_source26.is_Array) {
-              DAST._IType _797___mcc_h307 = _source26.dtor_element;
-              DAST._IType _source36 = _473___mcc_h121;
+              DAST._IType _812___mcc_h309 = _source26.dtor_element;
+              DAST._IType _source36 = _488___mcc_h123;
               if (_source36.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _798___mcc_h310 = _source36.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _799___mcc_h311 = _source36.dtor_typeArgs;
-                DAST._IResolvedType _800___mcc_h312 = _source36.dtor_resolved;
-                DAST._IResolvedType _source37 = _800___mcc_h312;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _813___mcc_h312 = _source36.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _814___mcc_h313 = _source36.dtor_typeArgs;
+                DAST._IResolvedType _815___mcc_h314 = _source36.dtor_resolved;
+                DAST._IResolvedType _source37 = _815___mcc_h314;
                 if (_source37.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _801___mcc_h316 = _source37.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _816___mcc_h318 = _source37.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _802_recursiveGen;
-                    bool _803_recOwned;
-                    bool _804_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _805_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out418;
-                    bool _out419;
-                    bool _out420;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out421;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out418, out _out419, out _out420, out _out421);
-                    _802_recursiveGen = _out418;
-                    _803_recOwned = _out419;
-                    _804_recErased = _out420;
-                    _805_recIdents = _out421;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _802_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _803_recOwned;
-                    isErased = _804_recErased;
-                    readIdents = _805_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _817_recursiveGen;
+                    bool _818_recOwned;
+                    bool _819_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _820_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out426;
+                    bool _out427;
+                    bool _out428;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out429;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out426, out _out427, out _out428, out _out429);
+                    _817_recursiveGen = _out426;
+                    _818_recOwned = _out427;
+                    _819_recErased = _out428;
+                    _820_recIdents = _out429;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _817_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _818_recOwned;
+                    isErased = _819_recErased;
+                    readIdents = _820_recIdents;
                   }
                 } else if (_source37.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _806___mcc_h318 = _source37.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _821___mcc_h320 = _source37.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _807_recursiveGen;
-                    bool _808_recOwned;
-                    bool _809_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _810_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out422;
-                    bool _out423;
-                    bool _out424;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out425;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out422, out _out423, out _out424, out _out425);
-                    _807_recursiveGen = _out422;
-                    _808_recOwned = _out423;
-                    _809_recErased = _out424;
-                    _810_recIdents = _out425;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _807_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _808_recOwned;
-                    isErased = _809_recErased;
-                    readIdents = _810_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _822_recursiveGen;
+                    bool _823_recOwned;
+                    bool _824_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _825_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out430;
+                    bool _out431;
+                    bool _out432;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out433;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out430, out _out431, out _out432, out _out433);
+                    _822_recursiveGen = _out430;
+                    _823_recOwned = _out431;
+                    _824_recErased = _out432;
+                    _825_recIdents = _out433;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _822_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _823_recOwned;
+                    isErased = _824_recErased;
+                    readIdents = _825_recIdents;
                   }
                 } else {
-                  DAST._IType _811___mcc_h320 = _source37.dtor_Newtype_a0;
-                  DAST._IType _812_b = _811___mcc_h320;
+                  DAST._IType _826___mcc_h322 = _source37.dtor_Newtype_a0;
+                  DAST._IType _827_b = _826___mcc_h322;
                   {
-                    if (object.Equals(_466_fromTpe, _812_b)) {
-                      Dafny.ISequence<Dafny.Rune> _813_recursiveGen;
-                      bool _814_recOwned;
-                      bool _815_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _816_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out426;
-                      bool _out427;
-                      bool _out428;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out429;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out426, out _out427, out _out428, out _out429);
-                      _813_recursiveGen = _out426;
-                      _814_recOwned = _out427;
-                      _815_recErased = _out428;
-                      _816_recIdents = _out429;
-                      Dafny.ISequence<Dafny.Rune> _817_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out430;
-                      _out430 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _817_rhsType = _out430;
-                      Dafny.ISequence<Dafny.Rune> _818_uneraseFn;
-                      _818_uneraseFn = ((_814_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _817_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _818_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _813_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _814_recOwned;
+                    if (object.Equals(_481_fromTpe, _827_b)) {
+                      Dafny.ISequence<Dafny.Rune> _828_recursiveGen;
+                      bool _829_recOwned;
+                      bool _830_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _831_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out434;
+                      bool _out435;
+                      bool _out436;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out437;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out434, out _out435, out _out436, out _out437);
+                      _828_recursiveGen = _out434;
+                      _829_recOwned = _out435;
+                      _830_recErased = _out436;
+                      _831_recIdents = _out437;
+                      Dafny.ISequence<Dafny.Rune> _832_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out438;
+                      _out438 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _832_rhsType = _out438;
+                      Dafny.ISequence<Dafny.Rune> _833_uneraseFn;
+                      _833_uneraseFn = ((_829_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _832_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _833_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _828_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _829_recOwned;
                       isErased = false;
-                      readIdents = _816_recIdents;
+                      readIdents = _831_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out431;
-                      bool _out432;
-                      bool _out433;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out434;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _812_b), _812_b, _465_toTpe), @params, mustOwn, out _out431, out _out432, out _out433, out _out434);
-                      s = _out431;
-                      isOwned = _out432;
-                      isErased = _out433;
-                      readIdents = _out434;
+                      Dafny.ISequence<Dafny.Rune> _out439;
+                      bool _out440;
+                      bool _out441;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out442;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _827_b), _827_b, _480_toTpe), @params, mustOwn, out _out439, out _out440, out _out441, out _out442);
+                      s = _out439;
+                      isOwned = _out440;
+                      isErased = _out441;
+                      readIdents = _out442;
                     }
                   }
                 }
               } else if (_source36.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _819___mcc_h322 = _source36.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _820_recursiveGen;
-                  bool _821_recOwned;
-                  bool _822_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _823_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out435;
-                  bool _out436;
-                  bool _out437;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out438;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out435, out _out436, out _out437, out _out438);
-                  _820_recursiveGen = _out435;
-                  _821_recOwned = _out436;
-                  _822_recErased = _out437;
-                  _823_recIdents = _out438;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _820_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _821_recOwned;
-                  isErased = _822_recErased;
-                  readIdents = _823_recIdents;
-                }
-              } else if (_source36.is_Array) {
-                DAST._IType _824___mcc_h324 = _source36.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _825_recursiveGen;
-                  bool _826_recOwned;
-                  bool _827_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _828_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out439;
-                  bool _out440;
-                  bool _out441;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out442;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out439, out _out440, out _out441, out _out442);
-                  _825_recursiveGen = _out439;
-                  _826_recOwned = _out440;
-                  _827_recErased = _out441;
-                  _828_recIdents = _out442;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _825_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _826_recOwned;
-                  isErased = _827_recErased;
-                  readIdents = _828_recIdents;
-                }
-              } else if (_source36.is_Seq) {
-                DAST._IType _829___mcc_h326 = _source36.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _830_recursiveGen;
-                  bool _831_recOwned;
-                  bool _832_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _833_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out443;
-                  bool _out444;
-                  bool _out445;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out446;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out443, out _out444, out _out445, out _out446);
-                  _830_recursiveGen = _out443;
-                  _831_recOwned = _out444;
-                  _832_recErased = _out445;
-                  _833_recIdents = _out446;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _830_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _831_recOwned;
-                  isErased = _832_recErased;
-                  readIdents = _833_recIdents;
-                }
-              } else if (_source36.is_Set) {
-                DAST._IType _834___mcc_h328 = _source36.dtor_element;
+                Dafny.ISequence<DAST._IType> _834___mcc_h324 = _source36.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _835_recursiveGen;
                   bool _836_recOwned;
                   bool _837_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _838_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out447;
-                  bool _out448;
-                  bool _out449;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out450;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out447, out _out448, out _out449, out _out450);
-                  _835_recursiveGen = _out447;
-                  _836_recOwned = _out448;
-                  _837_recErased = _out449;
-                  _838_recIdents = _out450;
+                  Dafny.ISequence<Dafny.Rune> _out443;
+                  bool _out444;
+                  bool _out445;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out446;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out443, out _out444, out _out445, out _out446);
+                  _835_recursiveGen = _out443;
+                  _836_recOwned = _out444;
+                  _837_recErased = _out445;
+                  _838_recIdents = _out446;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _835_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _836_recOwned;
                   isErased = _837_recErased;
                   readIdents = _838_recIdents;
                 }
-              } else if (_source36.is_Multiset) {
-                DAST._IType _839___mcc_h330 = _source36.dtor_element;
+              } else if (_source36.is_Array) {
+                DAST._IType _839___mcc_h326 = _source36.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _840_recursiveGen;
                   bool _841_recOwned;
                   bool _842_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _843_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out451;
-                  bool _out452;
-                  bool _out453;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out454;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out451, out _out452, out _out453, out _out454);
-                  _840_recursiveGen = _out451;
-                  _841_recOwned = _out452;
-                  _842_recErased = _out453;
-                  _843_recIdents = _out454;
+                  Dafny.ISequence<Dafny.Rune> _out447;
+                  bool _out448;
+                  bool _out449;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out450;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out447, out _out448, out _out449, out _out450);
+                  _840_recursiveGen = _out447;
+                  _841_recOwned = _out448;
+                  _842_recErased = _out449;
+                  _843_recIdents = _out450;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _840_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _841_recOwned;
                   isErased = _842_recErased;
                   readIdents = _843_recIdents;
                 }
-              } else if (_source36.is_Map) {
-                DAST._IType _844___mcc_h332 = _source36.dtor_key;
-                DAST._IType _845___mcc_h333 = _source36.dtor_value;
+              } else if (_source36.is_Seq) {
+                DAST._IType _844___mcc_h328 = _source36.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _846_recursiveGen;
-                  bool _847_recOwned;
-                  bool _848_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _849_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _845_recursiveGen;
+                  bool _846_recOwned;
+                  bool _847_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _848_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out451;
+                  bool _out452;
+                  bool _out453;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out454;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out451, out _out452, out _out453, out _out454);
+                  _845_recursiveGen = _out451;
+                  _846_recOwned = _out452;
+                  _847_recErased = _out453;
+                  _848_recIdents = _out454;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _845_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _846_recOwned;
+                  isErased = _847_recErased;
+                  readIdents = _848_recIdents;
+                }
+              } else if (_source36.is_Set) {
+                DAST._IType _849___mcc_h330 = _source36.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _850_recursiveGen;
+                  bool _851_recOwned;
+                  bool _852_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _853_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out455;
                   bool _out456;
                   bool _out457;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out458;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out455, out _out456, out _out457, out _out458);
-                  _846_recursiveGen = _out455;
-                  _847_recOwned = _out456;
-                  _848_recErased = _out457;
-                  _849_recIdents = _out458;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _846_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _847_recOwned;
-                  isErased = _848_recErased;
-                  readIdents = _849_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out455, out _out456, out _out457, out _out458);
+                  _850_recursiveGen = _out455;
+                  _851_recOwned = _out456;
+                  _852_recErased = _out457;
+                  _853_recIdents = _out458;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _850_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _851_recOwned;
+                  isErased = _852_recErased;
+                  readIdents = _853_recIdents;
                 }
-              } else if (_source36.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _850___mcc_h336 = _source36.dtor_args;
-                DAST._IType _851___mcc_h337 = _source36.dtor_result;
+              } else if (_source36.is_Multiset) {
+                DAST._IType _854___mcc_h332 = _source36.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _852_recursiveGen;
-                  bool _853_recOwned;
-                  bool _854_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _855_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _855_recursiveGen;
+                  bool _856_recOwned;
+                  bool _857_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _858_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out459;
                   bool _out460;
                   bool _out461;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out462;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out459, out _out460, out _out461, out _out462);
-                  _852_recursiveGen = _out459;
-                  _853_recOwned = _out460;
-                  _854_recErased = _out461;
-                  _855_recIdents = _out462;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _852_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _853_recOwned;
-                  isErased = _854_recErased;
-                  readIdents = _855_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out459, out _out460, out _out461, out _out462);
+                  _855_recursiveGen = _out459;
+                  _856_recOwned = _out460;
+                  _857_recErased = _out461;
+                  _858_recIdents = _out462;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _855_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _856_recOwned;
+                  isErased = _857_recErased;
+                  readIdents = _858_recIdents;
                 }
-              } else if (_source36.is_Primitive) {
-                DAST._IPrimitive _856___mcc_h340 = _source36.dtor_Primitive_a0;
+              } else if (_source36.is_Map) {
+                DAST._IType _859___mcc_h334 = _source36.dtor_key;
+                DAST._IType _860___mcc_h335 = _source36.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _857_recursiveGen;
-                  bool _858_recOwned;
-                  bool _859_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _860_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _861_recursiveGen;
+                  bool _862_recOwned;
+                  bool _863_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _864_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out463;
                   bool _out464;
                   bool _out465;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out466;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out463, out _out464, out _out465, out _out466);
-                  _857_recursiveGen = _out463;
-                  _858_recOwned = _out464;
-                  _859_recErased = _out465;
-                  _860_recIdents = _out466;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _857_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _858_recOwned;
-                  isErased = _859_recErased;
-                  readIdents = _860_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out463, out _out464, out _out465, out _out466);
+                  _861_recursiveGen = _out463;
+                  _862_recOwned = _out464;
+                  _863_recErased = _out465;
+                  _864_recIdents = _out466;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _861_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _862_recOwned;
+                  isErased = _863_recErased;
+                  readIdents = _864_recIdents;
                 }
-              } else if (_source36.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _861___mcc_h342 = _source36.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _862_recursiveGen;
-                  bool _863_recOwned;
-                  bool _864_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _865_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out467;
-                  bool _out468;
-                  bool _out469;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out470;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out467, out _out468, out _out469, out _out470);
-                  _862_recursiveGen = _out467;
-                  _863_recOwned = _out468;
-                  _864_recErased = _out469;
-                  _865_recIdents = _out470;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _862_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _863_recOwned;
-                  isErased = _864_recErased;
-                  readIdents = _865_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _866___mcc_h344 = _source36.dtor_TypeArg_a0;
+              } else if (_source36.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _865___mcc_h338 = _source36.dtor_args;
+                DAST._IType _866___mcc_h339 = _source36.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _867_recursiveGen;
                   bool _868_recOwned;
                   bool _869_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _870_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out471;
-                  bool _out472;
-                  bool _out473;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out474;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out471, out _out472, out _out473, out _out474);
-                  _867_recursiveGen = _out471;
-                  _868_recOwned = _out472;
-                  _869_recErased = _out473;
-                  _870_recIdents = _out474;
+                  Dafny.ISequence<Dafny.Rune> _out467;
+                  bool _out468;
+                  bool _out469;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out470;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out467, out _out468, out _out469, out _out470);
+                  _867_recursiveGen = _out467;
+                  _868_recOwned = _out468;
+                  _869_recErased = _out469;
+                  _870_recIdents = _out470;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _867_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _868_recOwned;
                   isErased = _869_recErased;
                   readIdents = _870_recIdents;
                 }
+              } else if (_source36.is_Primitive) {
+                DAST._IPrimitive _871___mcc_h342 = _source36.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _872_recursiveGen;
+                  bool _873_recOwned;
+                  bool _874_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _875_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out471;
+                  bool _out472;
+                  bool _out473;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out474;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out471, out _out472, out _out473, out _out474);
+                  _872_recursiveGen = _out471;
+                  _873_recOwned = _out472;
+                  _874_recErased = _out473;
+                  _875_recIdents = _out474;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _872_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _873_recOwned;
+                  isErased = _874_recErased;
+                  readIdents = _875_recIdents;
+                }
+              } else if (_source36.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _876___mcc_h344 = _source36.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _877_recursiveGen;
+                  bool _878_recOwned;
+                  bool _879_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _880_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out475;
+                  bool _out476;
+                  bool _out477;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out478;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out475, out _out476, out _out477, out _out478);
+                  _877_recursiveGen = _out475;
+                  _878_recOwned = _out476;
+                  _879_recErased = _out477;
+                  _880_recIdents = _out478;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _877_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _878_recOwned;
+                  isErased = _879_recErased;
+                  readIdents = _880_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _881___mcc_h346 = _source36.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _882_recursiveGen;
+                  bool _883_recOwned;
+                  bool _884_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _885_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out479;
+                  bool _out480;
+                  bool _out481;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out482;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out479, out _out480, out _out481, out _out482);
+                  _882_recursiveGen = _out479;
+                  _883_recOwned = _out480;
+                  _884_recErased = _out481;
+                  _885_recIdents = _out482;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _882_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _883_recOwned;
+                  isErased = _884_recErased;
+                  readIdents = _885_recIdents;
+                }
               }
             } else if (_source26.is_Seq) {
-              DAST._IType _871___mcc_h346 = _source26.dtor_element;
-              DAST._IType _source38 = _473___mcc_h121;
+              DAST._IType _886___mcc_h348 = _source26.dtor_element;
+              DAST._IType _source38 = _488___mcc_h123;
               if (_source38.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _872___mcc_h349 = _source38.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _873___mcc_h350 = _source38.dtor_typeArgs;
-                DAST._IResolvedType _874___mcc_h351 = _source38.dtor_resolved;
-                DAST._IResolvedType _source39 = _874___mcc_h351;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _887___mcc_h351 = _source38.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _888___mcc_h352 = _source38.dtor_typeArgs;
+                DAST._IResolvedType _889___mcc_h353 = _source38.dtor_resolved;
+                DAST._IResolvedType _source39 = _889___mcc_h353;
                 if (_source39.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _875___mcc_h355 = _source39.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _890___mcc_h357 = _source39.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _876_recursiveGen;
-                    bool _877_recOwned;
-                    bool _878_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _879_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out475;
-                    bool _out476;
-                    bool _out477;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out478;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out475, out _out476, out _out477, out _out478);
-                    _876_recursiveGen = _out475;
-                    _877_recOwned = _out476;
-                    _878_recErased = _out477;
-                    _879_recIdents = _out478;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _876_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _877_recOwned;
-                    isErased = _878_recErased;
-                    readIdents = _879_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _891_recursiveGen;
+                    bool _892_recOwned;
+                    bool _893_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _894_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out483;
+                    bool _out484;
+                    bool _out485;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out486;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out483, out _out484, out _out485, out _out486);
+                    _891_recursiveGen = _out483;
+                    _892_recOwned = _out484;
+                    _893_recErased = _out485;
+                    _894_recIdents = _out486;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _891_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _892_recOwned;
+                    isErased = _893_recErased;
+                    readIdents = _894_recIdents;
                   }
                 } else if (_source39.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _880___mcc_h357 = _source39.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _895___mcc_h359 = _source39.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _881_recursiveGen;
-                    bool _882_recOwned;
-                    bool _883_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _884_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out479;
-                    bool _out480;
-                    bool _out481;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out482;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out479, out _out480, out _out481, out _out482);
-                    _881_recursiveGen = _out479;
-                    _882_recOwned = _out480;
-                    _883_recErased = _out481;
-                    _884_recIdents = _out482;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _881_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _882_recOwned;
-                    isErased = _883_recErased;
-                    readIdents = _884_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _896_recursiveGen;
+                    bool _897_recOwned;
+                    bool _898_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _899_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out487;
+                    bool _out488;
+                    bool _out489;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out490;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out487, out _out488, out _out489, out _out490);
+                    _896_recursiveGen = _out487;
+                    _897_recOwned = _out488;
+                    _898_recErased = _out489;
+                    _899_recIdents = _out490;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _896_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _897_recOwned;
+                    isErased = _898_recErased;
+                    readIdents = _899_recIdents;
                   }
                 } else {
-                  DAST._IType _885___mcc_h359 = _source39.dtor_Newtype_a0;
-                  DAST._IType _886_b = _885___mcc_h359;
+                  DAST._IType _900___mcc_h361 = _source39.dtor_Newtype_a0;
+                  DAST._IType _901_b = _900___mcc_h361;
                   {
-                    if (object.Equals(_466_fromTpe, _886_b)) {
-                      Dafny.ISequence<Dafny.Rune> _887_recursiveGen;
-                      bool _888_recOwned;
-                      bool _889_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _890_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out483;
-                      bool _out484;
-                      bool _out485;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out486;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out483, out _out484, out _out485, out _out486);
-                      _887_recursiveGen = _out483;
-                      _888_recOwned = _out484;
-                      _889_recErased = _out485;
-                      _890_recIdents = _out486;
-                      Dafny.ISequence<Dafny.Rune> _891_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out487;
-                      _out487 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _891_rhsType = _out487;
-                      Dafny.ISequence<Dafny.Rune> _892_uneraseFn;
-                      _892_uneraseFn = ((_888_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _891_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _892_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _887_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _888_recOwned;
+                    if (object.Equals(_481_fromTpe, _901_b)) {
+                      Dafny.ISequence<Dafny.Rune> _902_recursiveGen;
+                      bool _903_recOwned;
+                      bool _904_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _905_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out491;
+                      bool _out492;
+                      bool _out493;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out494;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out491, out _out492, out _out493, out _out494);
+                      _902_recursiveGen = _out491;
+                      _903_recOwned = _out492;
+                      _904_recErased = _out493;
+                      _905_recIdents = _out494;
+                      Dafny.ISequence<Dafny.Rune> _906_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out495;
+                      _out495 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _906_rhsType = _out495;
+                      Dafny.ISequence<Dafny.Rune> _907_uneraseFn;
+                      _907_uneraseFn = ((_903_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _906_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _907_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _902_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _903_recOwned;
                       isErased = false;
-                      readIdents = _890_recIdents;
+                      readIdents = _905_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out488;
-                      bool _out489;
-                      bool _out490;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out491;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _886_b), _886_b, _465_toTpe), @params, mustOwn, out _out488, out _out489, out _out490, out _out491);
-                      s = _out488;
-                      isOwned = _out489;
-                      isErased = _out490;
-                      readIdents = _out491;
+                      Dafny.ISequence<Dafny.Rune> _out496;
+                      bool _out497;
+                      bool _out498;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out499;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _901_b), _901_b, _480_toTpe), @params, mustOwn, out _out496, out _out497, out _out498, out _out499);
+                      s = _out496;
+                      isOwned = _out497;
+                      isErased = _out498;
+                      readIdents = _out499;
                     }
                   }
                 }
               } else if (_source38.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _893___mcc_h361 = _source38.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _894_recursiveGen;
-                  bool _895_recOwned;
-                  bool _896_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _897_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out492;
-                  bool _out493;
-                  bool _out494;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out495;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out492, out _out493, out _out494, out _out495);
-                  _894_recursiveGen = _out492;
-                  _895_recOwned = _out493;
-                  _896_recErased = _out494;
-                  _897_recIdents = _out495;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _894_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _895_recOwned;
-                  isErased = _896_recErased;
-                  readIdents = _897_recIdents;
-                }
-              } else if (_source38.is_Array) {
-                DAST._IType _898___mcc_h363 = _source38.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _899_recursiveGen;
-                  bool _900_recOwned;
-                  bool _901_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _902_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out496;
-                  bool _out497;
-                  bool _out498;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out499;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out496, out _out497, out _out498, out _out499);
-                  _899_recursiveGen = _out496;
-                  _900_recOwned = _out497;
-                  _901_recErased = _out498;
-                  _902_recIdents = _out499;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _899_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _900_recOwned;
-                  isErased = _901_recErased;
-                  readIdents = _902_recIdents;
-                }
-              } else if (_source38.is_Seq) {
-                DAST._IType _903___mcc_h365 = _source38.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _904_recursiveGen;
-                  bool _905_recOwned;
-                  bool _906_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _907_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out500;
-                  bool _out501;
-                  bool _out502;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out503;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out500, out _out501, out _out502, out _out503);
-                  _904_recursiveGen = _out500;
-                  _905_recOwned = _out501;
-                  _906_recErased = _out502;
-                  _907_recIdents = _out503;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _904_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _905_recOwned;
-                  isErased = _906_recErased;
-                  readIdents = _907_recIdents;
-                }
-              } else if (_source38.is_Set) {
-                DAST._IType _908___mcc_h367 = _source38.dtor_element;
+                Dafny.ISequence<DAST._IType> _908___mcc_h363 = _source38.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _909_recursiveGen;
                   bool _910_recOwned;
                   bool _911_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _912_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out504;
-                  bool _out505;
-                  bool _out506;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out507;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out504, out _out505, out _out506, out _out507);
-                  _909_recursiveGen = _out504;
-                  _910_recOwned = _out505;
-                  _911_recErased = _out506;
-                  _912_recIdents = _out507;
+                  Dafny.ISequence<Dafny.Rune> _out500;
+                  bool _out501;
+                  bool _out502;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out503;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out500, out _out501, out _out502, out _out503);
+                  _909_recursiveGen = _out500;
+                  _910_recOwned = _out501;
+                  _911_recErased = _out502;
+                  _912_recIdents = _out503;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _909_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _910_recOwned;
                   isErased = _911_recErased;
                   readIdents = _912_recIdents;
                 }
-              } else if (_source38.is_Multiset) {
-                DAST._IType _913___mcc_h369 = _source38.dtor_element;
+              } else if (_source38.is_Array) {
+                DAST._IType _913___mcc_h365 = _source38.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _914_recursiveGen;
                   bool _915_recOwned;
                   bool _916_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _917_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out508;
-                  bool _out509;
-                  bool _out510;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out511;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out508, out _out509, out _out510, out _out511);
-                  _914_recursiveGen = _out508;
-                  _915_recOwned = _out509;
-                  _916_recErased = _out510;
-                  _917_recIdents = _out511;
+                  Dafny.ISequence<Dafny.Rune> _out504;
+                  bool _out505;
+                  bool _out506;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out507;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out504, out _out505, out _out506, out _out507);
+                  _914_recursiveGen = _out504;
+                  _915_recOwned = _out505;
+                  _916_recErased = _out506;
+                  _917_recIdents = _out507;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _914_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _915_recOwned;
                   isErased = _916_recErased;
                   readIdents = _917_recIdents;
                 }
-              } else if (_source38.is_Map) {
-                DAST._IType _918___mcc_h371 = _source38.dtor_key;
-                DAST._IType _919___mcc_h372 = _source38.dtor_value;
+              } else if (_source38.is_Seq) {
+                DAST._IType _918___mcc_h367 = _source38.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _920_recursiveGen;
-                  bool _921_recOwned;
-                  bool _922_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _923_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _919_recursiveGen;
+                  bool _920_recOwned;
+                  bool _921_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _922_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out508;
+                  bool _out509;
+                  bool _out510;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out511;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out508, out _out509, out _out510, out _out511);
+                  _919_recursiveGen = _out508;
+                  _920_recOwned = _out509;
+                  _921_recErased = _out510;
+                  _922_recIdents = _out511;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _919_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _920_recOwned;
+                  isErased = _921_recErased;
+                  readIdents = _922_recIdents;
+                }
+              } else if (_source38.is_Set) {
+                DAST._IType _923___mcc_h369 = _source38.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _924_recursiveGen;
+                  bool _925_recOwned;
+                  bool _926_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _927_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out512;
                   bool _out513;
                   bool _out514;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out515;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out512, out _out513, out _out514, out _out515);
-                  _920_recursiveGen = _out512;
-                  _921_recOwned = _out513;
-                  _922_recErased = _out514;
-                  _923_recIdents = _out515;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _920_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _921_recOwned;
-                  isErased = _922_recErased;
-                  readIdents = _923_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out512, out _out513, out _out514, out _out515);
+                  _924_recursiveGen = _out512;
+                  _925_recOwned = _out513;
+                  _926_recErased = _out514;
+                  _927_recIdents = _out515;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _924_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _925_recOwned;
+                  isErased = _926_recErased;
+                  readIdents = _927_recIdents;
                 }
-              } else if (_source38.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _924___mcc_h375 = _source38.dtor_args;
-                DAST._IType _925___mcc_h376 = _source38.dtor_result;
+              } else if (_source38.is_Multiset) {
+                DAST._IType _928___mcc_h371 = _source38.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _926_recursiveGen;
-                  bool _927_recOwned;
-                  bool _928_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _929_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _929_recursiveGen;
+                  bool _930_recOwned;
+                  bool _931_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _932_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out516;
                   bool _out517;
                   bool _out518;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out519;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out516, out _out517, out _out518, out _out519);
-                  _926_recursiveGen = _out516;
-                  _927_recOwned = _out517;
-                  _928_recErased = _out518;
-                  _929_recIdents = _out519;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _926_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _927_recOwned;
-                  isErased = _928_recErased;
-                  readIdents = _929_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out516, out _out517, out _out518, out _out519);
+                  _929_recursiveGen = _out516;
+                  _930_recOwned = _out517;
+                  _931_recErased = _out518;
+                  _932_recIdents = _out519;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _929_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _930_recOwned;
+                  isErased = _931_recErased;
+                  readIdents = _932_recIdents;
                 }
-              } else if (_source38.is_Primitive) {
-                DAST._IPrimitive _930___mcc_h379 = _source38.dtor_Primitive_a0;
+              } else if (_source38.is_Map) {
+                DAST._IType _933___mcc_h373 = _source38.dtor_key;
+                DAST._IType _934___mcc_h374 = _source38.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _931_recursiveGen;
-                  bool _932_recOwned;
-                  bool _933_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _934_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _935_recursiveGen;
+                  bool _936_recOwned;
+                  bool _937_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _938_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out520;
                   bool _out521;
                   bool _out522;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out523;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out520, out _out521, out _out522, out _out523);
-                  _931_recursiveGen = _out520;
-                  _932_recOwned = _out521;
-                  _933_recErased = _out522;
-                  _934_recIdents = _out523;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _931_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _932_recOwned;
-                  isErased = _933_recErased;
-                  readIdents = _934_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out520, out _out521, out _out522, out _out523);
+                  _935_recursiveGen = _out520;
+                  _936_recOwned = _out521;
+                  _937_recErased = _out522;
+                  _938_recIdents = _out523;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _935_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _936_recOwned;
+                  isErased = _937_recErased;
+                  readIdents = _938_recIdents;
                 }
-              } else if (_source38.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _935___mcc_h381 = _source38.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _936_recursiveGen;
-                  bool _937_recOwned;
-                  bool _938_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _939_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out524;
-                  bool _out525;
-                  bool _out526;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out527;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out524, out _out525, out _out526, out _out527);
-                  _936_recursiveGen = _out524;
-                  _937_recOwned = _out525;
-                  _938_recErased = _out526;
-                  _939_recIdents = _out527;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _936_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _937_recOwned;
-                  isErased = _938_recErased;
-                  readIdents = _939_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _940___mcc_h383 = _source38.dtor_TypeArg_a0;
+              } else if (_source38.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _939___mcc_h377 = _source38.dtor_args;
+                DAST._IType _940___mcc_h378 = _source38.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _941_recursiveGen;
                   bool _942_recOwned;
                   bool _943_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _944_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out528;
-                  bool _out529;
-                  bool _out530;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out531;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out528, out _out529, out _out530, out _out531);
-                  _941_recursiveGen = _out528;
-                  _942_recOwned = _out529;
-                  _943_recErased = _out530;
-                  _944_recIdents = _out531;
+                  Dafny.ISequence<Dafny.Rune> _out524;
+                  bool _out525;
+                  bool _out526;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out527;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out524, out _out525, out _out526, out _out527);
+                  _941_recursiveGen = _out524;
+                  _942_recOwned = _out525;
+                  _943_recErased = _out526;
+                  _944_recIdents = _out527;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _941_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _942_recOwned;
                   isErased = _943_recErased;
                   readIdents = _944_recIdents;
                 }
+              } else if (_source38.is_Primitive) {
+                DAST._IPrimitive _945___mcc_h381 = _source38.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _946_recursiveGen;
+                  bool _947_recOwned;
+                  bool _948_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _949_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out528;
+                  bool _out529;
+                  bool _out530;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out531;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out528, out _out529, out _out530, out _out531);
+                  _946_recursiveGen = _out528;
+                  _947_recOwned = _out529;
+                  _948_recErased = _out530;
+                  _949_recIdents = _out531;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _946_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _947_recOwned;
+                  isErased = _948_recErased;
+                  readIdents = _949_recIdents;
+                }
+              } else if (_source38.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _950___mcc_h383 = _source38.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _951_recursiveGen;
+                  bool _952_recOwned;
+                  bool _953_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _954_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out532;
+                  bool _out533;
+                  bool _out534;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out535;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out532, out _out533, out _out534, out _out535);
+                  _951_recursiveGen = _out532;
+                  _952_recOwned = _out533;
+                  _953_recErased = _out534;
+                  _954_recIdents = _out535;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _951_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _952_recOwned;
+                  isErased = _953_recErased;
+                  readIdents = _954_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _955___mcc_h385 = _source38.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _956_recursiveGen;
+                  bool _957_recOwned;
+                  bool _958_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _959_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out536;
+                  bool _out537;
+                  bool _out538;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out539;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out536, out _out537, out _out538, out _out539);
+                  _956_recursiveGen = _out536;
+                  _957_recOwned = _out537;
+                  _958_recErased = _out538;
+                  _959_recIdents = _out539;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _956_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _957_recOwned;
+                  isErased = _958_recErased;
+                  readIdents = _959_recIdents;
+                }
               }
             } else if (_source26.is_Set) {
-              DAST._IType _945___mcc_h385 = _source26.dtor_element;
-              DAST._IType _source40 = _473___mcc_h121;
+              DAST._IType _960___mcc_h387 = _source26.dtor_element;
+              DAST._IType _source40 = _488___mcc_h123;
               if (_source40.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _946___mcc_h388 = _source40.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _947___mcc_h389 = _source40.dtor_typeArgs;
-                DAST._IResolvedType _948___mcc_h390 = _source40.dtor_resolved;
-                DAST._IResolvedType _source41 = _948___mcc_h390;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _961___mcc_h390 = _source40.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _962___mcc_h391 = _source40.dtor_typeArgs;
+                DAST._IResolvedType _963___mcc_h392 = _source40.dtor_resolved;
+                DAST._IResolvedType _source41 = _963___mcc_h392;
                 if (_source41.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _949___mcc_h394 = _source41.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _964___mcc_h396 = _source41.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _950_recursiveGen;
-                    bool _951_recOwned;
-                    bool _952_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _953_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out532;
-                    bool _out533;
-                    bool _out534;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out535;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out532, out _out533, out _out534, out _out535);
-                    _950_recursiveGen = _out532;
-                    _951_recOwned = _out533;
-                    _952_recErased = _out534;
-                    _953_recIdents = _out535;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _950_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _951_recOwned;
-                    isErased = _952_recErased;
-                    readIdents = _953_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _965_recursiveGen;
+                    bool _966_recOwned;
+                    bool _967_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _968_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out540;
+                    bool _out541;
+                    bool _out542;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out543;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out540, out _out541, out _out542, out _out543);
+                    _965_recursiveGen = _out540;
+                    _966_recOwned = _out541;
+                    _967_recErased = _out542;
+                    _968_recIdents = _out543;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _965_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _966_recOwned;
+                    isErased = _967_recErased;
+                    readIdents = _968_recIdents;
                   }
                 } else if (_source41.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _954___mcc_h396 = _source41.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _969___mcc_h398 = _source41.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _955_recursiveGen;
-                    bool _956_recOwned;
-                    bool _957_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _958_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out536;
-                    bool _out537;
-                    bool _out538;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out539;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out536, out _out537, out _out538, out _out539);
-                    _955_recursiveGen = _out536;
-                    _956_recOwned = _out537;
-                    _957_recErased = _out538;
-                    _958_recIdents = _out539;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _955_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _956_recOwned;
-                    isErased = _957_recErased;
-                    readIdents = _958_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _970_recursiveGen;
+                    bool _971_recOwned;
+                    bool _972_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _973_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out544;
+                    bool _out545;
+                    bool _out546;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out547;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out544, out _out545, out _out546, out _out547);
+                    _970_recursiveGen = _out544;
+                    _971_recOwned = _out545;
+                    _972_recErased = _out546;
+                    _973_recIdents = _out547;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _970_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _971_recOwned;
+                    isErased = _972_recErased;
+                    readIdents = _973_recIdents;
                   }
                 } else {
-                  DAST._IType _959___mcc_h398 = _source41.dtor_Newtype_a0;
-                  DAST._IType _960_b = _959___mcc_h398;
+                  DAST._IType _974___mcc_h400 = _source41.dtor_Newtype_a0;
+                  DAST._IType _975_b = _974___mcc_h400;
                   {
-                    if (object.Equals(_466_fromTpe, _960_b)) {
-                      Dafny.ISequence<Dafny.Rune> _961_recursiveGen;
-                      bool _962_recOwned;
-                      bool _963_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _964_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out540;
-                      bool _out541;
-                      bool _out542;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out543;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out540, out _out541, out _out542, out _out543);
-                      _961_recursiveGen = _out540;
-                      _962_recOwned = _out541;
-                      _963_recErased = _out542;
-                      _964_recIdents = _out543;
-                      Dafny.ISequence<Dafny.Rune> _965_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out544;
-                      _out544 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _965_rhsType = _out544;
-                      Dafny.ISequence<Dafny.Rune> _966_uneraseFn;
-                      _966_uneraseFn = ((_962_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _965_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _966_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _961_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _962_recOwned;
+                    if (object.Equals(_481_fromTpe, _975_b)) {
+                      Dafny.ISequence<Dafny.Rune> _976_recursiveGen;
+                      bool _977_recOwned;
+                      bool _978_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _979_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out548;
+                      bool _out549;
+                      bool _out550;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out551;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out548, out _out549, out _out550, out _out551);
+                      _976_recursiveGen = _out548;
+                      _977_recOwned = _out549;
+                      _978_recErased = _out550;
+                      _979_recIdents = _out551;
+                      Dafny.ISequence<Dafny.Rune> _980_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out552;
+                      _out552 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _980_rhsType = _out552;
+                      Dafny.ISequence<Dafny.Rune> _981_uneraseFn;
+                      _981_uneraseFn = ((_977_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _980_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _981_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _976_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _977_recOwned;
                       isErased = false;
-                      readIdents = _964_recIdents;
+                      readIdents = _979_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out545;
-                      bool _out546;
-                      bool _out547;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out548;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _960_b), _960_b, _465_toTpe), @params, mustOwn, out _out545, out _out546, out _out547, out _out548);
-                      s = _out545;
-                      isOwned = _out546;
-                      isErased = _out547;
-                      readIdents = _out548;
+                      Dafny.ISequence<Dafny.Rune> _out553;
+                      bool _out554;
+                      bool _out555;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out556;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _975_b), _975_b, _480_toTpe), @params, mustOwn, out _out553, out _out554, out _out555, out _out556);
+                      s = _out553;
+                      isOwned = _out554;
+                      isErased = _out555;
+                      readIdents = _out556;
                     }
                   }
                 }
               } else if (_source40.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _967___mcc_h400 = _source40.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _968_recursiveGen;
-                  bool _969_recOwned;
-                  bool _970_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _971_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out549;
-                  bool _out550;
-                  bool _out551;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out552;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out549, out _out550, out _out551, out _out552);
-                  _968_recursiveGen = _out549;
-                  _969_recOwned = _out550;
-                  _970_recErased = _out551;
-                  _971_recIdents = _out552;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _968_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _969_recOwned;
-                  isErased = _970_recErased;
-                  readIdents = _971_recIdents;
-                }
-              } else if (_source40.is_Array) {
-                DAST._IType _972___mcc_h402 = _source40.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _973_recursiveGen;
-                  bool _974_recOwned;
-                  bool _975_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _976_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out553;
-                  bool _out554;
-                  bool _out555;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out556;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out553, out _out554, out _out555, out _out556);
-                  _973_recursiveGen = _out553;
-                  _974_recOwned = _out554;
-                  _975_recErased = _out555;
-                  _976_recIdents = _out556;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _973_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _974_recOwned;
-                  isErased = _975_recErased;
-                  readIdents = _976_recIdents;
-                }
-              } else if (_source40.is_Seq) {
-                DAST._IType _977___mcc_h404 = _source40.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _978_recursiveGen;
-                  bool _979_recOwned;
-                  bool _980_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _981_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out557;
-                  bool _out558;
-                  bool _out559;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out560;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out557, out _out558, out _out559, out _out560);
-                  _978_recursiveGen = _out557;
-                  _979_recOwned = _out558;
-                  _980_recErased = _out559;
-                  _981_recIdents = _out560;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _978_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _979_recOwned;
-                  isErased = _980_recErased;
-                  readIdents = _981_recIdents;
-                }
-              } else if (_source40.is_Set) {
-                DAST._IType _982___mcc_h406 = _source40.dtor_element;
+                Dafny.ISequence<DAST._IType> _982___mcc_h402 = _source40.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _983_recursiveGen;
                   bool _984_recOwned;
                   bool _985_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _986_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out561;
-                  bool _out562;
-                  bool _out563;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out564;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out561, out _out562, out _out563, out _out564);
-                  _983_recursiveGen = _out561;
-                  _984_recOwned = _out562;
-                  _985_recErased = _out563;
-                  _986_recIdents = _out564;
+                  Dafny.ISequence<Dafny.Rune> _out557;
+                  bool _out558;
+                  bool _out559;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out560;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out557, out _out558, out _out559, out _out560);
+                  _983_recursiveGen = _out557;
+                  _984_recOwned = _out558;
+                  _985_recErased = _out559;
+                  _986_recIdents = _out560;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _983_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _984_recOwned;
                   isErased = _985_recErased;
                   readIdents = _986_recIdents;
                 }
-              } else if (_source40.is_Multiset) {
-                DAST._IType _987___mcc_h408 = _source40.dtor_element;
+              } else if (_source40.is_Array) {
+                DAST._IType _987___mcc_h404 = _source40.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _988_recursiveGen;
                   bool _989_recOwned;
                   bool _990_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _991_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out565;
-                  bool _out566;
-                  bool _out567;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out568;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out565, out _out566, out _out567, out _out568);
-                  _988_recursiveGen = _out565;
-                  _989_recOwned = _out566;
-                  _990_recErased = _out567;
-                  _991_recIdents = _out568;
+                  Dafny.ISequence<Dafny.Rune> _out561;
+                  bool _out562;
+                  bool _out563;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out564;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out561, out _out562, out _out563, out _out564);
+                  _988_recursiveGen = _out561;
+                  _989_recOwned = _out562;
+                  _990_recErased = _out563;
+                  _991_recIdents = _out564;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _988_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _989_recOwned;
                   isErased = _990_recErased;
                   readIdents = _991_recIdents;
                 }
-              } else if (_source40.is_Map) {
-                DAST._IType _992___mcc_h410 = _source40.dtor_key;
-                DAST._IType _993___mcc_h411 = _source40.dtor_value;
+              } else if (_source40.is_Seq) {
+                DAST._IType _992___mcc_h406 = _source40.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _994_recursiveGen;
-                  bool _995_recOwned;
-                  bool _996_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _997_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _993_recursiveGen;
+                  bool _994_recOwned;
+                  bool _995_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _996_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out565;
+                  bool _out566;
+                  bool _out567;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out568;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out565, out _out566, out _out567, out _out568);
+                  _993_recursiveGen = _out565;
+                  _994_recOwned = _out566;
+                  _995_recErased = _out567;
+                  _996_recIdents = _out568;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _993_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _994_recOwned;
+                  isErased = _995_recErased;
+                  readIdents = _996_recIdents;
+                }
+              } else if (_source40.is_Set) {
+                DAST._IType _997___mcc_h408 = _source40.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _998_recursiveGen;
+                  bool _999_recOwned;
+                  bool _1000_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1001_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out569;
                   bool _out570;
                   bool _out571;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out572;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out569, out _out570, out _out571, out _out572);
-                  _994_recursiveGen = _out569;
-                  _995_recOwned = _out570;
-                  _996_recErased = _out571;
-                  _997_recIdents = _out572;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _994_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _995_recOwned;
-                  isErased = _996_recErased;
-                  readIdents = _997_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out569, out _out570, out _out571, out _out572);
+                  _998_recursiveGen = _out569;
+                  _999_recOwned = _out570;
+                  _1000_recErased = _out571;
+                  _1001_recIdents = _out572;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _998_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _999_recOwned;
+                  isErased = _1000_recErased;
+                  readIdents = _1001_recIdents;
                 }
-              } else if (_source40.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _998___mcc_h414 = _source40.dtor_args;
-                DAST._IType _999___mcc_h415 = _source40.dtor_result;
+              } else if (_source40.is_Multiset) {
+                DAST._IType _1002___mcc_h410 = _source40.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1000_recursiveGen;
-                  bool _1001_recOwned;
-                  bool _1002_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1003_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1003_recursiveGen;
+                  bool _1004_recOwned;
+                  bool _1005_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1006_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out573;
                   bool _out574;
                   bool _out575;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out576;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out573, out _out574, out _out575, out _out576);
-                  _1000_recursiveGen = _out573;
-                  _1001_recOwned = _out574;
-                  _1002_recErased = _out575;
-                  _1003_recIdents = _out576;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1000_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1001_recOwned;
-                  isErased = _1002_recErased;
-                  readIdents = _1003_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out573, out _out574, out _out575, out _out576);
+                  _1003_recursiveGen = _out573;
+                  _1004_recOwned = _out574;
+                  _1005_recErased = _out575;
+                  _1006_recIdents = _out576;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1003_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1004_recOwned;
+                  isErased = _1005_recErased;
+                  readIdents = _1006_recIdents;
                 }
-              } else if (_source40.is_Primitive) {
-                DAST._IPrimitive _1004___mcc_h418 = _source40.dtor_Primitive_a0;
+              } else if (_source40.is_Map) {
+                DAST._IType _1007___mcc_h412 = _source40.dtor_key;
+                DAST._IType _1008___mcc_h413 = _source40.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1005_recursiveGen;
-                  bool _1006_recOwned;
-                  bool _1007_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1008_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1009_recursiveGen;
+                  bool _1010_recOwned;
+                  bool _1011_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1012_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out577;
                   bool _out578;
                   bool _out579;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out580;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out577, out _out578, out _out579, out _out580);
-                  _1005_recursiveGen = _out577;
-                  _1006_recOwned = _out578;
-                  _1007_recErased = _out579;
-                  _1008_recIdents = _out580;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1005_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1006_recOwned;
-                  isErased = _1007_recErased;
-                  readIdents = _1008_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out577, out _out578, out _out579, out _out580);
+                  _1009_recursiveGen = _out577;
+                  _1010_recOwned = _out578;
+                  _1011_recErased = _out579;
+                  _1012_recIdents = _out580;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1009_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1010_recOwned;
+                  isErased = _1011_recErased;
+                  readIdents = _1012_recIdents;
                 }
-              } else if (_source40.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1009___mcc_h420 = _source40.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1010_recursiveGen;
-                  bool _1011_recOwned;
-                  bool _1012_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1013_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out581;
-                  bool _out582;
-                  bool _out583;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out584;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out581, out _out582, out _out583, out _out584);
-                  _1010_recursiveGen = _out581;
-                  _1011_recOwned = _out582;
-                  _1012_recErased = _out583;
-                  _1013_recIdents = _out584;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1010_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1011_recOwned;
-                  isErased = _1012_recErased;
-                  readIdents = _1013_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _1014___mcc_h422 = _source40.dtor_TypeArg_a0;
+              } else if (_source40.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1013___mcc_h416 = _source40.dtor_args;
+                DAST._IType _1014___mcc_h417 = _source40.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _1015_recursiveGen;
                   bool _1016_recOwned;
                   bool _1017_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1018_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out585;
-                  bool _out586;
-                  bool _out587;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out588;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out585, out _out586, out _out587, out _out588);
-                  _1015_recursiveGen = _out585;
-                  _1016_recOwned = _out586;
-                  _1017_recErased = _out587;
-                  _1018_recIdents = _out588;
+                  Dafny.ISequence<Dafny.Rune> _out581;
+                  bool _out582;
+                  bool _out583;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out584;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out581, out _out582, out _out583, out _out584);
+                  _1015_recursiveGen = _out581;
+                  _1016_recOwned = _out582;
+                  _1017_recErased = _out583;
+                  _1018_recIdents = _out584;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1015_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1016_recOwned;
                   isErased = _1017_recErased;
                   readIdents = _1018_recIdents;
                 }
+              } else if (_source40.is_Primitive) {
+                DAST._IPrimitive _1019___mcc_h420 = _source40.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1020_recursiveGen;
+                  bool _1021_recOwned;
+                  bool _1022_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1023_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out585;
+                  bool _out586;
+                  bool _out587;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out588;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out585, out _out586, out _out587, out _out588);
+                  _1020_recursiveGen = _out585;
+                  _1021_recOwned = _out586;
+                  _1022_recErased = _out587;
+                  _1023_recIdents = _out588;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1020_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1021_recOwned;
+                  isErased = _1022_recErased;
+                  readIdents = _1023_recIdents;
+                }
+              } else if (_source40.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _1024___mcc_h422 = _source40.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1025_recursiveGen;
+                  bool _1026_recOwned;
+                  bool _1027_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1028_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out589;
+                  bool _out590;
+                  bool _out591;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out592;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out589, out _out590, out _out591, out _out592);
+                  _1025_recursiveGen = _out589;
+                  _1026_recOwned = _out590;
+                  _1027_recErased = _out591;
+                  _1028_recIdents = _out592;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1025_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1026_recOwned;
+                  isErased = _1027_recErased;
+                  readIdents = _1028_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _1029___mcc_h424 = _source40.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1030_recursiveGen;
+                  bool _1031_recOwned;
+                  bool _1032_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1033_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out593;
+                  bool _out594;
+                  bool _out595;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out596;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out593, out _out594, out _out595, out _out596);
+                  _1030_recursiveGen = _out593;
+                  _1031_recOwned = _out594;
+                  _1032_recErased = _out595;
+                  _1033_recIdents = _out596;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1030_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1031_recOwned;
+                  isErased = _1032_recErased;
+                  readIdents = _1033_recIdents;
+                }
               }
             } else if (_source26.is_Multiset) {
-              DAST._IType _1019___mcc_h424 = _source26.dtor_element;
-              DAST._IType _source42 = _473___mcc_h121;
+              DAST._IType _1034___mcc_h426 = _source26.dtor_element;
+              DAST._IType _source42 = _488___mcc_h123;
               if (_source42.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1020___mcc_h427 = _source42.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _1021___mcc_h428 = _source42.dtor_typeArgs;
-                DAST._IResolvedType _1022___mcc_h429 = _source42.dtor_resolved;
-                DAST._IResolvedType _source43 = _1022___mcc_h429;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1035___mcc_h429 = _source42.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _1036___mcc_h430 = _source42.dtor_typeArgs;
+                DAST._IResolvedType _1037___mcc_h431 = _source42.dtor_resolved;
+                DAST._IResolvedType _source43 = _1037___mcc_h431;
                 if (_source43.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1023___mcc_h433 = _source43.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1038___mcc_h435 = _source43.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1024_recursiveGen;
-                    bool _1025_recOwned;
-                    bool _1026_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1027_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out589;
-                    bool _out590;
-                    bool _out591;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out592;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out589, out _out590, out _out591, out _out592);
-                    _1024_recursiveGen = _out589;
-                    _1025_recOwned = _out590;
-                    _1026_recErased = _out591;
-                    _1027_recIdents = _out592;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1024_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1025_recOwned;
-                    isErased = _1026_recErased;
-                    readIdents = _1027_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1039_recursiveGen;
+                    bool _1040_recOwned;
+                    bool _1041_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1042_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out597;
+                    bool _out598;
+                    bool _out599;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out600;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out597, out _out598, out _out599, out _out600);
+                    _1039_recursiveGen = _out597;
+                    _1040_recOwned = _out598;
+                    _1041_recErased = _out599;
+                    _1042_recIdents = _out600;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1039_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1040_recOwned;
+                    isErased = _1041_recErased;
+                    readIdents = _1042_recIdents;
                   }
                 } else if (_source43.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1028___mcc_h435 = _source43.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1043___mcc_h437 = _source43.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1029_recursiveGen;
-                    bool _1030_recOwned;
-                    bool _1031_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1032_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out593;
-                    bool _out594;
-                    bool _out595;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out596;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out593, out _out594, out _out595, out _out596);
-                    _1029_recursiveGen = _out593;
-                    _1030_recOwned = _out594;
-                    _1031_recErased = _out595;
-                    _1032_recIdents = _out596;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1029_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1030_recOwned;
-                    isErased = _1031_recErased;
-                    readIdents = _1032_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1044_recursiveGen;
+                    bool _1045_recOwned;
+                    bool _1046_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1047_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out601;
+                    bool _out602;
+                    bool _out603;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out604;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out601, out _out602, out _out603, out _out604);
+                    _1044_recursiveGen = _out601;
+                    _1045_recOwned = _out602;
+                    _1046_recErased = _out603;
+                    _1047_recIdents = _out604;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1044_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1045_recOwned;
+                    isErased = _1046_recErased;
+                    readIdents = _1047_recIdents;
                   }
                 } else {
-                  DAST._IType _1033___mcc_h437 = _source43.dtor_Newtype_a0;
-                  DAST._IType _1034_b = _1033___mcc_h437;
+                  DAST._IType _1048___mcc_h439 = _source43.dtor_Newtype_a0;
+                  DAST._IType _1049_b = _1048___mcc_h439;
                   {
-                    if (object.Equals(_466_fromTpe, _1034_b)) {
-                      Dafny.ISequence<Dafny.Rune> _1035_recursiveGen;
-                      bool _1036_recOwned;
-                      bool _1037_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1038_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out597;
-                      bool _out598;
-                      bool _out599;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out600;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out597, out _out598, out _out599, out _out600);
-                      _1035_recursiveGen = _out597;
-                      _1036_recOwned = _out598;
-                      _1037_recErased = _out599;
-                      _1038_recIdents = _out600;
-                      Dafny.ISequence<Dafny.Rune> _1039_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out601;
-                      _out601 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1039_rhsType = _out601;
-                      Dafny.ISequence<Dafny.Rune> _1040_uneraseFn;
-                      _1040_uneraseFn = ((_1036_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1039_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1040_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1035_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _1036_recOwned;
+                    if (object.Equals(_481_fromTpe, _1049_b)) {
+                      Dafny.ISequence<Dafny.Rune> _1050_recursiveGen;
+                      bool _1051_recOwned;
+                      bool _1052_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1053_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out605;
+                      bool _out606;
+                      bool _out607;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out608;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out605, out _out606, out _out607, out _out608);
+                      _1050_recursiveGen = _out605;
+                      _1051_recOwned = _out606;
+                      _1052_recErased = _out607;
+                      _1053_recIdents = _out608;
+                      Dafny.ISequence<Dafny.Rune> _1054_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out609;
+                      _out609 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1054_rhsType = _out609;
+                      Dafny.ISequence<Dafny.Rune> _1055_uneraseFn;
+                      _1055_uneraseFn = ((_1051_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1054_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1055_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1050_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _1051_recOwned;
                       isErased = false;
-                      readIdents = _1038_recIdents;
+                      readIdents = _1053_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out602;
-                      bool _out603;
-                      bool _out604;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out605;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1034_b), _1034_b, _465_toTpe), @params, mustOwn, out _out602, out _out603, out _out604, out _out605);
-                      s = _out602;
-                      isOwned = _out603;
-                      isErased = _out604;
-                      readIdents = _out605;
+                      Dafny.ISequence<Dafny.Rune> _out610;
+                      bool _out611;
+                      bool _out612;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out613;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1049_b), _1049_b, _480_toTpe), @params, mustOwn, out _out610, out _out611, out _out612, out _out613);
+                      s = _out610;
+                      isOwned = _out611;
+                      isErased = _out612;
+                      readIdents = _out613;
                     }
                   }
                 }
               } else if (_source42.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _1041___mcc_h439 = _source42.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1042_recursiveGen;
-                  bool _1043_recOwned;
-                  bool _1044_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1045_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out606;
-                  bool _out607;
-                  bool _out608;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out609;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out606, out _out607, out _out608, out _out609);
-                  _1042_recursiveGen = _out606;
-                  _1043_recOwned = _out607;
-                  _1044_recErased = _out608;
-                  _1045_recIdents = _out609;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1042_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1043_recOwned;
-                  isErased = _1044_recErased;
-                  readIdents = _1045_recIdents;
-                }
-              } else if (_source42.is_Array) {
-                DAST._IType _1046___mcc_h441 = _source42.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1047_recursiveGen;
-                  bool _1048_recOwned;
-                  bool _1049_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1050_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out610;
-                  bool _out611;
-                  bool _out612;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out613;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out610, out _out611, out _out612, out _out613);
-                  _1047_recursiveGen = _out610;
-                  _1048_recOwned = _out611;
-                  _1049_recErased = _out612;
-                  _1050_recIdents = _out613;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1047_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1048_recOwned;
-                  isErased = _1049_recErased;
-                  readIdents = _1050_recIdents;
-                }
-              } else if (_source42.is_Seq) {
-                DAST._IType _1051___mcc_h443 = _source42.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1052_recursiveGen;
-                  bool _1053_recOwned;
-                  bool _1054_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1055_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out614;
-                  bool _out615;
-                  bool _out616;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out617;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out614, out _out615, out _out616, out _out617);
-                  _1052_recursiveGen = _out614;
-                  _1053_recOwned = _out615;
-                  _1054_recErased = _out616;
-                  _1055_recIdents = _out617;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1052_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1053_recOwned;
-                  isErased = _1054_recErased;
-                  readIdents = _1055_recIdents;
-                }
-              } else if (_source42.is_Set) {
-                DAST._IType _1056___mcc_h445 = _source42.dtor_element;
+                Dafny.ISequence<DAST._IType> _1056___mcc_h441 = _source42.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _1057_recursiveGen;
                   bool _1058_recOwned;
                   bool _1059_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1060_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out618;
-                  bool _out619;
-                  bool _out620;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out621;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out618, out _out619, out _out620, out _out621);
-                  _1057_recursiveGen = _out618;
-                  _1058_recOwned = _out619;
-                  _1059_recErased = _out620;
-                  _1060_recIdents = _out621;
+                  Dafny.ISequence<Dafny.Rune> _out614;
+                  bool _out615;
+                  bool _out616;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out617;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out614, out _out615, out _out616, out _out617);
+                  _1057_recursiveGen = _out614;
+                  _1058_recOwned = _out615;
+                  _1059_recErased = _out616;
+                  _1060_recIdents = _out617;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1057_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1058_recOwned;
                   isErased = _1059_recErased;
                   readIdents = _1060_recIdents;
                 }
-              } else if (_source42.is_Multiset) {
-                DAST._IType _1061___mcc_h447 = _source42.dtor_element;
+              } else if (_source42.is_Array) {
+                DAST._IType _1061___mcc_h443 = _source42.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _1062_recursiveGen;
                   bool _1063_recOwned;
                   bool _1064_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1065_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out622;
-                  bool _out623;
-                  bool _out624;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out625;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out622, out _out623, out _out624, out _out625);
-                  _1062_recursiveGen = _out622;
-                  _1063_recOwned = _out623;
-                  _1064_recErased = _out624;
-                  _1065_recIdents = _out625;
+                  Dafny.ISequence<Dafny.Rune> _out618;
+                  bool _out619;
+                  bool _out620;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out621;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out618, out _out619, out _out620, out _out621);
+                  _1062_recursiveGen = _out618;
+                  _1063_recOwned = _out619;
+                  _1064_recErased = _out620;
+                  _1065_recIdents = _out621;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1062_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1063_recOwned;
                   isErased = _1064_recErased;
                   readIdents = _1065_recIdents;
                 }
-              } else if (_source42.is_Map) {
-                DAST._IType _1066___mcc_h449 = _source42.dtor_key;
-                DAST._IType _1067___mcc_h450 = _source42.dtor_value;
+              } else if (_source42.is_Seq) {
+                DAST._IType _1066___mcc_h445 = _source42.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1068_recursiveGen;
-                  bool _1069_recOwned;
-                  bool _1070_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1071_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1067_recursiveGen;
+                  bool _1068_recOwned;
+                  bool _1069_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1070_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out622;
+                  bool _out623;
+                  bool _out624;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out625;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out622, out _out623, out _out624, out _out625);
+                  _1067_recursiveGen = _out622;
+                  _1068_recOwned = _out623;
+                  _1069_recErased = _out624;
+                  _1070_recIdents = _out625;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1067_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1068_recOwned;
+                  isErased = _1069_recErased;
+                  readIdents = _1070_recIdents;
+                }
+              } else if (_source42.is_Set) {
+                DAST._IType _1071___mcc_h447 = _source42.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1072_recursiveGen;
+                  bool _1073_recOwned;
+                  bool _1074_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1075_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out626;
                   bool _out627;
                   bool _out628;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out629;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out626, out _out627, out _out628, out _out629);
-                  _1068_recursiveGen = _out626;
-                  _1069_recOwned = _out627;
-                  _1070_recErased = _out628;
-                  _1071_recIdents = _out629;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1068_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1069_recOwned;
-                  isErased = _1070_recErased;
-                  readIdents = _1071_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out626, out _out627, out _out628, out _out629);
+                  _1072_recursiveGen = _out626;
+                  _1073_recOwned = _out627;
+                  _1074_recErased = _out628;
+                  _1075_recIdents = _out629;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1072_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1073_recOwned;
+                  isErased = _1074_recErased;
+                  readIdents = _1075_recIdents;
                 }
-              } else if (_source42.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _1072___mcc_h453 = _source42.dtor_args;
-                DAST._IType _1073___mcc_h454 = _source42.dtor_result;
+              } else if (_source42.is_Multiset) {
+                DAST._IType _1076___mcc_h449 = _source42.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1074_recursiveGen;
-                  bool _1075_recOwned;
-                  bool _1076_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1077_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1077_recursiveGen;
+                  bool _1078_recOwned;
+                  bool _1079_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1080_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out630;
                   bool _out631;
                   bool _out632;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out633;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out630, out _out631, out _out632, out _out633);
-                  _1074_recursiveGen = _out630;
-                  _1075_recOwned = _out631;
-                  _1076_recErased = _out632;
-                  _1077_recIdents = _out633;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1074_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1075_recOwned;
-                  isErased = _1076_recErased;
-                  readIdents = _1077_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out630, out _out631, out _out632, out _out633);
+                  _1077_recursiveGen = _out630;
+                  _1078_recOwned = _out631;
+                  _1079_recErased = _out632;
+                  _1080_recIdents = _out633;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1077_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1078_recOwned;
+                  isErased = _1079_recErased;
+                  readIdents = _1080_recIdents;
                 }
-              } else if (_source42.is_Primitive) {
-                DAST._IPrimitive _1078___mcc_h457 = _source42.dtor_Primitive_a0;
+              } else if (_source42.is_Map) {
+                DAST._IType _1081___mcc_h451 = _source42.dtor_key;
+                DAST._IType _1082___mcc_h452 = _source42.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1079_recursiveGen;
-                  bool _1080_recOwned;
-                  bool _1081_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1082_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1083_recursiveGen;
+                  bool _1084_recOwned;
+                  bool _1085_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1086_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out634;
                   bool _out635;
                   bool _out636;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out637;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out634, out _out635, out _out636, out _out637);
-                  _1079_recursiveGen = _out634;
-                  _1080_recOwned = _out635;
-                  _1081_recErased = _out636;
-                  _1082_recIdents = _out637;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1079_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1080_recOwned;
-                  isErased = _1081_recErased;
-                  readIdents = _1082_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out634, out _out635, out _out636, out _out637);
+                  _1083_recursiveGen = _out634;
+                  _1084_recOwned = _out635;
+                  _1085_recErased = _out636;
+                  _1086_recIdents = _out637;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1083_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1084_recOwned;
+                  isErased = _1085_recErased;
+                  readIdents = _1086_recIdents;
                 }
-              } else if (_source42.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1083___mcc_h459 = _source42.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1084_recursiveGen;
-                  bool _1085_recOwned;
-                  bool _1086_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1087_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out638;
-                  bool _out639;
-                  bool _out640;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out641;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out638, out _out639, out _out640, out _out641);
-                  _1084_recursiveGen = _out638;
-                  _1085_recOwned = _out639;
-                  _1086_recErased = _out640;
-                  _1087_recIdents = _out641;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1084_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1085_recOwned;
-                  isErased = _1086_recErased;
-                  readIdents = _1087_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _1088___mcc_h461 = _source42.dtor_TypeArg_a0;
+              } else if (_source42.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1087___mcc_h455 = _source42.dtor_args;
+                DAST._IType _1088___mcc_h456 = _source42.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _1089_recursiveGen;
                   bool _1090_recOwned;
                   bool _1091_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1092_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out642;
-                  bool _out643;
-                  bool _out644;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out645;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out642, out _out643, out _out644, out _out645);
-                  _1089_recursiveGen = _out642;
-                  _1090_recOwned = _out643;
-                  _1091_recErased = _out644;
-                  _1092_recIdents = _out645;
+                  Dafny.ISequence<Dafny.Rune> _out638;
+                  bool _out639;
+                  bool _out640;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out641;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out638, out _out639, out _out640, out _out641);
+                  _1089_recursiveGen = _out638;
+                  _1090_recOwned = _out639;
+                  _1091_recErased = _out640;
+                  _1092_recIdents = _out641;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1089_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1090_recOwned;
                   isErased = _1091_recErased;
                   readIdents = _1092_recIdents;
                 }
+              } else if (_source42.is_Primitive) {
+                DAST._IPrimitive _1093___mcc_h459 = _source42.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1094_recursiveGen;
+                  bool _1095_recOwned;
+                  bool _1096_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1097_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out642;
+                  bool _out643;
+                  bool _out644;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out645;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out642, out _out643, out _out644, out _out645);
+                  _1094_recursiveGen = _out642;
+                  _1095_recOwned = _out643;
+                  _1096_recErased = _out644;
+                  _1097_recIdents = _out645;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1094_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1095_recOwned;
+                  isErased = _1096_recErased;
+                  readIdents = _1097_recIdents;
+                }
+              } else if (_source42.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _1098___mcc_h461 = _source42.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1099_recursiveGen;
+                  bool _1100_recOwned;
+                  bool _1101_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1102_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out646;
+                  bool _out647;
+                  bool _out648;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out649;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out646, out _out647, out _out648, out _out649);
+                  _1099_recursiveGen = _out646;
+                  _1100_recOwned = _out647;
+                  _1101_recErased = _out648;
+                  _1102_recIdents = _out649;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1099_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1100_recOwned;
+                  isErased = _1101_recErased;
+                  readIdents = _1102_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _1103___mcc_h463 = _source42.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1104_recursiveGen;
+                  bool _1105_recOwned;
+                  bool _1106_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1107_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out650;
+                  bool _out651;
+                  bool _out652;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out653;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out650, out _out651, out _out652, out _out653);
+                  _1104_recursiveGen = _out650;
+                  _1105_recOwned = _out651;
+                  _1106_recErased = _out652;
+                  _1107_recIdents = _out653;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1104_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1105_recOwned;
+                  isErased = _1106_recErased;
+                  readIdents = _1107_recIdents;
+                }
               }
             } else if (_source26.is_Map) {
-              DAST._IType _1093___mcc_h463 = _source26.dtor_key;
-              DAST._IType _1094___mcc_h464 = _source26.dtor_value;
-              DAST._IType _source44 = _473___mcc_h121;
+              DAST._IType _1108___mcc_h465 = _source26.dtor_key;
+              DAST._IType _1109___mcc_h466 = _source26.dtor_value;
+              DAST._IType _source44 = _488___mcc_h123;
               if (_source44.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1095___mcc_h469 = _source44.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _1096___mcc_h470 = _source44.dtor_typeArgs;
-                DAST._IResolvedType _1097___mcc_h471 = _source44.dtor_resolved;
-                DAST._IResolvedType _source45 = _1097___mcc_h471;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1110___mcc_h471 = _source44.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _1111___mcc_h472 = _source44.dtor_typeArgs;
+                DAST._IResolvedType _1112___mcc_h473 = _source44.dtor_resolved;
+                DAST._IResolvedType _source45 = _1112___mcc_h473;
                 if (_source45.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1098___mcc_h475 = _source45.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1113___mcc_h477 = _source45.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1099_recursiveGen;
-                    bool _1100_recOwned;
-                    bool _1101_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1102_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out646;
-                    bool _out647;
-                    bool _out648;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out649;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out646, out _out647, out _out648, out _out649);
-                    _1099_recursiveGen = _out646;
-                    _1100_recOwned = _out647;
-                    _1101_recErased = _out648;
-                    _1102_recIdents = _out649;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1099_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1100_recOwned;
-                    isErased = _1101_recErased;
-                    readIdents = _1102_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1114_recursiveGen;
+                    bool _1115_recOwned;
+                    bool _1116_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1117_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out654;
+                    bool _out655;
+                    bool _out656;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out657;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out654, out _out655, out _out656, out _out657);
+                    _1114_recursiveGen = _out654;
+                    _1115_recOwned = _out655;
+                    _1116_recErased = _out656;
+                    _1117_recIdents = _out657;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1114_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1115_recOwned;
+                    isErased = _1116_recErased;
+                    readIdents = _1117_recIdents;
                   }
                 } else if (_source45.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1103___mcc_h477 = _source45.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1118___mcc_h479 = _source45.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1104_recursiveGen;
-                    bool _1105_recOwned;
-                    bool _1106_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1107_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out650;
-                    bool _out651;
-                    bool _out652;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out653;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out650, out _out651, out _out652, out _out653);
-                    _1104_recursiveGen = _out650;
-                    _1105_recOwned = _out651;
-                    _1106_recErased = _out652;
-                    _1107_recIdents = _out653;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1104_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1105_recOwned;
-                    isErased = _1106_recErased;
-                    readIdents = _1107_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1119_recursiveGen;
+                    bool _1120_recOwned;
+                    bool _1121_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1122_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out658;
+                    bool _out659;
+                    bool _out660;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out661;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out658, out _out659, out _out660, out _out661);
+                    _1119_recursiveGen = _out658;
+                    _1120_recOwned = _out659;
+                    _1121_recErased = _out660;
+                    _1122_recIdents = _out661;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1119_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1120_recOwned;
+                    isErased = _1121_recErased;
+                    readIdents = _1122_recIdents;
                   }
                 } else {
-                  DAST._IType _1108___mcc_h479 = _source45.dtor_Newtype_a0;
-                  DAST._IType _1109_b = _1108___mcc_h479;
+                  DAST._IType _1123___mcc_h481 = _source45.dtor_Newtype_a0;
+                  DAST._IType _1124_b = _1123___mcc_h481;
                   {
-                    if (object.Equals(_466_fromTpe, _1109_b)) {
-                      Dafny.ISequence<Dafny.Rune> _1110_recursiveGen;
-                      bool _1111_recOwned;
-                      bool _1112_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1113_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out654;
-                      bool _out655;
-                      bool _out656;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out657;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out654, out _out655, out _out656, out _out657);
-                      _1110_recursiveGen = _out654;
-                      _1111_recOwned = _out655;
-                      _1112_recErased = _out656;
-                      _1113_recIdents = _out657;
-                      Dafny.ISequence<Dafny.Rune> _1114_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out658;
-                      _out658 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1114_rhsType = _out658;
-                      Dafny.ISequence<Dafny.Rune> _1115_uneraseFn;
-                      _1115_uneraseFn = ((_1111_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1114_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1115_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1110_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _1111_recOwned;
+                    if (object.Equals(_481_fromTpe, _1124_b)) {
+                      Dafny.ISequence<Dafny.Rune> _1125_recursiveGen;
+                      bool _1126_recOwned;
+                      bool _1127_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1128_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out662;
+                      bool _out663;
+                      bool _out664;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out665;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out662, out _out663, out _out664, out _out665);
+                      _1125_recursiveGen = _out662;
+                      _1126_recOwned = _out663;
+                      _1127_recErased = _out664;
+                      _1128_recIdents = _out665;
+                      Dafny.ISequence<Dafny.Rune> _1129_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out666;
+                      _out666 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1129_rhsType = _out666;
+                      Dafny.ISequence<Dafny.Rune> _1130_uneraseFn;
+                      _1130_uneraseFn = ((_1126_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1129_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1130_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1125_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _1126_recOwned;
                       isErased = false;
-                      readIdents = _1113_recIdents;
+                      readIdents = _1128_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out659;
-                      bool _out660;
-                      bool _out661;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out662;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1109_b), _1109_b, _465_toTpe), @params, mustOwn, out _out659, out _out660, out _out661, out _out662);
-                      s = _out659;
-                      isOwned = _out660;
-                      isErased = _out661;
-                      readIdents = _out662;
+                      Dafny.ISequence<Dafny.Rune> _out667;
+                      bool _out668;
+                      bool _out669;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out670;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1124_b), _1124_b, _480_toTpe), @params, mustOwn, out _out667, out _out668, out _out669, out _out670);
+                      s = _out667;
+                      isOwned = _out668;
+                      isErased = _out669;
+                      readIdents = _out670;
                     }
                   }
                 }
               } else if (_source44.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _1116___mcc_h481 = _source44.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1117_recursiveGen;
-                  bool _1118_recOwned;
-                  bool _1119_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1120_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out663;
-                  bool _out664;
-                  bool _out665;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out666;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out663, out _out664, out _out665, out _out666);
-                  _1117_recursiveGen = _out663;
-                  _1118_recOwned = _out664;
-                  _1119_recErased = _out665;
-                  _1120_recIdents = _out666;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1117_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1118_recOwned;
-                  isErased = _1119_recErased;
-                  readIdents = _1120_recIdents;
-                }
-              } else if (_source44.is_Array) {
-                DAST._IType _1121___mcc_h483 = _source44.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1122_recursiveGen;
-                  bool _1123_recOwned;
-                  bool _1124_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1125_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out667;
-                  bool _out668;
-                  bool _out669;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out670;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out667, out _out668, out _out669, out _out670);
-                  _1122_recursiveGen = _out667;
-                  _1123_recOwned = _out668;
-                  _1124_recErased = _out669;
-                  _1125_recIdents = _out670;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1122_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1123_recOwned;
-                  isErased = _1124_recErased;
-                  readIdents = _1125_recIdents;
-                }
-              } else if (_source44.is_Seq) {
-                DAST._IType _1126___mcc_h485 = _source44.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1127_recursiveGen;
-                  bool _1128_recOwned;
-                  bool _1129_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1130_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out671;
-                  bool _out672;
-                  bool _out673;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out674;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out671, out _out672, out _out673, out _out674);
-                  _1127_recursiveGen = _out671;
-                  _1128_recOwned = _out672;
-                  _1129_recErased = _out673;
-                  _1130_recIdents = _out674;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1127_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1128_recOwned;
-                  isErased = _1129_recErased;
-                  readIdents = _1130_recIdents;
-                }
-              } else if (_source44.is_Set) {
-                DAST._IType _1131___mcc_h487 = _source44.dtor_element;
+                Dafny.ISequence<DAST._IType> _1131___mcc_h483 = _source44.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _1132_recursiveGen;
                   bool _1133_recOwned;
                   bool _1134_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1135_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out675;
-                  bool _out676;
-                  bool _out677;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out678;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out675, out _out676, out _out677, out _out678);
-                  _1132_recursiveGen = _out675;
-                  _1133_recOwned = _out676;
-                  _1134_recErased = _out677;
-                  _1135_recIdents = _out678;
+                  Dafny.ISequence<Dafny.Rune> _out671;
+                  bool _out672;
+                  bool _out673;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out674;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out671, out _out672, out _out673, out _out674);
+                  _1132_recursiveGen = _out671;
+                  _1133_recOwned = _out672;
+                  _1134_recErased = _out673;
+                  _1135_recIdents = _out674;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1132_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1133_recOwned;
                   isErased = _1134_recErased;
                   readIdents = _1135_recIdents;
                 }
-              } else if (_source44.is_Multiset) {
-                DAST._IType _1136___mcc_h489 = _source44.dtor_element;
+              } else if (_source44.is_Array) {
+                DAST._IType _1136___mcc_h485 = _source44.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _1137_recursiveGen;
                   bool _1138_recOwned;
                   bool _1139_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1140_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out679;
-                  bool _out680;
-                  bool _out681;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out682;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out679, out _out680, out _out681, out _out682);
-                  _1137_recursiveGen = _out679;
-                  _1138_recOwned = _out680;
-                  _1139_recErased = _out681;
-                  _1140_recIdents = _out682;
+                  Dafny.ISequence<Dafny.Rune> _out675;
+                  bool _out676;
+                  bool _out677;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out678;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out675, out _out676, out _out677, out _out678);
+                  _1137_recursiveGen = _out675;
+                  _1138_recOwned = _out676;
+                  _1139_recErased = _out677;
+                  _1140_recIdents = _out678;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1137_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1138_recOwned;
                   isErased = _1139_recErased;
                   readIdents = _1140_recIdents;
                 }
-              } else if (_source44.is_Map) {
-                DAST._IType _1141___mcc_h491 = _source44.dtor_key;
-                DAST._IType _1142___mcc_h492 = _source44.dtor_value;
+              } else if (_source44.is_Seq) {
+                DAST._IType _1141___mcc_h487 = _source44.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1143_recursiveGen;
-                  bool _1144_recOwned;
-                  bool _1145_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1146_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1142_recursiveGen;
+                  bool _1143_recOwned;
+                  bool _1144_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1145_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out679;
+                  bool _out680;
+                  bool _out681;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out682;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out679, out _out680, out _out681, out _out682);
+                  _1142_recursiveGen = _out679;
+                  _1143_recOwned = _out680;
+                  _1144_recErased = _out681;
+                  _1145_recIdents = _out682;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1142_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1143_recOwned;
+                  isErased = _1144_recErased;
+                  readIdents = _1145_recIdents;
+                }
+              } else if (_source44.is_Set) {
+                DAST._IType _1146___mcc_h489 = _source44.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1147_recursiveGen;
+                  bool _1148_recOwned;
+                  bool _1149_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1150_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out683;
                   bool _out684;
                   bool _out685;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out686;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out683, out _out684, out _out685, out _out686);
-                  _1143_recursiveGen = _out683;
-                  _1144_recOwned = _out684;
-                  _1145_recErased = _out685;
-                  _1146_recIdents = _out686;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1143_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1144_recOwned;
-                  isErased = _1145_recErased;
-                  readIdents = _1146_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out683, out _out684, out _out685, out _out686);
+                  _1147_recursiveGen = _out683;
+                  _1148_recOwned = _out684;
+                  _1149_recErased = _out685;
+                  _1150_recIdents = _out686;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1147_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1148_recOwned;
+                  isErased = _1149_recErased;
+                  readIdents = _1150_recIdents;
                 }
-              } else if (_source44.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _1147___mcc_h495 = _source44.dtor_args;
-                DAST._IType _1148___mcc_h496 = _source44.dtor_result;
+              } else if (_source44.is_Multiset) {
+                DAST._IType _1151___mcc_h491 = _source44.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1149_recursiveGen;
-                  bool _1150_recOwned;
-                  bool _1151_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1152_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1152_recursiveGen;
+                  bool _1153_recOwned;
+                  bool _1154_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1155_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out687;
                   bool _out688;
                   bool _out689;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out690;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out687, out _out688, out _out689, out _out690);
-                  _1149_recursiveGen = _out687;
-                  _1150_recOwned = _out688;
-                  _1151_recErased = _out689;
-                  _1152_recIdents = _out690;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1149_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1150_recOwned;
-                  isErased = _1151_recErased;
-                  readIdents = _1152_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out687, out _out688, out _out689, out _out690);
+                  _1152_recursiveGen = _out687;
+                  _1153_recOwned = _out688;
+                  _1154_recErased = _out689;
+                  _1155_recIdents = _out690;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1152_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1153_recOwned;
+                  isErased = _1154_recErased;
+                  readIdents = _1155_recIdents;
                 }
-              } else if (_source44.is_Primitive) {
-                DAST._IPrimitive _1153___mcc_h499 = _source44.dtor_Primitive_a0;
+              } else if (_source44.is_Map) {
+                DAST._IType _1156___mcc_h493 = _source44.dtor_key;
+                DAST._IType _1157___mcc_h494 = _source44.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1154_recursiveGen;
-                  bool _1155_recOwned;
-                  bool _1156_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1157_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1158_recursiveGen;
+                  bool _1159_recOwned;
+                  bool _1160_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1161_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out691;
                   bool _out692;
                   bool _out693;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out694;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out691, out _out692, out _out693, out _out694);
-                  _1154_recursiveGen = _out691;
-                  _1155_recOwned = _out692;
-                  _1156_recErased = _out693;
-                  _1157_recIdents = _out694;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1154_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1155_recOwned;
-                  isErased = _1156_recErased;
-                  readIdents = _1157_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out691, out _out692, out _out693, out _out694);
+                  _1158_recursiveGen = _out691;
+                  _1159_recOwned = _out692;
+                  _1160_recErased = _out693;
+                  _1161_recIdents = _out694;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1158_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1159_recOwned;
+                  isErased = _1160_recErased;
+                  readIdents = _1161_recIdents;
                 }
-              } else if (_source44.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1158___mcc_h501 = _source44.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1159_recursiveGen;
-                  bool _1160_recOwned;
-                  bool _1161_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1162_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out695;
-                  bool _out696;
-                  bool _out697;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out698;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out695, out _out696, out _out697, out _out698);
-                  _1159_recursiveGen = _out695;
-                  _1160_recOwned = _out696;
-                  _1161_recErased = _out697;
-                  _1162_recIdents = _out698;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1159_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1160_recOwned;
-                  isErased = _1161_recErased;
-                  readIdents = _1162_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _1163___mcc_h503 = _source44.dtor_TypeArg_a0;
+              } else if (_source44.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1162___mcc_h497 = _source44.dtor_args;
+                DAST._IType _1163___mcc_h498 = _source44.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _1164_recursiveGen;
                   bool _1165_recOwned;
                   bool _1166_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1167_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out699;
-                  bool _out700;
-                  bool _out701;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out702;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out699, out _out700, out _out701, out _out702);
-                  _1164_recursiveGen = _out699;
-                  _1165_recOwned = _out700;
-                  _1166_recErased = _out701;
-                  _1167_recIdents = _out702;
+                  Dafny.ISequence<Dafny.Rune> _out695;
+                  bool _out696;
+                  bool _out697;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out698;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out695, out _out696, out _out697, out _out698);
+                  _1164_recursiveGen = _out695;
+                  _1165_recOwned = _out696;
+                  _1166_recErased = _out697;
+                  _1167_recIdents = _out698;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1164_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1165_recOwned;
                   isErased = _1166_recErased;
                   readIdents = _1167_recIdents;
                 }
+              } else if (_source44.is_Primitive) {
+                DAST._IPrimitive _1168___mcc_h501 = _source44.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1169_recursiveGen;
+                  bool _1170_recOwned;
+                  bool _1171_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1172_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out699;
+                  bool _out700;
+                  bool _out701;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out702;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out699, out _out700, out _out701, out _out702);
+                  _1169_recursiveGen = _out699;
+                  _1170_recOwned = _out700;
+                  _1171_recErased = _out701;
+                  _1172_recIdents = _out702;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1169_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1170_recOwned;
+                  isErased = _1171_recErased;
+                  readIdents = _1172_recIdents;
+                }
+              } else if (_source44.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _1173___mcc_h503 = _source44.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1174_recursiveGen;
+                  bool _1175_recOwned;
+                  bool _1176_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1177_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out703;
+                  bool _out704;
+                  bool _out705;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out706;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out703, out _out704, out _out705, out _out706);
+                  _1174_recursiveGen = _out703;
+                  _1175_recOwned = _out704;
+                  _1176_recErased = _out705;
+                  _1177_recIdents = _out706;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1174_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1175_recOwned;
+                  isErased = _1176_recErased;
+                  readIdents = _1177_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _1178___mcc_h505 = _source44.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1179_recursiveGen;
+                  bool _1180_recOwned;
+                  bool _1181_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1182_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out707;
+                  bool _out708;
+                  bool _out709;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out710;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out707, out _out708, out _out709, out _out710);
+                  _1179_recursiveGen = _out707;
+                  _1180_recOwned = _out708;
+                  _1181_recErased = _out709;
+                  _1182_recIdents = _out710;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1179_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1180_recOwned;
+                  isErased = _1181_recErased;
+                  readIdents = _1182_recIdents;
+                }
               }
             } else if (_source26.is_Arrow) {
-              Dafny.ISequence<DAST._IType> _1168___mcc_h505 = _source26.dtor_args;
-              DAST._IType _1169___mcc_h506 = _source26.dtor_result;
-              DAST._IType _source46 = _473___mcc_h121;
+              Dafny.ISequence<DAST._IType> _1183___mcc_h507 = _source26.dtor_args;
+              DAST._IType _1184___mcc_h508 = _source26.dtor_result;
+              DAST._IType _source46 = _488___mcc_h123;
               if (_source46.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1170___mcc_h511 = _source46.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _1171___mcc_h512 = _source46.dtor_typeArgs;
-                DAST._IResolvedType _1172___mcc_h513 = _source46.dtor_resolved;
-                DAST._IResolvedType _source47 = _1172___mcc_h513;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1185___mcc_h513 = _source46.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _1186___mcc_h514 = _source46.dtor_typeArgs;
+                DAST._IResolvedType _1187___mcc_h515 = _source46.dtor_resolved;
+                DAST._IResolvedType _source47 = _1187___mcc_h515;
                 if (_source47.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1173___mcc_h517 = _source47.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1188___mcc_h519 = _source47.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1174_recursiveGen;
-                    bool _1175_recOwned;
-                    bool _1176_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1177_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out703;
-                    bool _out704;
-                    bool _out705;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out706;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out703, out _out704, out _out705, out _out706);
-                    _1174_recursiveGen = _out703;
-                    _1175_recOwned = _out704;
-                    _1176_recErased = _out705;
-                    _1177_recIdents = _out706;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1174_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1175_recOwned;
-                    isErased = _1176_recErased;
-                    readIdents = _1177_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1189_recursiveGen;
+                    bool _1190_recOwned;
+                    bool _1191_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1192_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out711;
+                    bool _out712;
+                    bool _out713;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out714;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out711, out _out712, out _out713, out _out714);
+                    _1189_recursiveGen = _out711;
+                    _1190_recOwned = _out712;
+                    _1191_recErased = _out713;
+                    _1192_recIdents = _out714;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1189_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1190_recOwned;
+                    isErased = _1191_recErased;
+                    readIdents = _1192_recIdents;
                   }
                 } else if (_source47.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1178___mcc_h519 = _source47.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1193___mcc_h521 = _source47.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1179_recursiveGen;
-                    bool _1180_recOwned;
-                    bool _1181_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1182_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out707;
-                    bool _out708;
-                    bool _out709;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out710;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out707, out _out708, out _out709, out _out710);
-                    _1179_recursiveGen = _out707;
-                    _1180_recOwned = _out708;
-                    _1181_recErased = _out709;
-                    _1182_recIdents = _out710;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1179_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1180_recOwned;
-                    isErased = _1181_recErased;
-                    readIdents = _1182_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1194_recursiveGen;
+                    bool _1195_recOwned;
+                    bool _1196_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1197_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out715;
+                    bool _out716;
+                    bool _out717;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out718;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out715, out _out716, out _out717, out _out718);
+                    _1194_recursiveGen = _out715;
+                    _1195_recOwned = _out716;
+                    _1196_recErased = _out717;
+                    _1197_recIdents = _out718;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1194_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1195_recOwned;
+                    isErased = _1196_recErased;
+                    readIdents = _1197_recIdents;
                   }
                 } else {
-                  DAST._IType _1183___mcc_h521 = _source47.dtor_Newtype_a0;
-                  DAST._IType _1184_b = _1183___mcc_h521;
+                  DAST._IType _1198___mcc_h523 = _source47.dtor_Newtype_a0;
+                  DAST._IType _1199_b = _1198___mcc_h523;
                   {
-                    if (object.Equals(_466_fromTpe, _1184_b)) {
-                      Dafny.ISequence<Dafny.Rune> _1185_recursiveGen;
-                      bool _1186_recOwned;
-                      bool _1187_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1188_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out711;
-                      bool _out712;
-                      bool _out713;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out714;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out711, out _out712, out _out713, out _out714);
-                      _1185_recursiveGen = _out711;
-                      _1186_recOwned = _out712;
-                      _1187_recErased = _out713;
-                      _1188_recIdents = _out714;
-                      Dafny.ISequence<Dafny.Rune> _1189_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out715;
-                      _out715 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1189_rhsType = _out715;
-                      Dafny.ISequence<Dafny.Rune> _1190_uneraseFn;
-                      _1190_uneraseFn = ((_1186_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1189_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1190_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1185_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _1186_recOwned;
+                    if (object.Equals(_481_fromTpe, _1199_b)) {
+                      Dafny.ISequence<Dafny.Rune> _1200_recursiveGen;
+                      bool _1201_recOwned;
+                      bool _1202_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1203_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out719;
+                      bool _out720;
+                      bool _out721;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out722;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out719, out _out720, out _out721, out _out722);
+                      _1200_recursiveGen = _out719;
+                      _1201_recOwned = _out720;
+                      _1202_recErased = _out721;
+                      _1203_recIdents = _out722;
+                      Dafny.ISequence<Dafny.Rune> _1204_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out723;
+                      _out723 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1204_rhsType = _out723;
+                      Dafny.ISequence<Dafny.Rune> _1205_uneraseFn;
+                      _1205_uneraseFn = ((_1201_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1204_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1205_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1200_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _1201_recOwned;
                       isErased = false;
-                      readIdents = _1188_recIdents;
+                      readIdents = _1203_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out716;
-                      bool _out717;
-                      bool _out718;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out719;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1184_b), _1184_b, _465_toTpe), @params, mustOwn, out _out716, out _out717, out _out718, out _out719);
-                      s = _out716;
-                      isOwned = _out717;
-                      isErased = _out718;
-                      readIdents = _out719;
+                      Dafny.ISequence<Dafny.Rune> _out724;
+                      bool _out725;
+                      bool _out726;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out727;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1199_b), _1199_b, _480_toTpe), @params, mustOwn, out _out724, out _out725, out _out726, out _out727);
+                      s = _out724;
+                      isOwned = _out725;
+                      isErased = _out726;
+                      readIdents = _out727;
                     }
                   }
                 }
               } else if (_source46.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _1191___mcc_h523 = _source46.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1192_recursiveGen;
-                  bool _1193_recOwned;
-                  bool _1194_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1195_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out720;
-                  bool _out721;
-                  bool _out722;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out723;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out720, out _out721, out _out722, out _out723);
-                  _1192_recursiveGen = _out720;
-                  _1193_recOwned = _out721;
-                  _1194_recErased = _out722;
-                  _1195_recIdents = _out723;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1192_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1193_recOwned;
-                  isErased = _1194_recErased;
-                  readIdents = _1195_recIdents;
-                }
-              } else if (_source46.is_Array) {
-                DAST._IType _1196___mcc_h525 = _source46.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1197_recursiveGen;
-                  bool _1198_recOwned;
-                  bool _1199_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1200_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out724;
-                  bool _out725;
-                  bool _out726;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out727;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out724, out _out725, out _out726, out _out727);
-                  _1197_recursiveGen = _out724;
-                  _1198_recOwned = _out725;
-                  _1199_recErased = _out726;
-                  _1200_recIdents = _out727;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1197_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1198_recOwned;
-                  isErased = _1199_recErased;
-                  readIdents = _1200_recIdents;
-                }
-              } else if (_source46.is_Seq) {
-                DAST._IType _1201___mcc_h527 = _source46.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1202_recursiveGen;
-                  bool _1203_recOwned;
-                  bool _1204_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1205_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out728;
-                  bool _out729;
-                  bool _out730;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out731;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out728, out _out729, out _out730, out _out731);
-                  _1202_recursiveGen = _out728;
-                  _1203_recOwned = _out729;
-                  _1204_recErased = _out730;
-                  _1205_recIdents = _out731;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1202_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1203_recOwned;
-                  isErased = _1204_recErased;
-                  readIdents = _1205_recIdents;
-                }
-              } else if (_source46.is_Set) {
-                DAST._IType _1206___mcc_h529 = _source46.dtor_element;
+                Dafny.ISequence<DAST._IType> _1206___mcc_h525 = _source46.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _1207_recursiveGen;
                   bool _1208_recOwned;
                   bool _1209_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1210_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out732;
-                  bool _out733;
-                  bool _out734;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out735;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out732, out _out733, out _out734, out _out735);
-                  _1207_recursiveGen = _out732;
-                  _1208_recOwned = _out733;
-                  _1209_recErased = _out734;
-                  _1210_recIdents = _out735;
+                  Dafny.ISequence<Dafny.Rune> _out728;
+                  bool _out729;
+                  bool _out730;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out731;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out728, out _out729, out _out730, out _out731);
+                  _1207_recursiveGen = _out728;
+                  _1208_recOwned = _out729;
+                  _1209_recErased = _out730;
+                  _1210_recIdents = _out731;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1207_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1208_recOwned;
                   isErased = _1209_recErased;
                   readIdents = _1210_recIdents;
                 }
-              } else if (_source46.is_Multiset) {
-                DAST._IType _1211___mcc_h531 = _source46.dtor_element;
+              } else if (_source46.is_Array) {
+                DAST._IType _1211___mcc_h527 = _source46.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _1212_recursiveGen;
                   bool _1213_recOwned;
                   bool _1214_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1215_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out736;
-                  bool _out737;
-                  bool _out738;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out739;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out736, out _out737, out _out738, out _out739);
-                  _1212_recursiveGen = _out736;
-                  _1213_recOwned = _out737;
-                  _1214_recErased = _out738;
-                  _1215_recIdents = _out739;
+                  Dafny.ISequence<Dafny.Rune> _out732;
+                  bool _out733;
+                  bool _out734;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out735;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out732, out _out733, out _out734, out _out735);
+                  _1212_recursiveGen = _out732;
+                  _1213_recOwned = _out733;
+                  _1214_recErased = _out734;
+                  _1215_recIdents = _out735;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1212_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1213_recOwned;
                   isErased = _1214_recErased;
                   readIdents = _1215_recIdents;
                 }
-              } else if (_source46.is_Map) {
-                DAST._IType _1216___mcc_h533 = _source46.dtor_key;
-                DAST._IType _1217___mcc_h534 = _source46.dtor_value;
+              } else if (_source46.is_Seq) {
+                DAST._IType _1216___mcc_h529 = _source46.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1218_recursiveGen;
-                  bool _1219_recOwned;
-                  bool _1220_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1221_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1217_recursiveGen;
+                  bool _1218_recOwned;
+                  bool _1219_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1220_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out736;
+                  bool _out737;
+                  bool _out738;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out739;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out736, out _out737, out _out738, out _out739);
+                  _1217_recursiveGen = _out736;
+                  _1218_recOwned = _out737;
+                  _1219_recErased = _out738;
+                  _1220_recIdents = _out739;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1217_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1218_recOwned;
+                  isErased = _1219_recErased;
+                  readIdents = _1220_recIdents;
+                }
+              } else if (_source46.is_Set) {
+                DAST._IType _1221___mcc_h531 = _source46.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1222_recursiveGen;
+                  bool _1223_recOwned;
+                  bool _1224_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1225_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out740;
                   bool _out741;
                   bool _out742;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out743;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out740, out _out741, out _out742, out _out743);
-                  _1218_recursiveGen = _out740;
-                  _1219_recOwned = _out741;
-                  _1220_recErased = _out742;
-                  _1221_recIdents = _out743;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1218_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1219_recOwned;
-                  isErased = _1220_recErased;
-                  readIdents = _1221_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out740, out _out741, out _out742, out _out743);
+                  _1222_recursiveGen = _out740;
+                  _1223_recOwned = _out741;
+                  _1224_recErased = _out742;
+                  _1225_recIdents = _out743;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1222_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1223_recOwned;
+                  isErased = _1224_recErased;
+                  readIdents = _1225_recIdents;
                 }
-              } else if (_source46.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _1222___mcc_h537 = _source46.dtor_args;
-                DAST._IType _1223___mcc_h538 = _source46.dtor_result;
+              } else if (_source46.is_Multiset) {
+                DAST._IType _1226___mcc_h533 = _source46.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1224_recursiveGen;
-                  bool _1225_recOwned;
-                  bool _1226_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1227_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1227_recursiveGen;
+                  bool _1228_recOwned;
+                  bool _1229_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1230_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out744;
                   bool _out745;
                   bool _out746;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out747;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out744, out _out745, out _out746, out _out747);
-                  _1224_recursiveGen = _out744;
-                  _1225_recOwned = _out745;
-                  _1226_recErased = _out746;
-                  _1227_recIdents = _out747;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1224_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1225_recOwned;
-                  isErased = _1226_recErased;
-                  readIdents = _1227_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out744, out _out745, out _out746, out _out747);
+                  _1227_recursiveGen = _out744;
+                  _1228_recOwned = _out745;
+                  _1229_recErased = _out746;
+                  _1230_recIdents = _out747;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1227_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1228_recOwned;
+                  isErased = _1229_recErased;
+                  readIdents = _1230_recIdents;
                 }
-              } else if (_source46.is_Primitive) {
-                DAST._IPrimitive _1228___mcc_h541 = _source46.dtor_Primitive_a0;
+              } else if (_source46.is_Map) {
+                DAST._IType _1231___mcc_h535 = _source46.dtor_key;
+                DAST._IType _1232___mcc_h536 = _source46.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1229_recursiveGen;
-                  bool _1230_recOwned;
-                  bool _1231_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1232_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1233_recursiveGen;
+                  bool _1234_recOwned;
+                  bool _1235_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1236_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out748;
                   bool _out749;
                   bool _out750;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out751;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out748, out _out749, out _out750, out _out751);
-                  _1229_recursiveGen = _out748;
-                  _1230_recOwned = _out749;
-                  _1231_recErased = _out750;
-                  _1232_recIdents = _out751;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1229_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1230_recOwned;
-                  isErased = _1231_recErased;
-                  readIdents = _1232_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out748, out _out749, out _out750, out _out751);
+                  _1233_recursiveGen = _out748;
+                  _1234_recOwned = _out749;
+                  _1235_recErased = _out750;
+                  _1236_recIdents = _out751;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1233_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1234_recOwned;
+                  isErased = _1235_recErased;
+                  readIdents = _1236_recIdents;
                 }
-              } else if (_source46.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1233___mcc_h543 = _source46.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1234_recursiveGen;
-                  bool _1235_recOwned;
-                  bool _1236_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1237_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out752;
-                  bool _out753;
-                  bool _out754;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out755;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out752, out _out753, out _out754, out _out755);
-                  _1234_recursiveGen = _out752;
-                  _1235_recOwned = _out753;
-                  _1236_recErased = _out754;
-                  _1237_recIdents = _out755;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1234_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1235_recOwned;
-                  isErased = _1236_recErased;
-                  readIdents = _1237_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _1238___mcc_h545 = _source46.dtor_TypeArg_a0;
+              } else if (_source46.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1237___mcc_h539 = _source46.dtor_args;
+                DAST._IType _1238___mcc_h540 = _source46.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _1239_recursiveGen;
                   bool _1240_recOwned;
                   bool _1241_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1242_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out756;
-                  bool _out757;
-                  bool _out758;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out759;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out756, out _out757, out _out758, out _out759);
-                  _1239_recursiveGen = _out756;
-                  _1240_recOwned = _out757;
-                  _1241_recErased = _out758;
-                  _1242_recIdents = _out759;
+                  Dafny.ISequence<Dafny.Rune> _out752;
+                  bool _out753;
+                  bool _out754;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out755;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out752, out _out753, out _out754, out _out755);
+                  _1239_recursiveGen = _out752;
+                  _1240_recOwned = _out753;
+                  _1241_recErased = _out754;
+                  _1242_recIdents = _out755;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1239_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1240_recOwned;
                   isErased = _1241_recErased;
                   readIdents = _1242_recIdents;
                 }
+              } else if (_source46.is_Primitive) {
+                DAST._IPrimitive _1243___mcc_h543 = _source46.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1244_recursiveGen;
+                  bool _1245_recOwned;
+                  bool _1246_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1247_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out756;
+                  bool _out757;
+                  bool _out758;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out759;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out756, out _out757, out _out758, out _out759);
+                  _1244_recursiveGen = _out756;
+                  _1245_recOwned = _out757;
+                  _1246_recErased = _out758;
+                  _1247_recIdents = _out759;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1244_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1245_recOwned;
+                  isErased = _1246_recErased;
+                  readIdents = _1247_recIdents;
+                }
+              } else if (_source46.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _1248___mcc_h545 = _source46.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1249_recursiveGen;
+                  bool _1250_recOwned;
+                  bool _1251_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1252_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out760;
+                  bool _out761;
+                  bool _out762;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out763;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out760, out _out761, out _out762, out _out763);
+                  _1249_recursiveGen = _out760;
+                  _1250_recOwned = _out761;
+                  _1251_recErased = _out762;
+                  _1252_recIdents = _out763;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1249_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1250_recOwned;
+                  isErased = _1251_recErased;
+                  readIdents = _1252_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _1253___mcc_h547 = _source46.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1254_recursiveGen;
+                  bool _1255_recOwned;
+                  bool _1256_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1257_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out764;
+                  bool _out765;
+                  bool _out766;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out767;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out764, out _out765, out _out766, out _out767);
+                  _1254_recursiveGen = _out764;
+                  _1255_recOwned = _out765;
+                  _1256_recErased = _out766;
+                  _1257_recIdents = _out767;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1254_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1255_recOwned;
+                  isErased = _1256_recErased;
+                  readIdents = _1257_recIdents;
+                }
               }
             } else if (_source26.is_Primitive) {
-              DAST._IPrimitive _1243___mcc_h547 = _source26.dtor_Primitive_a0;
-              DAST._IPrimitive _source48 = _1243___mcc_h547;
+              DAST._IPrimitive _1258___mcc_h549 = _source26.dtor_Primitive_a0;
+              DAST._IPrimitive _source48 = _1258___mcc_h549;
               if (_source48.is_Int) {
-                DAST._IType _source49 = _473___mcc_h121;
+                DAST._IType _source49 = _488___mcc_h123;
                 if (_source49.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1244___mcc_h550 = _source49.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _1245___mcc_h551 = _source49.dtor_typeArgs;
-                  DAST._IResolvedType _1246___mcc_h552 = _source49.dtor_resolved;
-                  DAST._IResolvedType _source50 = _1246___mcc_h552;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1259___mcc_h552 = _source49.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _1260___mcc_h553 = _source49.dtor_typeArgs;
+                  DAST._IResolvedType _1261___mcc_h554 = _source49.dtor_resolved;
+                  DAST._IResolvedType _source50 = _1261___mcc_h554;
                   if (_source50.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1247___mcc_h556 = _source50.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1262___mcc_h558 = _source50.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1248_recursiveGen;
-                      bool _1249_recOwned;
-                      bool _1250_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1251_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out760;
-                      bool _out761;
-                      bool _out762;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out763;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out760, out _out761, out _out762, out _out763);
-                      _1248_recursiveGen = _out760;
-                      _1249_recOwned = _out761;
-                      _1250_recErased = _out762;
-                      _1251_recIdents = _out763;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1248_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1249_recOwned;
-                      isErased = _1250_recErased;
-                      readIdents = _1251_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1263_recursiveGen;
+                      bool _1264_recOwned;
+                      bool _1265_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1266_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out768;
+                      bool _out769;
+                      bool _out770;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out771;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out768, out _out769, out _out770, out _out771);
+                      _1263_recursiveGen = _out768;
+                      _1264_recOwned = _out769;
+                      _1265_recErased = _out770;
+                      _1266_recIdents = _out771;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1263_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1264_recOwned;
+                      isErased = _1265_recErased;
+                      readIdents = _1266_recIdents;
                     }
                   } else if (_source50.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1252___mcc_h558 = _source50.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1267___mcc_h560 = _source50.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1253_recursiveGen;
-                      bool _1254_recOwned;
-                      bool _1255_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1256_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out764;
-                      bool _out765;
-                      bool _out766;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out767;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out764, out _out765, out _out766, out _out767);
-                      _1253_recursiveGen = _out764;
-                      _1254_recOwned = _out765;
-                      _1255_recErased = _out766;
-                      _1256_recIdents = _out767;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1253_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1254_recOwned;
-                      isErased = _1255_recErased;
-                      readIdents = _1256_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1268_recursiveGen;
+                      bool _1269_recOwned;
+                      bool _1270_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1271_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out772;
+                      bool _out773;
+                      bool _out774;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out775;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out772, out _out773, out _out774, out _out775);
+                      _1268_recursiveGen = _out772;
+                      _1269_recOwned = _out773;
+                      _1270_recErased = _out774;
+                      _1271_recIdents = _out775;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1268_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1269_recOwned;
+                      isErased = _1270_recErased;
+                      readIdents = _1271_recIdents;
                     }
                   } else {
-                    DAST._IType _1257___mcc_h560 = _source50.dtor_Newtype_a0;
-                    DAST._IType _1258_b = _1257___mcc_h560;
+                    DAST._IType _1272___mcc_h562 = _source50.dtor_Newtype_a0;
+                    DAST._IType _1273_b = _1272___mcc_h562;
                     {
-                      if (object.Equals(_466_fromTpe, _1258_b)) {
-                        Dafny.ISequence<Dafny.Rune> _1259_recursiveGen;
-                        bool _1260_recOwned;
-                        bool _1261_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1262_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out768;
-                        bool _out769;
-                        bool _out770;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out771;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out768, out _out769, out _out770, out _out771);
-                        _1259_recursiveGen = _out768;
-                        _1260_recOwned = _out769;
-                        _1261_recErased = _out770;
-                        _1262_recIdents = _out771;
-                        Dafny.ISequence<Dafny.Rune> _1263_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out772;
-                        _out772 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _1263_rhsType = _out772;
-                        Dafny.ISequence<Dafny.Rune> _1264_uneraseFn;
-                        _1264_uneraseFn = ((_1260_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1263_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1264_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1259_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _1260_recOwned;
+                      if (object.Equals(_481_fromTpe, _1273_b)) {
+                        Dafny.ISequence<Dafny.Rune> _1274_recursiveGen;
+                        bool _1275_recOwned;
+                        bool _1276_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1277_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out776;
+                        bool _out777;
+                        bool _out778;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out779;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out776, out _out777, out _out778, out _out779);
+                        _1274_recursiveGen = _out776;
+                        _1275_recOwned = _out777;
+                        _1276_recErased = _out778;
+                        _1277_recIdents = _out779;
+                        Dafny.ISequence<Dafny.Rune> _1278_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out780;
+                        _out780 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _1278_rhsType = _out780;
+                        Dafny.ISequence<Dafny.Rune> _1279_uneraseFn;
+                        _1279_uneraseFn = ((_1275_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1278_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1279_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1274_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _1275_recOwned;
                         isErased = false;
-                        readIdents = _1262_recIdents;
+                        readIdents = _1277_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out773;
-                        bool _out774;
-                        bool _out775;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out776;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1258_b), _1258_b, _465_toTpe), @params, mustOwn, out _out773, out _out774, out _out775, out _out776);
-                        s = _out773;
-                        isOwned = _out774;
-                        isErased = _out775;
-                        readIdents = _out776;
+                        Dafny.ISequence<Dafny.Rune> _out781;
+                        bool _out782;
+                        bool _out783;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out784;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1273_b), _1273_b, _480_toTpe), @params, mustOwn, out _out781, out _out782, out _out783, out _out784);
+                        s = _out781;
+                        isOwned = _out782;
+                        isErased = _out783;
+                        readIdents = _out784;
                       }
                     }
                   }
                 } else if (_source49.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _1265___mcc_h562 = _source49.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1266_recursiveGen;
-                    bool _1267_recOwned;
-                    bool _1268_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1269_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out777;
-                    bool _out778;
-                    bool _out779;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out780;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out777, out _out778, out _out779, out _out780);
-                    _1266_recursiveGen = _out777;
-                    _1267_recOwned = _out778;
-                    _1268_recErased = _out779;
-                    _1269_recIdents = _out780;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1266_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1267_recOwned;
-                    isErased = _1268_recErased;
-                    readIdents = _1269_recIdents;
-                  }
-                } else if (_source49.is_Array) {
-                  DAST._IType _1270___mcc_h564 = _source49.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1271_recursiveGen;
-                    bool _1272_recOwned;
-                    bool _1273_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1274_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out781;
-                    bool _out782;
-                    bool _out783;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out784;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out781, out _out782, out _out783, out _out784);
-                    _1271_recursiveGen = _out781;
-                    _1272_recOwned = _out782;
-                    _1273_recErased = _out783;
-                    _1274_recIdents = _out784;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1271_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1272_recOwned;
-                    isErased = _1273_recErased;
-                    readIdents = _1274_recIdents;
-                  }
-                } else if (_source49.is_Seq) {
-                  DAST._IType _1275___mcc_h566 = _source49.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1276_recursiveGen;
-                    bool _1277_recOwned;
-                    bool _1278_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1279_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out785;
-                    bool _out786;
-                    bool _out787;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out788;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out785, out _out786, out _out787, out _out788);
-                    _1276_recursiveGen = _out785;
-                    _1277_recOwned = _out786;
-                    _1278_recErased = _out787;
-                    _1279_recIdents = _out788;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1276_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1277_recOwned;
-                    isErased = _1278_recErased;
-                    readIdents = _1279_recIdents;
-                  }
-                } else if (_source49.is_Set) {
-                  DAST._IType _1280___mcc_h568 = _source49.dtor_element;
+                  Dafny.ISequence<DAST._IType> _1280___mcc_h564 = _source49.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _1281_recursiveGen;
                     bool _1282_recOwned;
                     bool _1283_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1284_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out789;
-                    bool _out790;
-                    bool _out791;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out792;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out789, out _out790, out _out791, out _out792);
-                    _1281_recursiveGen = _out789;
-                    _1282_recOwned = _out790;
-                    _1283_recErased = _out791;
-                    _1284_recIdents = _out792;
+                    Dafny.ISequence<Dafny.Rune> _out785;
+                    bool _out786;
+                    bool _out787;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out788;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out785, out _out786, out _out787, out _out788);
+                    _1281_recursiveGen = _out785;
+                    _1282_recOwned = _out786;
+                    _1283_recErased = _out787;
+                    _1284_recIdents = _out788;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1281_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1282_recOwned;
                     isErased = _1283_recErased;
                     readIdents = _1284_recIdents;
                   }
-                } else if (_source49.is_Multiset) {
-                  DAST._IType _1285___mcc_h570 = _source49.dtor_element;
+                } else if (_source49.is_Array) {
+                  DAST._IType _1285___mcc_h566 = _source49.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _1286_recursiveGen;
                     bool _1287_recOwned;
                     bool _1288_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1289_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out793;
-                    bool _out794;
-                    bool _out795;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out796;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out793, out _out794, out _out795, out _out796);
-                    _1286_recursiveGen = _out793;
-                    _1287_recOwned = _out794;
-                    _1288_recErased = _out795;
-                    _1289_recIdents = _out796;
+                    Dafny.ISequence<Dafny.Rune> _out789;
+                    bool _out790;
+                    bool _out791;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out792;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out789, out _out790, out _out791, out _out792);
+                    _1286_recursiveGen = _out789;
+                    _1287_recOwned = _out790;
+                    _1288_recErased = _out791;
+                    _1289_recIdents = _out792;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1286_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1287_recOwned;
                     isErased = _1288_recErased;
                     readIdents = _1289_recIdents;
                   }
-                } else if (_source49.is_Map) {
-                  DAST._IType _1290___mcc_h572 = _source49.dtor_key;
-                  DAST._IType _1291___mcc_h573 = _source49.dtor_value;
+                } else if (_source49.is_Seq) {
+                  DAST._IType _1290___mcc_h568 = _source49.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1292_recursiveGen;
-                    bool _1293_recOwned;
-                    bool _1294_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1295_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1291_recursiveGen;
+                    bool _1292_recOwned;
+                    bool _1293_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1294_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out793;
+                    bool _out794;
+                    bool _out795;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out796;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out793, out _out794, out _out795, out _out796);
+                    _1291_recursiveGen = _out793;
+                    _1292_recOwned = _out794;
+                    _1293_recErased = _out795;
+                    _1294_recIdents = _out796;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1291_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1292_recOwned;
+                    isErased = _1293_recErased;
+                    readIdents = _1294_recIdents;
+                  }
+                } else if (_source49.is_Set) {
+                  DAST._IType _1295___mcc_h570 = _source49.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1296_recursiveGen;
+                    bool _1297_recOwned;
+                    bool _1298_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1299_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out797;
                     bool _out798;
                     bool _out799;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out800;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out797, out _out798, out _out799, out _out800);
-                    _1292_recursiveGen = _out797;
-                    _1293_recOwned = _out798;
-                    _1294_recErased = _out799;
-                    _1295_recIdents = _out800;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1292_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1293_recOwned;
-                    isErased = _1294_recErased;
-                    readIdents = _1295_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out797, out _out798, out _out799, out _out800);
+                    _1296_recursiveGen = _out797;
+                    _1297_recOwned = _out798;
+                    _1298_recErased = _out799;
+                    _1299_recIdents = _out800;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1296_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1297_recOwned;
+                    isErased = _1298_recErased;
+                    readIdents = _1299_recIdents;
                   }
-                } else if (_source49.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _1296___mcc_h576 = _source49.dtor_args;
-                  DAST._IType _1297___mcc_h577 = _source49.dtor_result;
+                } else if (_source49.is_Multiset) {
+                  DAST._IType _1300___mcc_h572 = _source49.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1298_recursiveGen;
-                    bool _1299_recOwned;
-                    bool _1300_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1301_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1301_recursiveGen;
+                    bool _1302_recOwned;
+                    bool _1303_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1304_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out801;
                     bool _out802;
                     bool _out803;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out804;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out801, out _out802, out _out803, out _out804);
-                    _1298_recursiveGen = _out801;
-                    _1299_recOwned = _out802;
-                    _1300_recErased = _out803;
-                    _1301_recIdents = _out804;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1298_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1299_recOwned;
-                    isErased = _1300_recErased;
-                    readIdents = _1301_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out801, out _out802, out _out803, out _out804);
+                    _1301_recursiveGen = _out801;
+                    _1302_recOwned = _out802;
+                    _1303_recErased = _out803;
+                    _1304_recIdents = _out804;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1301_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1302_recOwned;
+                    isErased = _1303_recErased;
+                    readIdents = _1304_recIdents;
+                  }
+                } else if (_source49.is_Map) {
+                  DAST._IType _1305___mcc_h574 = _source49.dtor_key;
+                  DAST._IType _1306___mcc_h575 = _source49.dtor_value;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1307_recursiveGen;
+                    bool _1308_recOwned;
+                    bool _1309_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1310_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out805;
+                    bool _out806;
+                    bool _out807;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out808;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out805, out _out806, out _out807, out _out808);
+                    _1307_recursiveGen = _out805;
+                    _1308_recOwned = _out806;
+                    _1309_recErased = _out807;
+                    _1310_recIdents = _out808;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1307_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1308_recOwned;
+                    isErased = _1309_recErased;
+                    readIdents = _1310_recIdents;
+                  }
+                } else if (_source49.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _1311___mcc_h578 = _source49.dtor_args;
+                  DAST._IType _1312___mcc_h579 = _source49.dtor_result;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1313_recursiveGen;
+                    bool _1314_recOwned;
+                    bool _1315_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1316_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out809;
+                    bool _out810;
+                    bool _out811;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out812;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out809, out _out810, out _out811, out _out812);
+                    _1313_recursiveGen = _out809;
+                    _1314_recOwned = _out810;
+                    _1315_recErased = _out811;
+                    _1316_recIdents = _out812;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1313_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1314_recOwned;
+                    isErased = _1315_recErased;
+                    readIdents = _1316_recIdents;
                   }
                 } else if (_source49.is_Primitive) {
-                  DAST._IPrimitive _1302___mcc_h580 = _source49.dtor_Primitive_a0;
-                  DAST._IPrimitive _source51 = _1302___mcc_h580;
+                  DAST._IPrimitive _1317___mcc_h582 = _source49.dtor_Primitive_a0;
+                  DAST._IPrimitive _source51 = _1317___mcc_h582;
                   if (_source51.is_Int) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1303_recursiveGen;
-                      bool _1304_recOwned;
-                      bool _1305_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1306_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out805;
-                      bool _out806;
-                      bool _out807;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out808;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out805, out _out806, out _out807, out _out808);
-                      _1303_recursiveGen = _out805;
-                      _1304_recOwned = _out806;
-                      _1305_recErased = _out807;
-                      _1306_recIdents = _out808;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1303_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1304_recOwned;
-                      isErased = _1305_recErased;
-                      readIdents = _1306_recIdents;
-                    }
-                  } else if (_source51.is_Real) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1307_recursiveGen;
-                      bool _1308___v39;
-                      bool _1309___v40;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1310_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out809;
-                      bool _out810;
-                      bool _out811;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out812;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out809, out _out810, out _out811, out _out812);
-                      _1307_recursiveGen = _out809;
-                      _1308___v39 = _out810;
-                      _1309___v40 = _out811;
-                      _1310_recIdents = _out812;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigRational::from_integer("), _1307_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = true;
-                      isErased = true;
-                      readIdents = _1310_recIdents;
-                    }
-                  } else if (_source51.is_String) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1311_recursiveGen;
-                      bool _1312_recOwned;
-                      bool _1313_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1314_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1318_recursiveGen;
+                      bool _1319_recOwned;
+                      bool _1320_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1321_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out813;
                       bool _out814;
                       bool _out815;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out816;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out813, out _out814, out _out815, out _out816);
-                      _1311_recursiveGen = _out813;
-                      _1312_recOwned = _out814;
-                      _1313_recErased = _out815;
-                      _1314_recIdents = _out816;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1311_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1312_recOwned;
-                      isErased = _1313_recErased;
-                      readIdents = _1314_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out813, out _out814, out _out815, out _out816);
+                      _1318_recursiveGen = _out813;
+                      _1319_recOwned = _out814;
+                      _1320_recErased = _out815;
+                      _1321_recIdents = _out816;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1318_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1319_recOwned;
+                      isErased = _1320_recErased;
+                      readIdents = _1321_recIdents;
                     }
-                  } else if (_source51.is_Bool) {
+                  } else if (_source51.is_Real) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1315_recursiveGen;
-                      bool _1316_recOwned;
-                      bool _1317_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1318_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1322_recursiveGen;
+                      bool _1323___v40;
+                      bool _1324___v41;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1325_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out817;
                       bool _out818;
                       bool _out819;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out820;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out817, out _out818, out _out819, out _out820);
-                      _1315_recursiveGen = _out817;
-                      _1316_recOwned = _out818;
-                      _1317_recErased = _out819;
-                      _1318_recIdents = _out820;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1315_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1316_recOwned;
-                      isErased = _1317_recErased;
-                      readIdents = _1318_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out817, out _out818, out _out819, out _out820);
+                      _1322_recursiveGen = _out817;
+                      _1323___v40 = _out818;
+                      _1324___v41 = _out819;
+                      _1325_recIdents = _out820;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigRational::from_integer("), _1322_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = true;
+                      isErased = true;
+                      readIdents = _1325_recIdents;
+                    }
+                  } else if (_source51.is_String) {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1326_recursiveGen;
+                      bool _1327_recOwned;
+                      bool _1328_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1329_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out821;
+                      bool _out822;
+                      bool _out823;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out824;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out821, out _out822, out _out823, out _out824);
+                      _1326_recursiveGen = _out821;
+                      _1327_recOwned = _out822;
+                      _1328_recErased = _out823;
+                      _1329_recIdents = _out824;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1326_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1327_recOwned;
+                      isErased = _1328_recErased;
+                      readIdents = _1329_recIdents;
+                    }
+                  } else if (_source51.is_Bool) {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1330_recursiveGen;
+                      bool _1331_recOwned;
+                      bool _1332_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1333_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out825;
+                      bool _out826;
+                      bool _out827;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out828;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out825, out _out826, out _out827, out _out828);
+                      _1330_recursiveGen = _out825;
+                      _1331_recOwned = _out826;
+                      _1332_recErased = _out827;
+                      _1333_recIdents = _out828;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1330_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1331_recOwned;
+                      isErased = _1332_recErased;
+                      readIdents = _1333_recIdents;
                     }
                   } else {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1319_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out821;
-                      _out821 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1319_rhsType = _out821;
-                      Dafny.ISequence<Dafny.Rune> _1320_recursiveGen;
-                      bool _1321___v49;
-                      bool _1322___v50;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1323_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out822;
-                      bool _out823;
-                      bool _out824;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out825;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out822, out _out823, out _out824, out _out825);
-                      _1320_recursiveGen = _out822;
-                      _1321___v49 = _out823;
-                      _1322___v50 = _out824;
-                      _1323_recIdents = _out825;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("char::from_u32(<u32 as ::dafny_runtime::NumCast>::from("), _1320_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()).unwrap()"));
+                      Dafny.ISequence<Dafny.Rune> _1334_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out829;
+                      _out829 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1334_rhsType = _out829;
+                      Dafny.ISequence<Dafny.Rune> _1335_recursiveGen;
+                      bool _1336___v50;
+                      bool _1337___v51;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1338_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out830;
+                      bool _out831;
+                      bool _out832;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out833;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out830, out _out831, out _out832, out _out833);
+                      _1335_recursiveGen = _out830;
+                      _1336___v50 = _out831;
+                      _1337___v51 = _out832;
+                      _1338_recIdents = _out833;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("char::from_u32(<u32 as ::dafny_runtime::NumCast>::from("), _1335_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()).unwrap()"));
                       isOwned = true;
                       isErased = true;
-                      readIdents = _1323_recIdents;
+                      readIdents = _1338_recIdents;
                     }
                   }
                 } else if (_source49.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _1324___mcc_h582 = _source49.dtor_Passthrough_a0;
+                  Dafny.ISequence<Dafny.Rune> _1339___mcc_h584 = _source49.dtor_Passthrough_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1325_rhsType;
-                    Dafny.ISequence<Dafny.Rune> _out826;
-                    _out826 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                    _1325_rhsType = _out826;
-                    Dafny.ISequence<Dafny.Rune> _1326_recursiveGen;
-                    bool _1327___v44;
-                    bool _1328___v45;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1329_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out827;
-                    bool _out828;
-                    bool _out829;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out830;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out827, out _out828, out _out829, out _out830);
-                    _1326_recursiveGen = _out827;
-                    _1327___v44 = _out828;
-                    _1328___v45 = _out829;
-                    _1329_recIdents = _out830;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1325_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::NumCast>::from(")), _1326_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()"));
+                    Dafny.ISequence<Dafny.Rune> _1340_rhsType;
+                    Dafny.ISequence<Dafny.Rune> _out834;
+                    _out834 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                    _1340_rhsType = _out834;
+                    Dafny.ISequence<Dafny.Rune> _1341_recursiveGen;
+                    bool _1342___v45;
+                    bool _1343___v46;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1344_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out835;
+                    bool _out836;
+                    bool _out837;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out838;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out835, out _out836, out _out837, out _out838);
+                    _1341_recursiveGen = _out835;
+                    _1342___v45 = _out836;
+                    _1343___v46 = _out837;
+                    _1344_recIdents = _out838;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1340_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::NumCast>::from(")), _1341_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()"));
                     isOwned = true;
                     isErased = true;
-                    readIdents = _1329_recIdents;
+                    readIdents = _1344_recIdents;
                   }
                 } else {
-                  Dafny.ISequence<Dafny.Rune> _1330___mcc_h584 = _source49.dtor_TypeArg_a0;
+                  Dafny.ISequence<Dafny.Rune> _1345___mcc_h586 = _source49.dtor_TypeArg_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1331_recursiveGen;
-                    bool _1332_recOwned;
-                    bool _1333_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1334_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out831;
-                    bool _out832;
-                    bool _out833;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out834;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out831, out _out832, out _out833, out _out834);
-                    _1331_recursiveGen = _out831;
-                    _1332_recOwned = _out832;
-                    _1333_recErased = _out833;
-                    _1334_recIdents = _out834;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1331_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1332_recOwned;
-                    isErased = _1333_recErased;
-                    readIdents = _1334_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1346_recursiveGen;
+                    bool _1347_recOwned;
+                    bool _1348_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1349_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out839;
+                    bool _out840;
+                    bool _out841;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out842;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out839, out _out840, out _out841, out _out842);
+                    _1346_recursiveGen = _out839;
+                    _1347_recOwned = _out840;
+                    _1348_recErased = _out841;
+                    _1349_recIdents = _out842;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1346_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1347_recOwned;
+                    isErased = _1348_recErased;
+                    readIdents = _1349_recIdents;
                   }
                 }
               } else if (_source48.is_Real) {
-                DAST._IType _source52 = _473___mcc_h121;
+                DAST._IType _source52 = _488___mcc_h123;
                 if (_source52.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1335___mcc_h586 = _source52.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _1336___mcc_h587 = _source52.dtor_typeArgs;
-                  DAST._IResolvedType _1337___mcc_h588 = _source52.dtor_resolved;
-                  DAST._IResolvedType _source53 = _1337___mcc_h588;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1350___mcc_h588 = _source52.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _1351___mcc_h589 = _source52.dtor_typeArgs;
+                  DAST._IResolvedType _1352___mcc_h590 = _source52.dtor_resolved;
+                  DAST._IResolvedType _source53 = _1352___mcc_h590;
                   if (_source53.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1338___mcc_h592 = _source53.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1353___mcc_h594 = _source53.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1339_recursiveGen;
-                      bool _1340_recOwned;
-                      bool _1341_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1342_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out835;
-                      bool _out836;
-                      bool _out837;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out838;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out835, out _out836, out _out837, out _out838);
-                      _1339_recursiveGen = _out835;
-                      _1340_recOwned = _out836;
-                      _1341_recErased = _out837;
-                      _1342_recIdents = _out838;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1339_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1340_recOwned;
-                      isErased = _1341_recErased;
-                      readIdents = _1342_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1354_recursiveGen;
+                      bool _1355_recOwned;
+                      bool _1356_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1357_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out843;
+                      bool _out844;
+                      bool _out845;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out846;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out843, out _out844, out _out845, out _out846);
+                      _1354_recursiveGen = _out843;
+                      _1355_recOwned = _out844;
+                      _1356_recErased = _out845;
+                      _1357_recIdents = _out846;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1354_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1355_recOwned;
+                      isErased = _1356_recErased;
+                      readIdents = _1357_recIdents;
                     }
                   } else if (_source53.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1343___mcc_h594 = _source53.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1358___mcc_h596 = _source53.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1344_recursiveGen;
-                      bool _1345_recOwned;
-                      bool _1346_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1347_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out839;
-                      bool _out840;
-                      bool _out841;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out842;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out839, out _out840, out _out841, out _out842);
-                      _1344_recursiveGen = _out839;
-                      _1345_recOwned = _out840;
-                      _1346_recErased = _out841;
-                      _1347_recIdents = _out842;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1344_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1345_recOwned;
-                      isErased = _1346_recErased;
-                      readIdents = _1347_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1359_recursiveGen;
+                      bool _1360_recOwned;
+                      bool _1361_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1362_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out847;
+                      bool _out848;
+                      bool _out849;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out850;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out847, out _out848, out _out849, out _out850);
+                      _1359_recursiveGen = _out847;
+                      _1360_recOwned = _out848;
+                      _1361_recErased = _out849;
+                      _1362_recIdents = _out850;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1359_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1360_recOwned;
+                      isErased = _1361_recErased;
+                      readIdents = _1362_recIdents;
                     }
                   } else {
-                    DAST._IType _1348___mcc_h596 = _source53.dtor_Newtype_a0;
-                    DAST._IType _1349_b = _1348___mcc_h596;
+                    DAST._IType _1363___mcc_h598 = _source53.dtor_Newtype_a0;
+                    DAST._IType _1364_b = _1363___mcc_h598;
                     {
-                      if (object.Equals(_466_fromTpe, _1349_b)) {
-                        Dafny.ISequence<Dafny.Rune> _1350_recursiveGen;
-                        bool _1351_recOwned;
-                        bool _1352_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1353_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out843;
-                        bool _out844;
-                        bool _out845;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out846;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out843, out _out844, out _out845, out _out846);
-                        _1350_recursiveGen = _out843;
-                        _1351_recOwned = _out844;
-                        _1352_recErased = _out845;
-                        _1353_recIdents = _out846;
-                        Dafny.ISequence<Dafny.Rune> _1354_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out847;
-                        _out847 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _1354_rhsType = _out847;
-                        Dafny.ISequence<Dafny.Rune> _1355_uneraseFn;
-                        _1355_uneraseFn = ((_1351_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1354_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1355_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1350_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _1351_recOwned;
+                      if (object.Equals(_481_fromTpe, _1364_b)) {
+                        Dafny.ISequence<Dafny.Rune> _1365_recursiveGen;
+                        bool _1366_recOwned;
+                        bool _1367_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1368_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out851;
+                        bool _out852;
+                        bool _out853;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out854;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out851, out _out852, out _out853, out _out854);
+                        _1365_recursiveGen = _out851;
+                        _1366_recOwned = _out852;
+                        _1367_recErased = _out853;
+                        _1368_recIdents = _out854;
+                        Dafny.ISequence<Dafny.Rune> _1369_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out855;
+                        _out855 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _1369_rhsType = _out855;
+                        Dafny.ISequence<Dafny.Rune> _1370_uneraseFn;
+                        _1370_uneraseFn = ((_1366_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1369_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1370_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1365_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _1366_recOwned;
                         isErased = false;
-                        readIdents = _1353_recIdents;
+                        readIdents = _1368_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out848;
-                        bool _out849;
-                        bool _out850;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out851;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1349_b), _1349_b, _465_toTpe), @params, mustOwn, out _out848, out _out849, out _out850, out _out851);
-                        s = _out848;
-                        isOwned = _out849;
-                        isErased = _out850;
-                        readIdents = _out851;
+                        Dafny.ISequence<Dafny.Rune> _out856;
+                        bool _out857;
+                        bool _out858;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out859;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1364_b), _1364_b, _480_toTpe), @params, mustOwn, out _out856, out _out857, out _out858, out _out859);
+                        s = _out856;
+                        isOwned = _out857;
+                        isErased = _out858;
+                        readIdents = _out859;
                       }
                     }
                   }
                 } else if (_source52.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _1356___mcc_h598 = _source52.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1357_recursiveGen;
-                    bool _1358_recOwned;
-                    bool _1359_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1360_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out852;
-                    bool _out853;
-                    bool _out854;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out855;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out852, out _out853, out _out854, out _out855);
-                    _1357_recursiveGen = _out852;
-                    _1358_recOwned = _out853;
-                    _1359_recErased = _out854;
-                    _1360_recIdents = _out855;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1357_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1358_recOwned;
-                    isErased = _1359_recErased;
-                    readIdents = _1360_recIdents;
-                  }
-                } else if (_source52.is_Array) {
-                  DAST._IType _1361___mcc_h600 = _source52.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1362_recursiveGen;
-                    bool _1363_recOwned;
-                    bool _1364_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1365_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out856;
-                    bool _out857;
-                    bool _out858;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out859;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out856, out _out857, out _out858, out _out859);
-                    _1362_recursiveGen = _out856;
-                    _1363_recOwned = _out857;
-                    _1364_recErased = _out858;
-                    _1365_recIdents = _out859;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1362_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1363_recOwned;
-                    isErased = _1364_recErased;
-                    readIdents = _1365_recIdents;
-                  }
-                } else if (_source52.is_Seq) {
-                  DAST._IType _1366___mcc_h602 = _source52.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1367_recursiveGen;
-                    bool _1368_recOwned;
-                    bool _1369_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1370_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out860;
-                    bool _out861;
-                    bool _out862;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out863;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out860, out _out861, out _out862, out _out863);
-                    _1367_recursiveGen = _out860;
-                    _1368_recOwned = _out861;
-                    _1369_recErased = _out862;
-                    _1370_recIdents = _out863;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1367_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1368_recOwned;
-                    isErased = _1369_recErased;
-                    readIdents = _1370_recIdents;
-                  }
-                } else if (_source52.is_Set) {
-                  DAST._IType _1371___mcc_h604 = _source52.dtor_element;
+                  Dafny.ISequence<DAST._IType> _1371___mcc_h600 = _source52.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _1372_recursiveGen;
                     bool _1373_recOwned;
                     bool _1374_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1375_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out864;
-                    bool _out865;
-                    bool _out866;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out867;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out864, out _out865, out _out866, out _out867);
-                    _1372_recursiveGen = _out864;
-                    _1373_recOwned = _out865;
-                    _1374_recErased = _out866;
-                    _1375_recIdents = _out867;
+                    Dafny.ISequence<Dafny.Rune> _out860;
+                    bool _out861;
+                    bool _out862;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out863;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out860, out _out861, out _out862, out _out863);
+                    _1372_recursiveGen = _out860;
+                    _1373_recOwned = _out861;
+                    _1374_recErased = _out862;
+                    _1375_recIdents = _out863;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1372_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1373_recOwned;
                     isErased = _1374_recErased;
                     readIdents = _1375_recIdents;
                   }
-                } else if (_source52.is_Multiset) {
-                  DAST._IType _1376___mcc_h606 = _source52.dtor_element;
+                } else if (_source52.is_Array) {
+                  DAST._IType _1376___mcc_h602 = _source52.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _1377_recursiveGen;
                     bool _1378_recOwned;
                     bool _1379_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1380_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out868;
-                    bool _out869;
-                    bool _out870;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out871;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out868, out _out869, out _out870, out _out871);
-                    _1377_recursiveGen = _out868;
-                    _1378_recOwned = _out869;
-                    _1379_recErased = _out870;
-                    _1380_recIdents = _out871;
+                    Dafny.ISequence<Dafny.Rune> _out864;
+                    bool _out865;
+                    bool _out866;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out867;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out864, out _out865, out _out866, out _out867);
+                    _1377_recursiveGen = _out864;
+                    _1378_recOwned = _out865;
+                    _1379_recErased = _out866;
+                    _1380_recIdents = _out867;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1377_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1378_recOwned;
                     isErased = _1379_recErased;
                     readIdents = _1380_recIdents;
                   }
-                } else if (_source52.is_Map) {
-                  DAST._IType _1381___mcc_h608 = _source52.dtor_key;
-                  DAST._IType _1382___mcc_h609 = _source52.dtor_value;
+                } else if (_source52.is_Seq) {
+                  DAST._IType _1381___mcc_h604 = _source52.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1383_recursiveGen;
-                    bool _1384_recOwned;
-                    bool _1385_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1386_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1382_recursiveGen;
+                    bool _1383_recOwned;
+                    bool _1384_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1385_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out868;
+                    bool _out869;
+                    bool _out870;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out871;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out868, out _out869, out _out870, out _out871);
+                    _1382_recursiveGen = _out868;
+                    _1383_recOwned = _out869;
+                    _1384_recErased = _out870;
+                    _1385_recIdents = _out871;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1382_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1383_recOwned;
+                    isErased = _1384_recErased;
+                    readIdents = _1385_recIdents;
+                  }
+                } else if (_source52.is_Set) {
+                  DAST._IType _1386___mcc_h606 = _source52.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1387_recursiveGen;
+                    bool _1388_recOwned;
+                    bool _1389_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1390_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out872;
                     bool _out873;
                     bool _out874;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out875;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out872, out _out873, out _out874, out _out875);
-                    _1383_recursiveGen = _out872;
-                    _1384_recOwned = _out873;
-                    _1385_recErased = _out874;
-                    _1386_recIdents = _out875;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1383_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1384_recOwned;
-                    isErased = _1385_recErased;
-                    readIdents = _1386_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out872, out _out873, out _out874, out _out875);
+                    _1387_recursiveGen = _out872;
+                    _1388_recOwned = _out873;
+                    _1389_recErased = _out874;
+                    _1390_recIdents = _out875;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1387_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1388_recOwned;
+                    isErased = _1389_recErased;
+                    readIdents = _1390_recIdents;
                   }
-                } else if (_source52.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _1387___mcc_h612 = _source52.dtor_args;
-                  DAST._IType _1388___mcc_h613 = _source52.dtor_result;
+                } else if (_source52.is_Multiset) {
+                  DAST._IType _1391___mcc_h608 = _source52.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1389_recursiveGen;
-                    bool _1390_recOwned;
-                    bool _1391_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1392_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1392_recursiveGen;
+                    bool _1393_recOwned;
+                    bool _1394_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1395_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out876;
                     bool _out877;
                     bool _out878;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out879;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out876, out _out877, out _out878, out _out879);
-                    _1389_recursiveGen = _out876;
-                    _1390_recOwned = _out877;
-                    _1391_recErased = _out878;
-                    _1392_recIdents = _out879;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1389_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1390_recOwned;
-                    isErased = _1391_recErased;
-                    readIdents = _1392_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out876, out _out877, out _out878, out _out879);
+                    _1392_recursiveGen = _out876;
+                    _1393_recOwned = _out877;
+                    _1394_recErased = _out878;
+                    _1395_recIdents = _out879;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1392_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1393_recOwned;
+                    isErased = _1394_recErased;
+                    readIdents = _1395_recIdents;
+                  }
+                } else if (_source52.is_Map) {
+                  DAST._IType _1396___mcc_h610 = _source52.dtor_key;
+                  DAST._IType _1397___mcc_h611 = _source52.dtor_value;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1398_recursiveGen;
+                    bool _1399_recOwned;
+                    bool _1400_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1401_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out880;
+                    bool _out881;
+                    bool _out882;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out883;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out880, out _out881, out _out882, out _out883);
+                    _1398_recursiveGen = _out880;
+                    _1399_recOwned = _out881;
+                    _1400_recErased = _out882;
+                    _1401_recIdents = _out883;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1398_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1399_recOwned;
+                    isErased = _1400_recErased;
+                    readIdents = _1401_recIdents;
+                  }
+                } else if (_source52.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _1402___mcc_h614 = _source52.dtor_args;
+                  DAST._IType _1403___mcc_h615 = _source52.dtor_result;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1404_recursiveGen;
+                    bool _1405_recOwned;
+                    bool _1406_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1407_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out884;
+                    bool _out885;
+                    bool _out886;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out887;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out884, out _out885, out _out886, out _out887);
+                    _1404_recursiveGen = _out884;
+                    _1405_recOwned = _out885;
+                    _1406_recErased = _out886;
+                    _1407_recIdents = _out887;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1404_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1405_recOwned;
+                    isErased = _1406_recErased;
+                    readIdents = _1407_recIdents;
                   }
                 } else if (_source52.is_Primitive) {
-                  DAST._IPrimitive _1393___mcc_h616 = _source52.dtor_Primitive_a0;
-                  DAST._IPrimitive _source54 = _1393___mcc_h616;
+                  DAST._IPrimitive _1408___mcc_h618 = _source52.dtor_Primitive_a0;
+                  DAST._IPrimitive _source54 = _1408___mcc_h618;
                   if (_source54.is_Int) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1394_recursiveGen;
-                      bool _1395___v41;
-                      bool _1396___v42;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1397_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out880;
-                      bool _out881;
-                      bool _out882;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out883;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, false, out _out880, out _out881, out _out882, out _out883);
-                      _1394_recursiveGen = _out880;
-                      _1395___v41 = _out881;
-                      _1396___v42 = _out882;
-                      _1397_recIdents = _out883;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::dafny_rational_to_int("), _1394_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = true;
-                      isErased = true;
-                      readIdents = _1397_recIdents;
-                    }
-                  } else if (_source54.is_Real) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1398_recursiveGen;
-                      bool _1399_recOwned;
-                      bool _1400_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1401_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out884;
-                      bool _out885;
-                      bool _out886;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out887;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out884, out _out885, out _out886, out _out887);
-                      _1398_recursiveGen = _out884;
-                      _1399_recOwned = _out885;
-                      _1400_recErased = _out886;
-                      _1401_recIdents = _out887;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1398_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1399_recOwned;
-                      isErased = _1400_recErased;
-                      readIdents = _1401_recIdents;
-                    }
-                  } else if (_source54.is_String) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1402_recursiveGen;
-                      bool _1403_recOwned;
-                      bool _1404_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1405_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1409_recursiveGen;
+                      bool _1410___v42;
+                      bool _1411___v43;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1412_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out888;
                       bool _out889;
                       bool _out890;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out891;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out888, out _out889, out _out890, out _out891);
-                      _1402_recursiveGen = _out888;
-                      _1403_recOwned = _out889;
-                      _1404_recErased = _out890;
-                      _1405_recIdents = _out891;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1402_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1403_recOwned;
-                      isErased = _1404_recErased;
-                      readIdents = _1405_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, false, out _out888, out _out889, out _out890, out _out891);
+                      _1409_recursiveGen = _out888;
+                      _1410___v42 = _out889;
+                      _1411___v43 = _out890;
+                      _1412_recIdents = _out891;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::dafny_rational_to_int("), _1409_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = true;
+                      isErased = true;
+                      readIdents = _1412_recIdents;
                     }
-                  } else if (_source54.is_Bool) {
+                  } else if (_source54.is_Real) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1406_recursiveGen;
-                      bool _1407_recOwned;
-                      bool _1408_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1409_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1413_recursiveGen;
+                      bool _1414_recOwned;
+                      bool _1415_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1416_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out892;
                       bool _out893;
                       bool _out894;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out895;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out892, out _out893, out _out894, out _out895);
-                      _1406_recursiveGen = _out892;
-                      _1407_recOwned = _out893;
-                      _1408_recErased = _out894;
-                      _1409_recIdents = _out895;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1406_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1407_recOwned;
-                      isErased = _1408_recErased;
-                      readIdents = _1409_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out892, out _out893, out _out894, out _out895);
+                      _1413_recursiveGen = _out892;
+                      _1414_recOwned = _out893;
+                      _1415_recErased = _out894;
+                      _1416_recIdents = _out895;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1413_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1414_recOwned;
+                      isErased = _1415_recErased;
+                      readIdents = _1416_recIdents;
                     }
-                  } else {
+                  } else if (_source54.is_String) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1410_recursiveGen;
-                      bool _1411_recOwned;
-                      bool _1412_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1413_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1417_recursiveGen;
+                      bool _1418_recOwned;
+                      bool _1419_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1420_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out896;
                       bool _out897;
                       bool _out898;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out899;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out896, out _out897, out _out898, out _out899);
-                      _1410_recursiveGen = _out896;
-                      _1411_recOwned = _out897;
-                      _1412_recErased = _out898;
-                      _1413_recIdents = _out899;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1410_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1411_recOwned;
-                      isErased = _1412_recErased;
-                      readIdents = _1413_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out896, out _out897, out _out898, out _out899);
+                      _1417_recursiveGen = _out896;
+                      _1418_recOwned = _out897;
+                      _1419_recErased = _out898;
+                      _1420_recIdents = _out899;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1417_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1418_recOwned;
+                      isErased = _1419_recErased;
+                      readIdents = _1420_recIdents;
+                    }
+                  } else if (_source54.is_Bool) {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1421_recursiveGen;
+                      bool _1422_recOwned;
+                      bool _1423_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1424_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out900;
+                      bool _out901;
+                      bool _out902;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out903;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out900, out _out901, out _out902, out _out903);
+                      _1421_recursiveGen = _out900;
+                      _1422_recOwned = _out901;
+                      _1423_recErased = _out902;
+                      _1424_recIdents = _out903;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1421_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1422_recOwned;
+                      isErased = _1423_recErased;
+                      readIdents = _1424_recIdents;
+                    }
+                  } else {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1425_recursiveGen;
+                      bool _1426_recOwned;
+                      bool _1427_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1428_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out904;
+                      bool _out905;
+                      bool _out906;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out907;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out904, out _out905, out _out906, out _out907);
+                      _1425_recursiveGen = _out904;
+                      _1426_recOwned = _out905;
+                      _1427_recErased = _out906;
+                      _1428_recIdents = _out907;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1425_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1426_recOwned;
+                      isErased = _1427_recErased;
+                      readIdents = _1428_recIdents;
                     }
                   }
                 } else if (_source52.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _1414___mcc_h618 = _source52.dtor_Passthrough_a0;
+                  Dafny.ISequence<Dafny.Rune> _1429___mcc_h620 = _source52.dtor_Passthrough_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1415_recursiveGen;
-                    bool _1416_recOwned;
-                    bool _1417_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1418_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out900;
-                    bool _out901;
-                    bool _out902;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out903;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out900, out _out901, out _out902, out _out903);
-                    _1415_recursiveGen = _out900;
-                    _1416_recOwned = _out901;
-                    _1417_recErased = _out902;
-                    _1418_recIdents = _out903;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1415_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1416_recOwned;
-                    isErased = _1417_recErased;
-                    readIdents = _1418_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1430_recursiveGen;
+                    bool _1431_recOwned;
+                    bool _1432_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1433_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out908;
+                    bool _out909;
+                    bool _out910;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out911;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out908, out _out909, out _out910, out _out911);
+                    _1430_recursiveGen = _out908;
+                    _1431_recOwned = _out909;
+                    _1432_recErased = _out910;
+                    _1433_recIdents = _out911;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1430_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1431_recOwned;
+                    isErased = _1432_recErased;
+                    readIdents = _1433_recIdents;
                   }
                 } else {
-                  Dafny.ISequence<Dafny.Rune> _1419___mcc_h620 = _source52.dtor_TypeArg_a0;
+                  Dafny.ISequence<Dafny.Rune> _1434___mcc_h622 = _source52.dtor_TypeArg_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1420_recursiveGen;
-                    bool _1421_recOwned;
-                    bool _1422_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1423_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out904;
-                    bool _out905;
-                    bool _out906;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out907;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out904, out _out905, out _out906, out _out907);
-                    _1420_recursiveGen = _out904;
-                    _1421_recOwned = _out905;
-                    _1422_recErased = _out906;
-                    _1423_recIdents = _out907;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1420_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1421_recOwned;
-                    isErased = _1422_recErased;
-                    readIdents = _1423_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1435_recursiveGen;
+                    bool _1436_recOwned;
+                    bool _1437_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1438_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out912;
+                    bool _out913;
+                    bool _out914;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out915;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out912, out _out913, out _out914, out _out915);
+                    _1435_recursiveGen = _out912;
+                    _1436_recOwned = _out913;
+                    _1437_recErased = _out914;
+                    _1438_recIdents = _out915;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1435_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1436_recOwned;
+                    isErased = _1437_recErased;
+                    readIdents = _1438_recIdents;
                   }
                 }
               } else if (_source48.is_String) {
-                DAST._IType _source55 = _473___mcc_h121;
+                DAST._IType _source55 = _488___mcc_h123;
                 if (_source55.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1424___mcc_h622 = _source55.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _1425___mcc_h623 = _source55.dtor_typeArgs;
-                  DAST._IResolvedType _1426___mcc_h624 = _source55.dtor_resolved;
-                  DAST._IResolvedType _source56 = _1426___mcc_h624;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1439___mcc_h624 = _source55.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _1440___mcc_h625 = _source55.dtor_typeArgs;
+                  DAST._IResolvedType _1441___mcc_h626 = _source55.dtor_resolved;
+                  DAST._IResolvedType _source56 = _1441___mcc_h626;
                   if (_source56.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1427___mcc_h628 = _source56.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1442___mcc_h630 = _source56.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1428_recursiveGen;
-                      bool _1429_recOwned;
-                      bool _1430_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1431_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out908;
-                      bool _out909;
-                      bool _out910;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out911;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out908, out _out909, out _out910, out _out911);
-                      _1428_recursiveGen = _out908;
-                      _1429_recOwned = _out909;
-                      _1430_recErased = _out910;
-                      _1431_recIdents = _out911;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1428_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1429_recOwned;
-                      isErased = _1430_recErased;
-                      readIdents = _1431_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1443_recursiveGen;
+                      bool _1444_recOwned;
+                      bool _1445_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1446_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out916;
+                      bool _out917;
+                      bool _out918;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out919;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out916, out _out917, out _out918, out _out919);
+                      _1443_recursiveGen = _out916;
+                      _1444_recOwned = _out917;
+                      _1445_recErased = _out918;
+                      _1446_recIdents = _out919;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1443_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1444_recOwned;
+                      isErased = _1445_recErased;
+                      readIdents = _1446_recIdents;
                     }
                   } else if (_source56.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1432___mcc_h630 = _source56.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1447___mcc_h632 = _source56.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1433_recursiveGen;
-                      bool _1434_recOwned;
-                      bool _1435_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1436_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out912;
-                      bool _out913;
-                      bool _out914;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out915;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out912, out _out913, out _out914, out _out915);
-                      _1433_recursiveGen = _out912;
-                      _1434_recOwned = _out913;
-                      _1435_recErased = _out914;
-                      _1436_recIdents = _out915;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1433_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1434_recOwned;
-                      isErased = _1435_recErased;
-                      readIdents = _1436_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1448_recursiveGen;
+                      bool _1449_recOwned;
+                      bool _1450_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1451_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out920;
+                      bool _out921;
+                      bool _out922;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out923;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out920, out _out921, out _out922, out _out923);
+                      _1448_recursiveGen = _out920;
+                      _1449_recOwned = _out921;
+                      _1450_recErased = _out922;
+                      _1451_recIdents = _out923;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1448_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1449_recOwned;
+                      isErased = _1450_recErased;
+                      readIdents = _1451_recIdents;
                     }
                   } else {
-                    DAST._IType _1437___mcc_h632 = _source56.dtor_Newtype_a0;
-                    DAST._IType _1438_b = _1437___mcc_h632;
+                    DAST._IType _1452___mcc_h634 = _source56.dtor_Newtype_a0;
+                    DAST._IType _1453_b = _1452___mcc_h634;
                     {
-                      if (object.Equals(_466_fromTpe, _1438_b)) {
-                        Dafny.ISequence<Dafny.Rune> _1439_recursiveGen;
-                        bool _1440_recOwned;
-                        bool _1441_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1442_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out916;
-                        bool _out917;
-                        bool _out918;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out919;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out916, out _out917, out _out918, out _out919);
-                        _1439_recursiveGen = _out916;
-                        _1440_recOwned = _out917;
-                        _1441_recErased = _out918;
-                        _1442_recIdents = _out919;
-                        Dafny.ISequence<Dafny.Rune> _1443_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out920;
-                        _out920 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _1443_rhsType = _out920;
-                        Dafny.ISequence<Dafny.Rune> _1444_uneraseFn;
-                        _1444_uneraseFn = ((_1440_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1443_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1444_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1439_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _1440_recOwned;
+                      if (object.Equals(_481_fromTpe, _1453_b)) {
+                        Dafny.ISequence<Dafny.Rune> _1454_recursiveGen;
+                        bool _1455_recOwned;
+                        bool _1456_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1457_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out924;
+                        bool _out925;
+                        bool _out926;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out927;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out924, out _out925, out _out926, out _out927);
+                        _1454_recursiveGen = _out924;
+                        _1455_recOwned = _out925;
+                        _1456_recErased = _out926;
+                        _1457_recIdents = _out927;
+                        Dafny.ISequence<Dafny.Rune> _1458_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out928;
+                        _out928 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _1458_rhsType = _out928;
+                        Dafny.ISequence<Dafny.Rune> _1459_uneraseFn;
+                        _1459_uneraseFn = ((_1455_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1458_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1459_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1454_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _1455_recOwned;
                         isErased = false;
-                        readIdents = _1442_recIdents;
+                        readIdents = _1457_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out921;
-                        bool _out922;
-                        bool _out923;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out924;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1438_b), _1438_b, _465_toTpe), @params, mustOwn, out _out921, out _out922, out _out923, out _out924);
-                        s = _out921;
-                        isOwned = _out922;
-                        isErased = _out923;
-                        readIdents = _out924;
+                        Dafny.ISequence<Dafny.Rune> _out929;
+                        bool _out930;
+                        bool _out931;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out932;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1453_b), _1453_b, _480_toTpe), @params, mustOwn, out _out929, out _out930, out _out931, out _out932);
+                        s = _out929;
+                        isOwned = _out930;
+                        isErased = _out931;
+                        readIdents = _out932;
                       }
                     }
                   }
                 } else if (_source55.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _1445___mcc_h634 = _source55.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1446_recursiveGen;
-                    bool _1447_recOwned;
-                    bool _1448_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1449_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out925;
-                    bool _out926;
-                    bool _out927;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out928;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out925, out _out926, out _out927, out _out928);
-                    _1446_recursiveGen = _out925;
-                    _1447_recOwned = _out926;
-                    _1448_recErased = _out927;
-                    _1449_recIdents = _out928;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1446_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1447_recOwned;
-                    isErased = _1448_recErased;
-                    readIdents = _1449_recIdents;
-                  }
-                } else if (_source55.is_Array) {
-                  DAST._IType _1450___mcc_h636 = _source55.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1451_recursiveGen;
-                    bool _1452_recOwned;
-                    bool _1453_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1454_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out929;
-                    bool _out930;
-                    bool _out931;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out932;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out929, out _out930, out _out931, out _out932);
-                    _1451_recursiveGen = _out929;
-                    _1452_recOwned = _out930;
-                    _1453_recErased = _out931;
-                    _1454_recIdents = _out932;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1451_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1452_recOwned;
-                    isErased = _1453_recErased;
-                    readIdents = _1454_recIdents;
-                  }
-                } else if (_source55.is_Seq) {
-                  DAST._IType _1455___mcc_h638 = _source55.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1456_recursiveGen;
-                    bool _1457_recOwned;
-                    bool _1458_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1459_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out933;
-                    bool _out934;
-                    bool _out935;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out936;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out933, out _out934, out _out935, out _out936);
-                    _1456_recursiveGen = _out933;
-                    _1457_recOwned = _out934;
-                    _1458_recErased = _out935;
-                    _1459_recIdents = _out936;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1456_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1457_recOwned;
-                    isErased = _1458_recErased;
-                    readIdents = _1459_recIdents;
-                  }
-                } else if (_source55.is_Set) {
-                  DAST._IType _1460___mcc_h640 = _source55.dtor_element;
+                  Dafny.ISequence<DAST._IType> _1460___mcc_h636 = _source55.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _1461_recursiveGen;
                     bool _1462_recOwned;
                     bool _1463_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1464_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out937;
-                    bool _out938;
-                    bool _out939;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out940;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out937, out _out938, out _out939, out _out940);
-                    _1461_recursiveGen = _out937;
-                    _1462_recOwned = _out938;
-                    _1463_recErased = _out939;
-                    _1464_recIdents = _out940;
+                    Dafny.ISequence<Dafny.Rune> _out933;
+                    bool _out934;
+                    bool _out935;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out936;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out933, out _out934, out _out935, out _out936);
+                    _1461_recursiveGen = _out933;
+                    _1462_recOwned = _out934;
+                    _1463_recErased = _out935;
+                    _1464_recIdents = _out936;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1461_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1462_recOwned;
                     isErased = _1463_recErased;
                     readIdents = _1464_recIdents;
                   }
-                } else if (_source55.is_Multiset) {
-                  DAST._IType _1465___mcc_h642 = _source55.dtor_element;
+                } else if (_source55.is_Array) {
+                  DAST._IType _1465___mcc_h638 = _source55.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _1466_recursiveGen;
                     bool _1467_recOwned;
                     bool _1468_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1469_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out941;
-                    bool _out942;
-                    bool _out943;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out944;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out941, out _out942, out _out943, out _out944);
-                    _1466_recursiveGen = _out941;
-                    _1467_recOwned = _out942;
-                    _1468_recErased = _out943;
-                    _1469_recIdents = _out944;
+                    Dafny.ISequence<Dafny.Rune> _out937;
+                    bool _out938;
+                    bool _out939;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out940;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out937, out _out938, out _out939, out _out940);
+                    _1466_recursiveGen = _out937;
+                    _1467_recOwned = _out938;
+                    _1468_recErased = _out939;
+                    _1469_recIdents = _out940;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1466_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1467_recOwned;
                     isErased = _1468_recErased;
                     readIdents = _1469_recIdents;
                   }
-                } else if (_source55.is_Map) {
-                  DAST._IType _1470___mcc_h644 = _source55.dtor_key;
-                  DAST._IType _1471___mcc_h645 = _source55.dtor_value;
+                } else if (_source55.is_Seq) {
+                  DAST._IType _1470___mcc_h640 = _source55.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1472_recursiveGen;
-                    bool _1473_recOwned;
-                    bool _1474_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1475_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1471_recursiveGen;
+                    bool _1472_recOwned;
+                    bool _1473_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1474_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out941;
+                    bool _out942;
+                    bool _out943;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out944;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out941, out _out942, out _out943, out _out944);
+                    _1471_recursiveGen = _out941;
+                    _1472_recOwned = _out942;
+                    _1473_recErased = _out943;
+                    _1474_recIdents = _out944;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1471_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1472_recOwned;
+                    isErased = _1473_recErased;
+                    readIdents = _1474_recIdents;
+                  }
+                } else if (_source55.is_Set) {
+                  DAST._IType _1475___mcc_h642 = _source55.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1476_recursiveGen;
+                    bool _1477_recOwned;
+                    bool _1478_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1479_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out945;
                     bool _out946;
                     bool _out947;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out948;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out945, out _out946, out _out947, out _out948);
-                    _1472_recursiveGen = _out945;
-                    _1473_recOwned = _out946;
-                    _1474_recErased = _out947;
-                    _1475_recIdents = _out948;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1472_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1473_recOwned;
-                    isErased = _1474_recErased;
-                    readIdents = _1475_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out945, out _out946, out _out947, out _out948);
+                    _1476_recursiveGen = _out945;
+                    _1477_recOwned = _out946;
+                    _1478_recErased = _out947;
+                    _1479_recIdents = _out948;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1476_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1477_recOwned;
+                    isErased = _1478_recErased;
+                    readIdents = _1479_recIdents;
                   }
-                } else if (_source55.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _1476___mcc_h648 = _source55.dtor_args;
-                  DAST._IType _1477___mcc_h649 = _source55.dtor_result;
+                } else if (_source55.is_Multiset) {
+                  DAST._IType _1480___mcc_h644 = _source55.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1478_recursiveGen;
-                    bool _1479_recOwned;
-                    bool _1480_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1481_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1481_recursiveGen;
+                    bool _1482_recOwned;
+                    bool _1483_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1484_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out949;
                     bool _out950;
                     bool _out951;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out952;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out949, out _out950, out _out951, out _out952);
-                    _1478_recursiveGen = _out949;
-                    _1479_recOwned = _out950;
-                    _1480_recErased = _out951;
-                    _1481_recIdents = _out952;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1478_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1479_recOwned;
-                    isErased = _1480_recErased;
-                    readIdents = _1481_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out949, out _out950, out _out951, out _out952);
+                    _1481_recursiveGen = _out949;
+                    _1482_recOwned = _out950;
+                    _1483_recErased = _out951;
+                    _1484_recIdents = _out952;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1481_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1482_recOwned;
+                    isErased = _1483_recErased;
+                    readIdents = _1484_recIdents;
                   }
-                } else if (_source55.is_Primitive) {
-                  DAST._IPrimitive _1482___mcc_h652 = _source55.dtor_Primitive_a0;
+                } else if (_source55.is_Map) {
+                  DAST._IType _1485___mcc_h646 = _source55.dtor_key;
+                  DAST._IType _1486___mcc_h647 = _source55.dtor_value;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1483_recursiveGen;
-                    bool _1484_recOwned;
-                    bool _1485_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1486_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1487_recursiveGen;
+                    bool _1488_recOwned;
+                    bool _1489_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1490_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out953;
                     bool _out954;
                     bool _out955;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out956;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out953, out _out954, out _out955, out _out956);
-                    _1483_recursiveGen = _out953;
-                    _1484_recOwned = _out954;
-                    _1485_recErased = _out955;
-                    _1486_recIdents = _out956;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1483_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1484_recOwned;
-                    isErased = _1485_recErased;
-                    readIdents = _1486_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out953, out _out954, out _out955, out _out956);
+                    _1487_recursiveGen = _out953;
+                    _1488_recOwned = _out954;
+                    _1489_recErased = _out955;
+                    _1490_recIdents = _out956;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1487_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1488_recOwned;
+                    isErased = _1489_recErased;
+                    readIdents = _1490_recIdents;
                   }
-                } else if (_source55.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _1487___mcc_h654 = _source55.dtor_Passthrough_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1488_recursiveGen;
-                    bool _1489_recOwned;
-                    bool _1490_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1491_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out957;
-                    bool _out958;
-                    bool _out959;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out960;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out957, out _out958, out _out959, out _out960);
-                    _1488_recursiveGen = _out957;
-                    _1489_recOwned = _out958;
-                    _1490_recErased = _out959;
-                    _1491_recIdents = _out960;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1488_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1489_recOwned;
-                    isErased = _1490_recErased;
-                    readIdents = _1491_recIdents;
-                  }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _1492___mcc_h656 = _source55.dtor_TypeArg_a0;
+                } else if (_source55.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _1491___mcc_h650 = _source55.dtor_args;
+                  DAST._IType _1492___mcc_h651 = _source55.dtor_result;
                   {
                     Dafny.ISequence<Dafny.Rune> _1493_recursiveGen;
                     bool _1494_recOwned;
                     bool _1495_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1496_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out961;
-                    bool _out962;
-                    bool _out963;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out964;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out961, out _out962, out _out963, out _out964);
-                    _1493_recursiveGen = _out961;
-                    _1494_recOwned = _out962;
-                    _1495_recErased = _out963;
-                    _1496_recIdents = _out964;
+                    Dafny.ISequence<Dafny.Rune> _out957;
+                    bool _out958;
+                    bool _out959;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out960;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out957, out _out958, out _out959, out _out960);
+                    _1493_recursiveGen = _out957;
+                    _1494_recOwned = _out958;
+                    _1495_recErased = _out959;
+                    _1496_recIdents = _out960;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1493_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1494_recOwned;
                     isErased = _1495_recErased;
                     readIdents = _1496_recIdents;
                   }
+                } else if (_source55.is_Primitive) {
+                  DAST._IPrimitive _1497___mcc_h654 = _source55.dtor_Primitive_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1498_recursiveGen;
+                    bool _1499_recOwned;
+                    bool _1500_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1501_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out961;
+                    bool _out962;
+                    bool _out963;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out964;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out961, out _out962, out _out963, out _out964);
+                    _1498_recursiveGen = _out961;
+                    _1499_recOwned = _out962;
+                    _1500_recErased = _out963;
+                    _1501_recIdents = _out964;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1498_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1499_recOwned;
+                    isErased = _1500_recErased;
+                    readIdents = _1501_recIdents;
+                  }
+                } else if (_source55.is_Passthrough) {
+                  Dafny.ISequence<Dafny.Rune> _1502___mcc_h656 = _source55.dtor_Passthrough_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1503_recursiveGen;
+                    bool _1504_recOwned;
+                    bool _1505_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1506_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out965;
+                    bool _out966;
+                    bool _out967;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out968;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out965, out _out966, out _out967, out _out968);
+                    _1503_recursiveGen = _out965;
+                    _1504_recOwned = _out966;
+                    _1505_recErased = _out967;
+                    _1506_recIdents = _out968;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1503_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1504_recOwned;
+                    isErased = _1505_recErased;
+                    readIdents = _1506_recIdents;
+                  }
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _1507___mcc_h658 = _source55.dtor_TypeArg_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1508_recursiveGen;
+                    bool _1509_recOwned;
+                    bool _1510_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1511_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out969;
+                    bool _out970;
+                    bool _out971;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out972;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out969, out _out970, out _out971, out _out972);
+                    _1508_recursiveGen = _out969;
+                    _1509_recOwned = _out970;
+                    _1510_recErased = _out971;
+                    _1511_recIdents = _out972;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1508_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1509_recOwned;
+                    isErased = _1510_recErased;
+                    readIdents = _1511_recIdents;
+                  }
                 }
               } else if (_source48.is_Bool) {
-                DAST._IType _source57 = _473___mcc_h121;
+                DAST._IType _source57 = _488___mcc_h123;
                 if (_source57.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1497___mcc_h658 = _source57.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _1498___mcc_h659 = _source57.dtor_typeArgs;
-                  DAST._IResolvedType _1499___mcc_h660 = _source57.dtor_resolved;
-                  DAST._IResolvedType _source58 = _1499___mcc_h660;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1512___mcc_h660 = _source57.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _1513___mcc_h661 = _source57.dtor_typeArgs;
+                  DAST._IResolvedType _1514___mcc_h662 = _source57.dtor_resolved;
+                  DAST._IResolvedType _source58 = _1514___mcc_h662;
                   if (_source58.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1500___mcc_h664 = _source58.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1515___mcc_h666 = _source58.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1501_recursiveGen;
-                      bool _1502_recOwned;
-                      bool _1503_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1504_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out965;
-                      bool _out966;
-                      bool _out967;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out968;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out965, out _out966, out _out967, out _out968);
-                      _1501_recursiveGen = _out965;
-                      _1502_recOwned = _out966;
-                      _1503_recErased = _out967;
-                      _1504_recIdents = _out968;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1501_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1502_recOwned;
-                      isErased = _1503_recErased;
-                      readIdents = _1504_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1516_recursiveGen;
+                      bool _1517_recOwned;
+                      bool _1518_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1519_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out973;
+                      bool _out974;
+                      bool _out975;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out976;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out973, out _out974, out _out975, out _out976);
+                      _1516_recursiveGen = _out973;
+                      _1517_recOwned = _out974;
+                      _1518_recErased = _out975;
+                      _1519_recIdents = _out976;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1516_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1517_recOwned;
+                      isErased = _1518_recErased;
+                      readIdents = _1519_recIdents;
                     }
                   } else if (_source58.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1505___mcc_h666 = _source58.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1520___mcc_h668 = _source58.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1506_recursiveGen;
-                      bool _1507_recOwned;
-                      bool _1508_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1509_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out969;
-                      bool _out970;
-                      bool _out971;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out972;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out969, out _out970, out _out971, out _out972);
-                      _1506_recursiveGen = _out969;
-                      _1507_recOwned = _out970;
-                      _1508_recErased = _out971;
-                      _1509_recIdents = _out972;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1506_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1507_recOwned;
-                      isErased = _1508_recErased;
-                      readIdents = _1509_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1521_recursiveGen;
+                      bool _1522_recOwned;
+                      bool _1523_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1524_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out977;
+                      bool _out978;
+                      bool _out979;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out980;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out977, out _out978, out _out979, out _out980);
+                      _1521_recursiveGen = _out977;
+                      _1522_recOwned = _out978;
+                      _1523_recErased = _out979;
+                      _1524_recIdents = _out980;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1521_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1522_recOwned;
+                      isErased = _1523_recErased;
+                      readIdents = _1524_recIdents;
                     }
                   } else {
-                    DAST._IType _1510___mcc_h668 = _source58.dtor_Newtype_a0;
-                    DAST._IType _1511_b = _1510___mcc_h668;
+                    DAST._IType _1525___mcc_h670 = _source58.dtor_Newtype_a0;
+                    DAST._IType _1526_b = _1525___mcc_h670;
                     {
-                      if (object.Equals(_466_fromTpe, _1511_b)) {
-                        Dafny.ISequence<Dafny.Rune> _1512_recursiveGen;
-                        bool _1513_recOwned;
-                        bool _1514_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1515_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out973;
-                        bool _out974;
-                        bool _out975;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out976;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out973, out _out974, out _out975, out _out976);
-                        _1512_recursiveGen = _out973;
-                        _1513_recOwned = _out974;
-                        _1514_recErased = _out975;
-                        _1515_recIdents = _out976;
-                        Dafny.ISequence<Dafny.Rune> _1516_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out977;
-                        _out977 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _1516_rhsType = _out977;
-                        Dafny.ISequence<Dafny.Rune> _1517_uneraseFn;
-                        _1517_uneraseFn = ((_1513_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1516_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1517_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1512_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _1513_recOwned;
+                      if (object.Equals(_481_fromTpe, _1526_b)) {
+                        Dafny.ISequence<Dafny.Rune> _1527_recursiveGen;
+                        bool _1528_recOwned;
+                        bool _1529_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1530_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out981;
+                        bool _out982;
+                        bool _out983;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out984;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out981, out _out982, out _out983, out _out984);
+                        _1527_recursiveGen = _out981;
+                        _1528_recOwned = _out982;
+                        _1529_recErased = _out983;
+                        _1530_recIdents = _out984;
+                        Dafny.ISequence<Dafny.Rune> _1531_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out985;
+                        _out985 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _1531_rhsType = _out985;
+                        Dafny.ISequence<Dafny.Rune> _1532_uneraseFn;
+                        _1532_uneraseFn = ((_1528_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1531_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1532_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1527_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _1528_recOwned;
                         isErased = false;
-                        readIdents = _1515_recIdents;
+                        readIdents = _1530_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out978;
-                        bool _out979;
-                        bool _out980;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out981;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1511_b), _1511_b, _465_toTpe), @params, mustOwn, out _out978, out _out979, out _out980, out _out981);
-                        s = _out978;
-                        isOwned = _out979;
-                        isErased = _out980;
-                        readIdents = _out981;
+                        Dafny.ISequence<Dafny.Rune> _out986;
+                        bool _out987;
+                        bool _out988;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out989;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1526_b), _1526_b, _480_toTpe), @params, mustOwn, out _out986, out _out987, out _out988, out _out989);
+                        s = _out986;
+                        isOwned = _out987;
+                        isErased = _out988;
+                        readIdents = _out989;
                       }
                     }
                   }
                 } else if (_source57.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _1518___mcc_h670 = _source57.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1519_recursiveGen;
-                    bool _1520_recOwned;
-                    bool _1521_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1522_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out982;
-                    bool _out983;
-                    bool _out984;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out985;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out982, out _out983, out _out984, out _out985);
-                    _1519_recursiveGen = _out982;
-                    _1520_recOwned = _out983;
-                    _1521_recErased = _out984;
-                    _1522_recIdents = _out985;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1519_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1520_recOwned;
-                    isErased = _1521_recErased;
-                    readIdents = _1522_recIdents;
-                  }
-                } else if (_source57.is_Array) {
-                  DAST._IType _1523___mcc_h672 = _source57.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1524_recursiveGen;
-                    bool _1525_recOwned;
-                    bool _1526_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1527_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out986;
-                    bool _out987;
-                    bool _out988;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out989;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out986, out _out987, out _out988, out _out989);
-                    _1524_recursiveGen = _out986;
-                    _1525_recOwned = _out987;
-                    _1526_recErased = _out988;
-                    _1527_recIdents = _out989;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1524_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1525_recOwned;
-                    isErased = _1526_recErased;
-                    readIdents = _1527_recIdents;
-                  }
-                } else if (_source57.is_Seq) {
-                  DAST._IType _1528___mcc_h674 = _source57.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1529_recursiveGen;
-                    bool _1530_recOwned;
-                    bool _1531_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1532_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out990;
-                    bool _out991;
-                    bool _out992;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out993;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out990, out _out991, out _out992, out _out993);
-                    _1529_recursiveGen = _out990;
-                    _1530_recOwned = _out991;
-                    _1531_recErased = _out992;
-                    _1532_recIdents = _out993;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1529_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1530_recOwned;
-                    isErased = _1531_recErased;
-                    readIdents = _1532_recIdents;
-                  }
-                } else if (_source57.is_Set) {
-                  DAST._IType _1533___mcc_h676 = _source57.dtor_element;
+                  Dafny.ISequence<DAST._IType> _1533___mcc_h672 = _source57.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _1534_recursiveGen;
                     bool _1535_recOwned;
                     bool _1536_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1537_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out994;
-                    bool _out995;
-                    bool _out996;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out997;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out994, out _out995, out _out996, out _out997);
-                    _1534_recursiveGen = _out994;
-                    _1535_recOwned = _out995;
-                    _1536_recErased = _out996;
-                    _1537_recIdents = _out997;
+                    Dafny.ISequence<Dafny.Rune> _out990;
+                    bool _out991;
+                    bool _out992;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out993;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out990, out _out991, out _out992, out _out993);
+                    _1534_recursiveGen = _out990;
+                    _1535_recOwned = _out991;
+                    _1536_recErased = _out992;
+                    _1537_recIdents = _out993;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1534_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1535_recOwned;
                     isErased = _1536_recErased;
                     readIdents = _1537_recIdents;
                   }
-                } else if (_source57.is_Multiset) {
-                  DAST._IType _1538___mcc_h678 = _source57.dtor_element;
+                } else if (_source57.is_Array) {
+                  DAST._IType _1538___mcc_h674 = _source57.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _1539_recursiveGen;
                     bool _1540_recOwned;
                     bool _1541_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1542_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out998;
-                    bool _out999;
-                    bool _out1000;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1001;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out998, out _out999, out _out1000, out _out1001);
-                    _1539_recursiveGen = _out998;
-                    _1540_recOwned = _out999;
-                    _1541_recErased = _out1000;
-                    _1542_recIdents = _out1001;
+                    Dafny.ISequence<Dafny.Rune> _out994;
+                    bool _out995;
+                    bool _out996;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out997;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out994, out _out995, out _out996, out _out997);
+                    _1539_recursiveGen = _out994;
+                    _1540_recOwned = _out995;
+                    _1541_recErased = _out996;
+                    _1542_recIdents = _out997;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1539_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1540_recOwned;
                     isErased = _1541_recErased;
                     readIdents = _1542_recIdents;
                   }
-                } else if (_source57.is_Map) {
-                  DAST._IType _1543___mcc_h680 = _source57.dtor_key;
-                  DAST._IType _1544___mcc_h681 = _source57.dtor_value;
+                } else if (_source57.is_Seq) {
+                  DAST._IType _1543___mcc_h676 = _source57.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1545_recursiveGen;
-                    bool _1546_recOwned;
-                    bool _1547_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1548_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1544_recursiveGen;
+                    bool _1545_recOwned;
+                    bool _1546_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1547_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out998;
+                    bool _out999;
+                    bool _out1000;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1001;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out998, out _out999, out _out1000, out _out1001);
+                    _1544_recursiveGen = _out998;
+                    _1545_recOwned = _out999;
+                    _1546_recErased = _out1000;
+                    _1547_recIdents = _out1001;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1544_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1545_recOwned;
+                    isErased = _1546_recErased;
+                    readIdents = _1547_recIdents;
+                  }
+                } else if (_source57.is_Set) {
+                  DAST._IType _1548___mcc_h678 = _source57.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1549_recursiveGen;
+                    bool _1550_recOwned;
+                    bool _1551_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1552_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1002;
                     bool _out1003;
                     bool _out1004;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1005;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1002, out _out1003, out _out1004, out _out1005);
-                    _1545_recursiveGen = _out1002;
-                    _1546_recOwned = _out1003;
-                    _1547_recErased = _out1004;
-                    _1548_recIdents = _out1005;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1545_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1546_recOwned;
-                    isErased = _1547_recErased;
-                    readIdents = _1548_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1002, out _out1003, out _out1004, out _out1005);
+                    _1549_recursiveGen = _out1002;
+                    _1550_recOwned = _out1003;
+                    _1551_recErased = _out1004;
+                    _1552_recIdents = _out1005;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1549_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1550_recOwned;
+                    isErased = _1551_recErased;
+                    readIdents = _1552_recIdents;
                   }
-                } else if (_source57.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _1549___mcc_h684 = _source57.dtor_args;
-                  DAST._IType _1550___mcc_h685 = _source57.dtor_result;
+                } else if (_source57.is_Multiset) {
+                  DAST._IType _1553___mcc_h680 = _source57.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1551_recursiveGen;
-                    bool _1552_recOwned;
-                    bool _1553_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1554_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1554_recursiveGen;
+                    bool _1555_recOwned;
+                    bool _1556_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1557_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1006;
                     bool _out1007;
                     bool _out1008;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1009;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1006, out _out1007, out _out1008, out _out1009);
-                    _1551_recursiveGen = _out1006;
-                    _1552_recOwned = _out1007;
-                    _1553_recErased = _out1008;
-                    _1554_recIdents = _out1009;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1551_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1552_recOwned;
-                    isErased = _1553_recErased;
-                    readIdents = _1554_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1006, out _out1007, out _out1008, out _out1009);
+                    _1554_recursiveGen = _out1006;
+                    _1555_recOwned = _out1007;
+                    _1556_recErased = _out1008;
+                    _1557_recIdents = _out1009;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1554_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1555_recOwned;
+                    isErased = _1556_recErased;
+                    readIdents = _1557_recIdents;
                   }
-                } else if (_source57.is_Primitive) {
-                  DAST._IPrimitive _1555___mcc_h688 = _source57.dtor_Primitive_a0;
+                } else if (_source57.is_Map) {
+                  DAST._IType _1558___mcc_h682 = _source57.dtor_key;
+                  DAST._IType _1559___mcc_h683 = _source57.dtor_value;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1556_recursiveGen;
-                    bool _1557_recOwned;
-                    bool _1558_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1559_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1560_recursiveGen;
+                    bool _1561_recOwned;
+                    bool _1562_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1563_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1010;
                     bool _out1011;
                     bool _out1012;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1013;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1010, out _out1011, out _out1012, out _out1013);
-                    _1556_recursiveGen = _out1010;
-                    _1557_recOwned = _out1011;
-                    _1558_recErased = _out1012;
-                    _1559_recIdents = _out1013;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1556_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1557_recOwned;
-                    isErased = _1558_recErased;
-                    readIdents = _1559_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1010, out _out1011, out _out1012, out _out1013);
+                    _1560_recursiveGen = _out1010;
+                    _1561_recOwned = _out1011;
+                    _1562_recErased = _out1012;
+                    _1563_recIdents = _out1013;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1560_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1561_recOwned;
+                    isErased = _1562_recErased;
+                    readIdents = _1563_recIdents;
                   }
-                } else if (_source57.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _1560___mcc_h690 = _source57.dtor_Passthrough_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1561_recursiveGen;
-                    bool _1562_recOwned;
-                    bool _1563_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1564_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1014;
-                    bool _out1015;
-                    bool _out1016;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1017;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1014, out _out1015, out _out1016, out _out1017);
-                    _1561_recursiveGen = _out1014;
-                    _1562_recOwned = _out1015;
-                    _1563_recErased = _out1016;
-                    _1564_recIdents = _out1017;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1561_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1562_recOwned;
-                    isErased = _1563_recErased;
-                    readIdents = _1564_recIdents;
-                  }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _1565___mcc_h692 = _source57.dtor_TypeArg_a0;
+                } else if (_source57.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _1564___mcc_h686 = _source57.dtor_args;
+                  DAST._IType _1565___mcc_h687 = _source57.dtor_result;
                   {
                     Dafny.ISequence<Dafny.Rune> _1566_recursiveGen;
                     bool _1567_recOwned;
                     bool _1568_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1569_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1018;
-                    bool _out1019;
-                    bool _out1020;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1021;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1018, out _out1019, out _out1020, out _out1021);
-                    _1566_recursiveGen = _out1018;
-                    _1567_recOwned = _out1019;
-                    _1568_recErased = _out1020;
-                    _1569_recIdents = _out1021;
+                    Dafny.ISequence<Dafny.Rune> _out1014;
+                    bool _out1015;
+                    bool _out1016;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1017;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1014, out _out1015, out _out1016, out _out1017);
+                    _1566_recursiveGen = _out1014;
+                    _1567_recOwned = _out1015;
+                    _1568_recErased = _out1016;
+                    _1569_recIdents = _out1017;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1566_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1567_recOwned;
                     isErased = _1568_recErased;
                     readIdents = _1569_recIdents;
                   }
+                } else if (_source57.is_Primitive) {
+                  DAST._IPrimitive _1570___mcc_h690 = _source57.dtor_Primitive_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1571_recursiveGen;
+                    bool _1572_recOwned;
+                    bool _1573_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1574_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1018;
+                    bool _out1019;
+                    bool _out1020;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1021;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1018, out _out1019, out _out1020, out _out1021);
+                    _1571_recursiveGen = _out1018;
+                    _1572_recOwned = _out1019;
+                    _1573_recErased = _out1020;
+                    _1574_recIdents = _out1021;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1571_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1572_recOwned;
+                    isErased = _1573_recErased;
+                    readIdents = _1574_recIdents;
+                  }
+                } else if (_source57.is_Passthrough) {
+                  Dafny.ISequence<Dafny.Rune> _1575___mcc_h692 = _source57.dtor_Passthrough_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1576_recursiveGen;
+                    bool _1577_recOwned;
+                    bool _1578_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1579_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1022;
+                    bool _out1023;
+                    bool _out1024;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1025;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1022, out _out1023, out _out1024, out _out1025);
+                    _1576_recursiveGen = _out1022;
+                    _1577_recOwned = _out1023;
+                    _1578_recErased = _out1024;
+                    _1579_recIdents = _out1025;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1576_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1577_recOwned;
+                    isErased = _1578_recErased;
+                    readIdents = _1579_recIdents;
+                  }
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _1580___mcc_h694 = _source57.dtor_TypeArg_a0;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1581_recursiveGen;
+                    bool _1582_recOwned;
+                    bool _1583_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1584_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1026;
+                    bool _out1027;
+                    bool _out1028;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1029;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1026, out _out1027, out _out1028, out _out1029);
+                    _1581_recursiveGen = _out1026;
+                    _1582_recOwned = _out1027;
+                    _1583_recErased = _out1028;
+                    _1584_recIdents = _out1029;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1581_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1582_recOwned;
+                    isErased = _1583_recErased;
+                    readIdents = _1584_recIdents;
+                  }
                 }
               } else {
-                DAST._IType _source59 = _473___mcc_h121;
+                DAST._IType _source59 = _488___mcc_h123;
                 if (_source59.is_Path) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1570___mcc_h694 = _source59.dtor_Path_a0;
-                  Dafny.ISequence<DAST._IType> _1571___mcc_h695 = _source59.dtor_typeArgs;
-                  DAST._IResolvedType _1572___mcc_h696 = _source59.dtor_resolved;
-                  DAST._IResolvedType _source60 = _1572___mcc_h696;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1585___mcc_h696 = _source59.dtor_Path_a0;
+                  Dafny.ISequence<DAST._IType> _1586___mcc_h697 = _source59.dtor_typeArgs;
+                  DAST._IResolvedType _1587___mcc_h698 = _source59.dtor_resolved;
+                  DAST._IResolvedType _source60 = _1587___mcc_h698;
                   if (_source60.is_Datatype) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1573___mcc_h700 = _source60.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1588___mcc_h702 = _source60.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1574_recursiveGen;
-                      bool _1575_recOwned;
-                      bool _1576_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1577_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1022;
-                      bool _out1023;
-                      bool _out1024;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1025;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1022, out _out1023, out _out1024, out _out1025);
-                      _1574_recursiveGen = _out1022;
-                      _1575_recOwned = _out1023;
-                      _1576_recErased = _out1024;
-                      _1577_recIdents = _out1025;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1574_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1575_recOwned;
-                      isErased = _1576_recErased;
-                      readIdents = _1577_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1589_recursiveGen;
+                      bool _1590_recOwned;
+                      bool _1591_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1592_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1030;
+                      bool _out1031;
+                      bool _out1032;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1033;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1030, out _out1031, out _out1032, out _out1033);
+                      _1589_recursiveGen = _out1030;
+                      _1590_recOwned = _out1031;
+                      _1591_recErased = _out1032;
+                      _1592_recIdents = _out1033;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1589_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1590_recOwned;
+                      isErased = _1591_recErased;
+                      readIdents = _1592_recIdents;
                     }
                   } else if (_source60.is_Trait) {
-                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1578___mcc_h702 = _source60.dtor_path;
+                    Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1593___mcc_h704 = _source60.dtor_path;
                     {
-                      Dafny.ISequence<Dafny.Rune> _1579_recursiveGen;
-                      bool _1580_recOwned;
-                      bool _1581_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1582_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1026;
-                      bool _out1027;
-                      bool _out1028;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1029;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1026, out _out1027, out _out1028, out _out1029);
-                      _1579_recursiveGen = _out1026;
-                      _1580_recOwned = _out1027;
-                      _1581_recErased = _out1028;
-                      _1582_recIdents = _out1029;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1579_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1580_recOwned;
-                      isErased = _1581_recErased;
-                      readIdents = _1582_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1594_recursiveGen;
+                      bool _1595_recOwned;
+                      bool _1596_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1597_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1034;
+                      bool _out1035;
+                      bool _out1036;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1037;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1034, out _out1035, out _out1036, out _out1037);
+                      _1594_recursiveGen = _out1034;
+                      _1595_recOwned = _out1035;
+                      _1596_recErased = _out1036;
+                      _1597_recIdents = _out1037;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1594_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1595_recOwned;
+                      isErased = _1596_recErased;
+                      readIdents = _1597_recIdents;
                     }
                   } else {
-                    DAST._IType _1583___mcc_h704 = _source60.dtor_Newtype_a0;
-                    DAST._IType _1584_b = _1583___mcc_h704;
+                    DAST._IType _1598___mcc_h706 = _source60.dtor_Newtype_a0;
+                    DAST._IType _1599_b = _1598___mcc_h706;
                     {
-                      if (object.Equals(_466_fromTpe, _1584_b)) {
-                        Dafny.ISequence<Dafny.Rune> _1585_recursiveGen;
-                        bool _1586_recOwned;
-                        bool _1587_recErased;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1588_recIdents;
-                        Dafny.ISequence<Dafny.Rune> _out1030;
-                        bool _out1031;
-                        bool _out1032;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1033;
-                        DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1030, out _out1031, out _out1032, out _out1033);
-                        _1585_recursiveGen = _out1030;
-                        _1586_recOwned = _out1031;
-                        _1587_recErased = _out1032;
-                        _1588_recIdents = _out1033;
-                        Dafny.ISequence<Dafny.Rune> _1589_rhsType;
-                        Dafny.ISequence<Dafny.Rune> _out1034;
-                        _out1034 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                        _1589_rhsType = _out1034;
-                        Dafny.ISequence<Dafny.Rune> _1590_uneraseFn;
-                        _1590_uneraseFn = ((_1586_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1589_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1590_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1585_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                        isOwned = _1586_recOwned;
+                      if (object.Equals(_481_fromTpe, _1599_b)) {
+                        Dafny.ISequence<Dafny.Rune> _1600_recursiveGen;
+                        bool _1601_recOwned;
+                        bool _1602_recErased;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1603_recIdents;
+                        Dafny.ISequence<Dafny.Rune> _out1038;
+                        bool _out1039;
+                        bool _out1040;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1041;
+                        DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1038, out _out1039, out _out1040, out _out1041);
+                        _1600_recursiveGen = _out1038;
+                        _1601_recOwned = _out1039;
+                        _1602_recErased = _out1040;
+                        _1603_recIdents = _out1041;
+                        Dafny.ISequence<Dafny.Rune> _1604_rhsType;
+                        Dafny.ISequence<Dafny.Rune> _out1042;
+                        _out1042 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                        _1604_rhsType = _out1042;
+                        Dafny.ISequence<Dafny.Rune> _1605_uneraseFn;
+                        _1605_uneraseFn = ((_1601_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                        s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1604_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1605_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1600_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                        isOwned = _1601_recOwned;
                         isErased = false;
-                        readIdents = _1588_recIdents;
+                        readIdents = _1603_recIdents;
                       } else {
-                        Dafny.ISequence<Dafny.Rune> _out1035;
-                        bool _out1036;
-                        bool _out1037;
-                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1038;
-                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1584_b), _1584_b, _465_toTpe), @params, mustOwn, out _out1035, out _out1036, out _out1037, out _out1038);
-                        s = _out1035;
-                        isOwned = _out1036;
-                        isErased = _out1037;
-                        readIdents = _out1038;
+                        Dafny.ISequence<Dafny.Rune> _out1043;
+                        bool _out1044;
+                        bool _out1045;
+                        Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1046;
+                        DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1599_b), _1599_b, _480_toTpe), @params, mustOwn, out _out1043, out _out1044, out _out1045, out _out1046);
+                        s = _out1043;
+                        isOwned = _out1044;
+                        isErased = _out1045;
+                        readIdents = _out1046;
                       }
                     }
                   }
                 } else if (_source59.is_Tuple) {
-                  Dafny.ISequence<DAST._IType> _1591___mcc_h706 = _source59.dtor_Tuple_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1592_recursiveGen;
-                    bool _1593_recOwned;
-                    bool _1594_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1595_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1039;
-                    bool _out1040;
-                    bool _out1041;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1042;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1039, out _out1040, out _out1041, out _out1042);
-                    _1592_recursiveGen = _out1039;
-                    _1593_recOwned = _out1040;
-                    _1594_recErased = _out1041;
-                    _1595_recIdents = _out1042;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1592_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1593_recOwned;
-                    isErased = _1594_recErased;
-                    readIdents = _1595_recIdents;
-                  }
-                } else if (_source59.is_Array) {
-                  DAST._IType _1596___mcc_h708 = _source59.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1597_recursiveGen;
-                    bool _1598_recOwned;
-                    bool _1599_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1600_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1043;
-                    bool _out1044;
-                    bool _out1045;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1046;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1043, out _out1044, out _out1045, out _out1046);
-                    _1597_recursiveGen = _out1043;
-                    _1598_recOwned = _out1044;
-                    _1599_recErased = _out1045;
-                    _1600_recIdents = _out1046;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1597_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1598_recOwned;
-                    isErased = _1599_recErased;
-                    readIdents = _1600_recIdents;
-                  }
-                } else if (_source59.is_Seq) {
-                  DAST._IType _1601___mcc_h710 = _source59.dtor_element;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1602_recursiveGen;
-                    bool _1603_recOwned;
-                    bool _1604_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1605_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1047;
-                    bool _out1048;
-                    bool _out1049;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1050;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1047, out _out1048, out _out1049, out _out1050);
-                    _1602_recursiveGen = _out1047;
-                    _1603_recOwned = _out1048;
-                    _1604_recErased = _out1049;
-                    _1605_recIdents = _out1050;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1602_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1603_recOwned;
-                    isErased = _1604_recErased;
-                    readIdents = _1605_recIdents;
-                  }
-                } else if (_source59.is_Set) {
-                  DAST._IType _1606___mcc_h712 = _source59.dtor_element;
+                  Dafny.ISequence<DAST._IType> _1606___mcc_h708 = _source59.dtor_Tuple_a0;
                   {
                     Dafny.ISequence<Dafny.Rune> _1607_recursiveGen;
                     bool _1608_recOwned;
                     bool _1609_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1610_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1051;
-                    bool _out1052;
-                    bool _out1053;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1054;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1051, out _out1052, out _out1053, out _out1054);
-                    _1607_recursiveGen = _out1051;
-                    _1608_recOwned = _out1052;
-                    _1609_recErased = _out1053;
-                    _1610_recIdents = _out1054;
+                    Dafny.ISequence<Dafny.Rune> _out1047;
+                    bool _out1048;
+                    bool _out1049;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1050;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1047, out _out1048, out _out1049, out _out1050);
+                    _1607_recursiveGen = _out1047;
+                    _1608_recOwned = _out1048;
+                    _1609_recErased = _out1049;
+                    _1610_recIdents = _out1050;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1607_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1608_recOwned;
                     isErased = _1609_recErased;
                     readIdents = _1610_recIdents;
                   }
-                } else if (_source59.is_Multiset) {
-                  DAST._IType _1611___mcc_h714 = _source59.dtor_element;
+                } else if (_source59.is_Array) {
+                  DAST._IType _1611___mcc_h710 = _source59.dtor_element;
                   {
                     Dafny.ISequence<Dafny.Rune> _1612_recursiveGen;
                     bool _1613_recOwned;
                     bool _1614_recErased;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1615_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1055;
-                    bool _out1056;
-                    bool _out1057;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1058;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1055, out _out1056, out _out1057, out _out1058);
-                    _1612_recursiveGen = _out1055;
-                    _1613_recOwned = _out1056;
-                    _1614_recErased = _out1057;
-                    _1615_recIdents = _out1058;
+                    Dafny.ISequence<Dafny.Rune> _out1051;
+                    bool _out1052;
+                    bool _out1053;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1054;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1051, out _out1052, out _out1053, out _out1054);
+                    _1612_recursiveGen = _out1051;
+                    _1613_recOwned = _out1052;
+                    _1614_recErased = _out1053;
+                    _1615_recIdents = _out1054;
                     s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1612_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                     isOwned = _1613_recOwned;
                     isErased = _1614_recErased;
                     readIdents = _1615_recIdents;
                   }
-                } else if (_source59.is_Map) {
-                  DAST._IType _1616___mcc_h716 = _source59.dtor_key;
-                  DAST._IType _1617___mcc_h717 = _source59.dtor_value;
+                } else if (_source59.is_Seq) {
+                  DAST._IType _1616___mcc_h712 = _source59.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1618_recursiveGen;
-                    bool _1619_recOwned;
-                    bool _1620_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1621_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1617_recursiveGen;
+                    bool _1618_recOwned;
+                    bool _1619_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1620_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1055;
+                    bool _out1056;
+                    bool _out1057;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1058;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1055, out _out1056, out _out1057, out _out1058);
+                    _1617_recursiveGen = _out1055;
+                    _1618_recOwned = _out1056;
+                    _1619_recErased = _out1057;
+                    _1620_recIdents = _out1058;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1617_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1618_recOwned;
+                    isErased = _1619_recErased;
+                    readIdents = _1620_recIdents;
+                  }
+                } else if (_source59.is_Set) {
+                  DAST._IType _1621___mcc_h714 = _source59.dtor_element;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1622_recursiveGen;
+                    bool _1623_recOwned;
+                    bool _1624_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1625_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1059;
                     bool _out1060;
                     bool _out1061;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1062;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1059, out _out1060, out _out1061, out _out1062);
-                    _1618_recursiveGen = _out1059;
-                    _1619_recOwned = _out1060;
-                    _1620_recErased = _out1061;
-                    _1621_recIdents = _out1062;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1618_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1619_recOwned;
-                    isErased = _1620_recErased;
-                    readIdents = _1621_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1059, out _out1060, out _out1061, out _out1062);
+                    _1622_recursiveGen = _out1059;
+                    _1623_recOwned = _out1060;
+                    _1624_recErased = _out1061;
+                    _1625_recIdents = _out1062;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1622_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1623_recOwned;
+                    isErased = _1624_recErased;
+                    readIdents = _1625_recIdents;
                   }
-                } else if (_source59.is_Arrow) {
-                  Dafny.ISequence<DAST._IType> _1622___mcc_h720 = _source59.dtor_args;
-                  DAST._IType _1623___mcc_h721 = _source59.dtor_result;
+                } else if (_source59.is_Multiset) {
+                  DAST._IType _1626___mcc_h716 = _source59.dtor_element;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1624_recursiveGen;
-                    bool _1625_recOwned;
-                    bool _1626_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1627_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1627_recursiveGen;
+                    bool _1628_recOwned;
+                    bool _1629_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1630_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1063;
                     bool _out1064;
                     bool _out1065;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1066;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1063, out _out1064, out _out1065, out _out1066);
-                    _1624_recursiveGen = _out1063;
-                    _1625_recOwned = _out1064;
-                    _1626_recErased = _out1065;
-                    _1627_recIdents = _out1066;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1624_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1625_recOwned;
-                    isErased = _1626_recErased;
-                    readIdents = _1627_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1063, out _out1064, out _out1065, out _out1066);
+                    _1627_recursiveGen = _out1063;
+                    _1628_recOwned = _out1064;
+                    _1629_recErased = _out1065;
+                    _1630_recIdents = _out1066;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1627_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1628_recOwned;
+                    isErased = _1629_recErased;
+                    readIdents = _1630_recIdents;
+                  }
+                } else if (_source59.is_Map) {
+                  DAST._IType _1631___mcc_h718 = _source59.dtor_key;
+                  DAST._IType _1632___mcc_h719 = _source59.dtor_value;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1633_recursiveGen;
+                    bool _1634_recOwned;
+                    bool _1635_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1636_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1067;
+                    bool _out1068;
+                    bool _out1069;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1070;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1067, out _out1068, out _out1069, out _out1070);
+                    _1633_recursiveGen = _out1067;
+                    _1634_recOwned = _out1068;
+                    _1635_recErased = _out1069;
+                    _1636_recIdents = _out1070;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1633_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1634_recOwned;
+                    isErased = _1635_recErased;
+                    readIdents = _1636_recIdents;
+                  }
+                } else if (_source59.is_Arrow) {
+                  Dafny.ISequence<DAST._IType> _1637___mcc_h722 = _source59.dtor_args;
+                  DAST._IType _1638___mcc_h723 = _source59.dtor_result;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1639_recursiveGen;
+                    bool _1640_recOwned;
+                    bool _1641_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1642_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1071;
+                    bool _out1072;
+                    bool _out1073;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1074;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1071, out _out1072, out _out1073, out _out1074);
+                    _1639_recursiveGen = _out1071;
+                    _1640_recOwned = _out1072;
+                    _1641_recErased = _out1073;
+                    _1642_recIdents = _out1074;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1639_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1640_recOwned;
+                    isErased = _1641_recErased;
+                    readIdents = _1642_recIdents;
                   }
                 } else if (_source59.is_Primitive) {
-                  DAST._IPrimitive _1628___mcc_h724 = _source59.dtor_Primitive_a0;
-                  DAST._IPrimitive _source61 = _1628___mcc_h724;
+                  DAST._IPrimitive _1643___mcc_h726 = _source59.dtor_Primitive_a0;
+                  DAST._IPrimitive _source61 = _1643___mcc_h726;
                   if (_source61.is_Int) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1629_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out1067;
-                      _out1067 = DCOMP.COMP.GenType(_466_fromTpe, true, false);
-                      _1629_rhsType = _out1067;
-                      Dafny.ISequence<Dafny.Rune> _1630_recursiveGen;
-                      bool _1631___v51;
-                      bool _1632___v52;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1633_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1068;
-                      bool _out1069;
-                      bool _out1070;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1071;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out1068, out _out1069, out _out1070, out _out1071);
-                      _1630_recursiveGen = _out1068;
-                      _1631___v51 = _out1069;
-                      _1632___v52 = _out1070;
-                      _1633_recIdents = _out1071;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::from("), _1630_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as u32)"));
-                      isOwned = true;
-                      isErased = true;
-                      readIdents = _1633_recIdents;
-                    }
-                  } else if (_source61.is_Real) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1634_recursiveGen;
-                      bool _1635_recOwned;
-                      bool _1636_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1637_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1072;
-                      bool _out1073;
-                      bool _out1074;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1075;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1072, out _out1073, out _out1074, out _out1075);
-                      _1634_recursiveGen = _out1072;
-                      _1635_recOwned = _out1073;
-                      _1636_recErased = _out1074;
-                      _1637_recIdents = _out1075;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1634_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1635_recOwned;
-                      isErased = _1636_recErased;
-                      readIdents = _1637_recIdents;
-                    }
-                  } else if (_source61.is_String) {
-                    {
-                      Dafny.ISequence<Dafny.Rune> _1638_recursiveGen;
-                      bool _1639_recOwned;
-                      bool _1640_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1641_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1644_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out1075;
+                      _out1075 = DCOMP.COMP.GenType(_481_fromTpe, true, false);
+                      _1644_rhsType = _out1075;
+                      Dafny.ISequence<Dafny.Rune> _1645_recursiveGen;
+                      bool _1646___v52;
+                      bool _1647___v53;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1648_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out1076;
                       bool _out1077;
                       bool _out1078;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1079;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1076, out _out1077, out _out1078, out _out1079);
-                      _1638_recursiveGen = _out1076;
-                      _1639_recOwned = _out1077;
-                      _1640_recErased = _out1078;
-                      _1641_recIdents = _out1079;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1638_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1639_recOwned;
-                      isErased = _1640_recErased;
-                      readIdents = _1641_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out1076, out _out1077, out _out1078, out _out1079);
+                      _1645_recursiveGen = _out1076;
+                      _1646___v52 = _out1077;
+                      _1647___v53 = _out1078;
+                      _1648_recIdents = _out1079;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::from("), _1645_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as u32)"));
+                      isOwned = true;
+                      isErased = true;
+                      readIdents = _1648_recIdents;
                     }
-                  } else if (_source61.is_Bool) {
+                  } else if (_source61.is_Real) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1642_recursiveGen;
-                      bool _1643_recOwned;
-                      bool _1644_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1645_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1649_recursiveGen;
+                      bool _1650_recOwned;
+                      bool _1651_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1652_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out1080;
                       bool _out1081;
                       bool _out1082;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1083;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1080, out _out1081, out _out1082, out _out1083);
-                      _1642_recursiveGen = _out1080;
-                      _1643_recOwned = _out1081;
-                      _1644_recErased = _out1082;
-                      _1645_recIdents = _out1083;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1642_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1643_recOwned;
-                      isErased = _1644_recErased;
-                      readIdents = _1645_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1080, out _out1081, out _out1082, out _out1083);
+                      _1649_recursiveGen = _out1080;
+                      _1650_recOwned = _out1081;
+                      _1651_recErased = _out1082;
+                      _1652_recIdents = _out1083;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1649_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1650_recOwned;
+                      isErased = _1651_recErased;
+                      readIdents = _1652_recIdents;
                     }
-                  } else {
+                  } else if (_source61.is_String) {
                     {
-                      Dafny.ISequence<Dafny.Rune> _1646_recursiveGen;
-                      bool _1647_recOwned;
-                      bool _1648_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1649_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _1653_recursiveGen;
+                      bool _1654_recOwned;
+                      bool _1655_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1656_recIdents;
                       Dafny.ISequence<Dafny.Rune> _out1084;
                       bool _out1085;
                       bool _out1086;
                       Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1087;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1084, out _out1085, out _out1086, out _out1087);
-                      _1646_recursiveGen = _out1084;
-                      _1647_recOwned = _out1085;
-                      _1648_recErased = _out1086;
-                      _1649_recIdents = _out1087;
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1646_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                      isOwned = _1647_recOwned;
-                      isErased = _1648_recErased;
-                      readIdents = _1649_recIdents;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1084, out _out1085, out _out1086, out _out1087);
+                      _1653_recursiveGen = _out1084;
+                      _1654_recOwned = _out1085;
+                      _1655_recErased = _out1086;
+                      _1656_recIdents = _out1087;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1653_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1654_recOwned;
+                      isErased = _1655_recErased;
+                      readIdents = _1656_recIdents;
+                    }
+                  } else if (_source61.is_Bool) {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1657_recursiveGen;
+                      bool _1658_recOwned;
+                      bool _1659_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1660_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1088;
+                      bool _out1089;
+                      bool _out1090;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1091;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1088, out _out1089, out _out1090, out _out1091);
+                      _1657_recursiveGen = _out1088;
+                      _1658_recOwned = _out1089;
+                      _1659_recErased = _out1090;
+                      _1660_recIdents = _out1091;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1657_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1658_recOwned;
+                      isErased = _1659_recErased;
+                      readIdents = _1660_recIdents;
+                    }
+                  } else {
+                    {
+                      Dafny.ISequence<Dafny.Rune> _1661_recursiveGen;
+                      bool _1662_recOwned;
+                      bool _1663_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1664_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1092;
+                      bool _out1093;
+                      bool _out1094;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1095;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1092, out _out1093, out _out1094, out _out1095);
+                      _1661_recursiveGen = _out1092;
+                      _1662_recOwned = _out1093;
+                      _1663_recErased = _out1094;
+                      _1664_recIdents = _out1095;
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1661_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                      isOwned = _1662_recOwned;
+                      isErased = _1663_recErased;
+                      readIdents = _1664_recIdents;
                     }
                   }
                 } else if (_source59.is_Passthrough) {
-                  Dafny.ISequence<Dafny.Rune> _1650___mcc_h726 = _source59.dtor_Passthrough_a0;
+                  Dafny.ISequence<Dafny.Rune> _1665___mcc_h728 = _source59.dtor_Passthrough_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1651_recursiveGen;
-                    bool _1652_recOwned;
-                    bool _1653_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1654_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1088;
-                    bool _out1089;
-                    bool _out1090;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1091;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1088, out _out1089, out _out1090, out _out1091);
-                    _1651_recursiveGen = _out1088;
-                    _1652_recOwned = _out1089;
-                    _1653_recErased = _out1090;
-                    _1654_recIdents = _out1091;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1651_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1652_recOwned;
-                    isErased = _1653_recErased;
-                    readIdents = _1654_recIdents;
-                  }
-                } else {
-                  Dafny.ISequence<Dafny.Rune> _1655___mcc_h728 = _source59.dtor_TypeArg_a0;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1656_recursiveGen;
-                    bool _1657_recOwned;
-                    bool _1658_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1659_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1092;
-                    bool _out1093;
-                    bool _out1094;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1095;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1092, out _out1093, out _out1094, out _out1095);
-                    _1656_recursiveGen = _out1092;
-                    _1657_recOwned = _out1093;
-                    _1658_recErased = _out1094;
-                    _1659_recIdents = _out1095;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1656_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1657_recOwned;
-                    isErased = _1658_recErased;
-                    readIdents = _1659_recIdents;
-                  }
-                }
-              }
-            } else if (_source26.is_Passthrough) {
-              Dafny.ISequence<Dafny.Rune> _1660___mcc_h730 = _source26.dtor_Passthrough_a0;
-              DAST._IType _source62 = _473___mcc_h121;
-              if (_source62.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1661___mcc_h733 = _source62.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _1662___mcc_h734 = _source62.dtor_typeArgs;
-                DAST._IResolvedType _1663___mcc_h735 = _source62.dtor_resolved;
-                DAST._IResolvedType _source63 = _1663___mcc_h735;
-                if (_source63.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1664___mcc_h739 = _source63.dtor_path;
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1665_recursiveGen;
-                    bool _1666_recOwned;
-                    bool _1667_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1668_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1666_recursiveGen;
+                    bool _1667_recOwned;
+                    bool _1668_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1669_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1096;
                     bool _out1097;
                     bool _out1098;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1099;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1096, out _out1097, out _out1098, out _out1099);
-                    _1665_recursiveGen = _out1096;
-                    _1666_recOwned = _out1097;
-                    _1667_recErased = _out1098;
-                    _1668_recIdents = _out1099;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1665_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1666_recOwned;
-                    isErased = _1667_recErased;
-                    readIdents = _1668_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1096, out _out1097, out _out1098, out _out1099);
+                    _1666_recursiveGen = _out1096;
+                    _1667_recOwned = _out1097;
+                    _1668_recErased = _out1098;
+                    _1669_recIdents = _out1099;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1666_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1667_recOwned;
+                    isErased = _1668_recErased;
+                    readIdents = _1669_recIdents;
                   }
-                } else if (_source63.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1669___mcc_h741 = _source63.dtor_path;
+                } else {
+                  Dafny.ISequence<Dafny.Rune> _1670___mcc_h730 = _source59.dtor_TypeArg_a0;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1670_recursiveGen;
-                    bool _1671_recOwned;
-                    bool _1672_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1673_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1671_recursiveGen;
+                    bool _1672_recOwned;
+                    bool _1673_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1674_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1100;
                     bool _out1101;
                     bool _out1102;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1103;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1100, out _out1101, out _out1102, out _out1103);
-                    _1670_recursiveGen = _out1100;
-                    _1671_recOwned = _out1101;
-                    _1672_recErased = _out1102;
-                    _1673_recIdents = _out1103;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1670_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1671_recOwned;
-                    isErased = _1672_recErased;
-                    readIdents = _1673_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1100, out _out1101, out _out1102, out _out1103);
+                    _1671_recursiveGen = _out1100;
+                    _1672_recOwned = _out1101;
+                    _1673_recErased = _out1102;
+                    _1674_recIdents = _out1103;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1671_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1672_recOwned;
+                    isErased = _1673_recErased;
+                    readIdents = _1674_recIdents;
+                  }
+                }
+              }
+            } else if (_source26.is_Passthrough) {
+              Dafny.ISequence<Dafny.Rune> _1675___mcc_h732 = _source26.dtor_Passthrough_a0;
+              DAST._IType _source62 = _488___mcc_h123;
+              if (_source62.is_Path) {
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1676___mcc_h735 = _source62.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _1677___mcc_h736 = _source62.dtor_typeArgs;
+                DAST._IResolvedType _1678___mcc_h737 = _source62.dtor_resolved;
+                DAST._IResolvedType _source63 = _1678___mcc_h737;
+                if (_source63.is_Datatype) {
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1679___mcc_h741 = _source63.dtor_path;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1680_recursiveGen;
+                    bool _1681_recOwned;
+                    bool _1682_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1683_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1104;
+                    bool _out1105;
+                    bool _out1106;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1107;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1104, out _out1105, out _out1106, out _out1107);
+                    _1680_recursiveGen = _out1104;
+                    _1681_recOwned = _out1105;
+                    _1682_recErased = _out1106;
+                    _1683_recIdents = _out1107;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1680_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1681_recOwned;
+                    isErased = _1682_recErased;
+                    readIdents = _1683_recIdents;
+                  }
+                } else if (_source63.is_Trait) {
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1684___mcc_h743 = _source63.dtor_path;
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1685_recursiveGen;
+                    bool _1686_recOwned;
+                    bool _1687_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1688_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1108;
+                    bool _out1109;
+                    bool _out1110;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1111;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1108, out _out1109, out _out1110, out _out1111);
+                    _1685_recursiveGen = _out1108;
+                    _1686_recOwned = _out1109;
+                    _1687_recErased = _out1110;
+                    _1688_recIdents = _out1111;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1685_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1686_recOwned;
+                    isErased = _1687_recErased;
+                    readIdents = _1688_recIdents;
                   }
                 } else {
-                  DAST._IType _1674___mcc_h743 = _source63.dtor_Newtype_a0;
-                  DAST._IType _1675_b = _1674___mcc_h743;
+                  DAST._IType _1689___mcc_h745 = _source63.dtor_Newtype_a0;
+                  DAST._IType _1690_b = _1689___mcc_h745;
                   {
-                    if (object.Equals(_466_fromTpe, _1675_b)) {
-                      Dafny.ISequence<Dafny.Rune> _1676_recursiveGen;
-                      bool _1677_recOwned;
-                      bool _1678_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1679_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1104;
-                      bool _out1105;
-                      bool _out1106;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1107;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1104, out _out1105, out _out1106, out _out1107);
-                      _1676_recursiveGen = _out1104;
-                      _1677_recOwned = _out1105;
-                      _1678_recErased = _out1106;
-                      _1679_recIdents = _out1107;
-                      Dafny.ISequence<Dafny.Rune> _1680_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out1108;
-                      _out1108 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1680_rhsType = _out1108;
-                      Dafny.ISequence<Dafny.Rune> _1681_uneraseFn;
-                      _1681_uneraseFn = ((_1677_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1680_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1681_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1676_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _1677_recOwned;
+                    if (object.Equals(_481_fromTpe, _1690_b)) {
+                      Dafny.ISequence<Dafny.Rune> _1691_recursiveGen;
+                      bool _1692_recOwned;
+                      bool _1693_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1694_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1112;
+                      bool _out1113;
+                      bool _out1114;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1115;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1112, out _out1113, out _out1114, out _out1115);
+                      _1691_recursiveGen = _out1112;
+                      _1692_recOwned = _out1113;
+                      _1693_recErased = _out1114;
+                      _1694_recIdents = _out1115;
+                      Dafny.ISequence<Dafny.Rune> _1695_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out1116;
+                      _out1116 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1695_rhsType = _out1116;
+                      Dafny.ISequence<Dafny.Rune> _1696_uneraseFn;
+                      _1696_uneraseFn = ((_1692_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1695_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1696_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1691_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _1692_recOwned;
                       isErased = false;
-                      readIdents = _1679_recIdents;
+                      readIdents = _1694_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out1109;
-                      bool _out1110;
-                      bool _out1111;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1112;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1675_b), _1675_b, _465_toTpe), @params, mustOwn, out _out1109, out _out1110, out _out1111, out _out1112);
-                      s = _out1109;
-                      isOwned = _out1110;
-                      isErased = _out1111;
-                      readIdents = _out1112;
+                      Dafny.ISequence<Dafny.Rune> _out1117;
+                      bool _out1118;
+                      bool _out1119;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1120;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1690_b), _1690_b, _480_toTpe), @params, mustOwn, out _out1117, out _out1118, out _out1119, out _out1120);
+                      s = _out1117;
+                      isOwned = _out1118;
+                      isErased = _out1119;
+                      readIdents = _out1120;
                     }
                   }
                 }
               } else if (_source62.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _1682___mcc_h745 = _source62.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1683_recursiveGen;
-                  bool _1684_recOwned;
-                  bool _1685_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1686_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1113;
-                  bool _out1114;
-                  bool _out1115;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1116;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1113, out _out1114, out _out1115, out _out1116);
-                  _1683_recursiveGen = _out1113;
-                  _1684_recOwned = _out1114;
-                  _1685_recErased = _out1115;
-                  _1686_recIdents = _out1116;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1683_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1684_recOwned;
-                  isErased = _1685_recErased;
-                  readIdents = _1686_recIdents;
-                }
-              } else if (_source62.is_Array) {
-                DAST._IType _1687___mcc_h747 = _source62.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1688_recursiveGen;
-                  bool _1689_recOwned;
-                  bool _1690_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1691_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1117;
-                  bool _out1118;
-                  bool _out1119;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1120;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1117, out _out1118, out _out1119, out _out1120);
-                  _1688_recursiveGen = _out1117;
-                  _1689_recOwned = _out1118;
-                  _1690_recErased = _out1119;
-                  _1691_recIdents = _out1120;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1688_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1689_recOwned;
-                  isErased = _1690_recErased;
-                  readIdents = _1691_recIdents;
-                }
-              } else if (_source62.is_Seq) {
-                DAST._IType _1692___mcc_h749 = _source62.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1693_recursiveGen;
-                  bool _1694_recOwned;
-                  bool _1695_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1696_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1121;
-                  bool _out1122;
-                  bool _out1123;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1124;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1121, out _out1122, out _out1123, out _out1124);
-                  _1693_recursiveGen = _out1121;
-                  _1694_recOwned = _out1122;
-                  _1695_recErased = _out1123;
-                  _1696_recIdents = _out1124;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1693_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1694_recOwned;
-                  isErased = _1695_recErased;
-                  readIdents = _1696_recIdents;
-                }
-              } else if (_source62.is_Set) {
-                DAST._IType _1697___mcc_h751 = _source62.dtor_element;
+                Dafny.ISequence<DAST._IType> _1697___mcc_h747 = _source62.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _1698_recursiveGen;
                   bool _1699_recOwned;
                   bool _1700_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1701_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1125;
-                  bool _out1126;
-                  bool _out1127;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1128;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1125, out _out1126, out _out1127, out _out1128);
-                  _1698_recursiveGen = _out1125;
-                  _1699_recOwned = _out1126;
-                  _1700_recErased = _out1127;
-                  _1701_recIdents = _out1128;
+                  Dafny.ISequence<Dafny.Rune> _out1121;
+                  bool _out1122;
+                  bool _out1123;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1124;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1121, out _out1122, out _out1123, out _out1124);
+                  _1698_recursiveGen = _out1121;
+                  _1699_recOwned = _out1122;
+                  _1700_recErased = _out1123;
+                  _1701_recIdents = _out1124;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1698_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1699_recOwned;
                   isErased = _1700_recErased;
                   readIdents = _1701_recIdents;
                 }
-              } else if (_source62.is_Multiset) {
-                DAST._IType _1702___mcc_h753 = _source62.dtor_element;
+              } else if (_source62.is_Array) {
+                DAST._IType _1702___mcc_h749 = _source62.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _1703_recursiveGen;
                   bool _1704_recOwned;
                   bool _1705_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1706_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1129;
-                  bool _out1130;
-                  bool _out1131;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1132;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1129, out _out1130, out _out1131, out _out1132);
-                  _1703_recursiveGen = _out1129;
-                  _1704_recOwned = _out1130;
-                  _1705_recErased = _out1131;
-                  _1706_recIdents = _out1132;
+                  Dafny.ISequence<Dafny.Rune> _out1125;
+                  bool _out1126;
+                  bool _out1127;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1128;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1125, out _out1126, out _out1127, out _out1128);
+                  _1703_recursiveGen = _out1125;
+                  _1704_recOwned = _out1126;
+                  _1705_recErased = _out1127;
+                  _1706_recIdents = _out1128;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1703_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1704_recOwned;
                   isErased = _1705_recErased;
                   readIdents = _1706_recIdents;
                 }
-              } else if (_source62.is_Map) {
-                DAST._IType _1707___mcc_h755 = _source62.dtor_key;
-                DAST._IType _1708___mcc_h756 = _source62.dtor_value;
+              } else if (_source62.is_Seq) {
+                DAST._IType _1707___mcc_h751 = _source62.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1709_recursiveGen;
-                  bool _1710_recOwned;
-                  bool _1711_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1712_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1708_recursiveGen;
+                  bool _1709_recOwned;
+                  bool _1710_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1711_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1129;
+                  bool _out1130;
+                  bool _out1131;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1132;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1129, out _out1130, out _out1131, out _out1132);
+                  _1708_recursiveGen = _out1129;
+                  _1709_recOwned = _out1130;
+                  _1710_recErased = _out1131;
+                  _1711_recIdents = _out1132;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1708_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1709_recOwned;
+                  isErased = _1710_recErased;
+                  readIdents = _1711_recIdents;
+                }
+              } else if (_source62.is_Set) {
+                DAST._IType _1712___mcc_h753 = _source62.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1713_recursiveGen;
+                  bool _1714_recOwned;
+                  bool _1715_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1716_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out1133;
                   bool _out1134;
                   bool _out1135;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1136;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1133, out _out1134, out _out1135, out _out1136);
-                  _1709_recursiveGen = _out1133;
-                  _1710_recOwned = _out1134;
-                  _1711_recErased = _out1135;
-                  _1712_recIdents = _out1136;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1709_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1710_recOwned;
-                  isErased = _1711_recErased;
-                  readIdents = _1712_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1133, out _out1134, out _out1135, out _out1136);
+                  _1713_recursiveGen = _out1133;
+                  _1714_recOwned = _out1134;
+                  _1715_recErased = _out1135;
+                  _1716_recIdents = _out1136;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1713_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1714_recOwned;
+                  isErased = _1715_recErased;
+                  readIdents = _1716_recIdents;
                 }
-              } else if (_source62.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _1713___mcc_h759 = _source62.dtor_args;
-                DAST._IType _1714___mcc_h760 = _source62.dtor_result;
+              } else if (_source62.is_Multiset) {
+                DAST._IType _1717___mcc_h755 = _source62.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1715_recursiveGen;
-                  bool _1716_recOwned;
-                  bool _1717_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1718_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1718_recursiveGen;
+                  bool _1719_recOwned;
+                  bool _1720_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1721_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out1137;
                   bool _out1138;
                   bool _out1139;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1140;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1137, out _out1138, out _out1139, out _out1140);
-                  _1715_recursiveGen = _out1137;
-                  _1716_recOwned = _out1138;
-                  _1717_recErased = _out1139;
-                  _1718_recIdents = _out1140;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1715_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1716_recOwned;
-                  isErased = _1717_recErased;
-                  readIdents = _1718_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1137, out _out1138, out _out1139, out _out1140);
+                  _1718_recursiveGen = _out1137;
+                  _1719_recOwned = _out1138;
+                  _1720_recErased = _out1139;
+                  _1721_recIdents = _out1140;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1718_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1719_recOwned;
+                  isErased = _1720_recErased;
+                  readIdents = _1721_recIdents;
+                }
+              } else if (_source62.is_Map) {
+                DAST._IType _1722___mcc_h757 = _source62.dtor_key;
+                DAST._IType _1723___mcc_h758 = _source62.dtor_value;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1724_recursiveGen;
+                  bool _1725_recOwned;
+                  bool _1726_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1727_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1141;
+                  bool _out1142;
+                  bool _out1143;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1144;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1141, out _out1142, out _out1143, out _out1144);
+                  _1724_recursiveGen = _out1141;
+                  _1725_recOwned = _out1142;
+                  _1726_recErased = _out1143;
+                  _1727_recIdents = _out1144;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1724_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1725_recOwned;
+                  isErased = _1726_recErased;
+                  readIdents = _1727_recIdents;
+                }
+              } else if (_source62.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1728___mcc_h761 = _source62.dtor_args;
+                DAST._IType _1729___mcc_h762 = _source62.dtor_result;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1730_recursiveGen;
+                  bool _1731_recOwned;
+                  bool _1732_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1733_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1145;
+                  bool _out1146;
+                  bool _out1147;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1148;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1145, out _out1146, out _out1147, out _out1148);
+                  _1730_recursiveGen = _out1145;
+                  _1731_recOwned = _out1146;
+                  _1732_recErased = _out1147;
+                  _1733_recIdents = _out1148;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1730_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1731_recOwned;
+                  isErased = _1732_recErased;
+                  readIdents = _1733_recIdents;
                 }
               } else if (_source62.is_Primitive) {
-                DAST._IPrimitive _1719___mcc_h763 = _source62.dtor_Primitive_a0;
-                DAST._IPrimitive _source64 = _1719___mcc_h763;
+                DAST._IPrimitive _1734___mcc_h765 = _source62.dtor_Primitive_a0;
+                DAST._IPrimitive _source64 = _1734___mcc_h765;
                 if (_source64.is_Int) {
                   {
-                    Dafny.ISequence<Dafny.Rune> _1720_rhsType;
-                    Dafny.ISequence<Dafny.Rune> _out1141;
-                    _out1141 = DCOMP.COMP.GenType(_466_fromTpe, true, false);
-                    _1720_rhsType = _out1141;
-                    Dafny.ISequence<Dafny.Rune> _1721_recursiveGen;
-                    bool _1722___v47;
-                    bool _1723___v48;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1724_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1142;
-                    bool _out1143;
-                    bool _out1144;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1145;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out1142, out _out1143, out _out1144, out _out1145);
-                    _1721_recursiveGen = _out1142;
-                    _1722___v47 = _out1143;
-                    _1723___v48 = _out1144;
-                    _1724_recIdents = _out1145;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::from("), _1721_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                    isOwned = true;
-                    isErased = true;
-                    readIdents = _1724_recIdents;
-                  }
-                } else if (_source64.is_Real) {
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1725_recursiveGen;
-                    bool _1726_recOwned;
-                    bool _1727_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1728_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1146;
-                    bool _out1147;
-                    bool _out1148;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1149;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1146, out _out1147, out _out1148, out _out1149);
-                    _1725_recursiveGen = _out1146;
-                    _1726_recOwned = _out1147;
-                    _1727_recErased = _out1148;
-                    _1728_recIdents = _out1149;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1725_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1726_recOwned;
-                    isErased = _1727_recErased;
-                    readIdents = _1728_recIdents;
-                  }
-                } else if (_source64.is_String) {
-                  {
-                    Dafny.ISequence<Dafny.Rune> _1729_recursiveGen;
-                    bool _1730_recOwned;
-                    bool _1731_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1732_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1735_rhsType;
+                    Dafny.ISequence<Dafny.Rune> _out1149;
+                    _out1149 = DCOMP.COMP.GenType(_481_fromTpe, true, false);
+                    _1735_rhsType = _out1149;
+                    Dafny.ISequence<Dafny.Rune> _1736_recursiveGen;
+                    bool _1737___v48;
+                    bool _1738___v49;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1739_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1150;
                     bool _out1151;
                     bool _out1152;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1153;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1150, out _out1151, out _out1152, out _out1153);
-                    _1729_recursiveGen = _out1150;
-                    _1730_recOwned = _out1151;
-                    _1731_recErased = _out1152;
-                    _1732_recIdents = _out1153;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1729_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1730_recOwned;
-                    isErased = _1731_recErased;
-                    readIdents = _1732_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out1150, out _out1151, out _out1152, out _out1153);
+                    _1736_recursiveGen = _out1150;
+                    _1737___v48 = _out1151;
+                    _1738___v49 = _out1152;
+                    _1739_recIdents = _out1153;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::from("), _1736_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                    isOwned = true;
+                    isErased = true;
+                    readIdents = _1739_recIdents;
                   }
-                } else if (_source64.is_Bool) {
+                } else if (_source64.is_Real) {
                   {
-                    Dafny.ISequence<Dafny.Rune> _1733_recursiveGen;
-                    bool _1734_recOwned;
-                    bool _1735_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1736_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1740_recursiveGen;
+                    bool _1741_recOwned;
+                    bool _1742_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1743_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1154;
                     bool _out1155;
                     bool _out1156;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1157;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1154, out _out1155, out _out1156, out _out1157);
-                    _1733_recursiveGen = _out1154;
-                    _1734_recOwned = _out1155;
-                    _1735_recErased = _out1156;
-                    _1736_recIdents = _out1157;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1733_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1734_recOwned;
-                    isErased = _1735_recErased;
-                    readIdents = _1736_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1154, out _out1155, out _out1156, out _out1157);
+                    _1740_recursiveGen = _out1154;
+                    _1741_recOwned = _out1155;
+                    _1742_recErased = _out1156;
+                    _1743_recIdents = _out1157;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1740_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1741_recOwned;
+                    isErased = _1742_recErased;
+                    readIdents = _1743_recIdents;
                   }
-                } else {
+                } else if (_source64.is_String) {
                   {
-                    Dafny.ISequence<Dafny.Rune> _1737_recursiveGen;
-                    bool _1738_recOwned;
-                    bool _1739_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1740_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1744_recursiveGen;
+                    bool _1745_recOwned;
+                    bool _1746_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1747_recIdents;
                     Dafny.ISequence<Dafny.Rune> _out1158;
                     bool _out1159;
                     bool _out1160;
                     Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1161;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1158, out _out1159, out _out1160, out _out1161);
-                    _1737_recursiveGen = _out1158;
-                    _1738_recOwned = _out1159;
-                    _1739_recErased = _out1160;
-                    _1740_recIdents = _out1161;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1737_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1738_recOwned;
-                    isErased = _1739_recErased;
-                    readIdents = _1740_recIdents;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1158, out _out1159, out _out1160, out _out1161);
+                    _1744_recursiveGen = _out1158;
+                    _1745_recOwned = _out1159;
+                    _1746_recErased = _out1160;
+                    _1747_recIdents = _out1161;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1744_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1745_recOwned;
+                    isErased = _1746_recErased;
+                    readIdents = _1747_recIdents;
+                  }
+                } else if (_source64.is_Bool) {
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1748_recursiveGen;
+                    bool _1749_recOwned;
+                    bool _1750_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1751_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1162;
+                    bool _out1163;
+                    bool _out1164;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1165;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1162, out _out1163, out _out1164, out _out1165);
+                    _1748_recursiveGen = _out1162;
+                    _1749_recOwned = _out1163;
+                    _1750_recErased = _out1164;
+                    _1751_recIdents = _out1165;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1748_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1749_recOwned;
+                    isErased = _1750_recErased;
+                    readIdents = _1751_recIdents;
+                  }
+                } else {
+                  {
+                    Dafny.ISequence<Dafny.Rune> _1752_recursiveGen;
+                    bool _1753_recOwned;
+                    bool _1754_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1755_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1166;
+                    bool _out1167;
+                    bool _out1168;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1169;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1166, out _out1167, out _out1168, out _out1169);
+                    _1752_recursiveGen = _out1166;
+                    _1753_recOwned = _out1167;
+                    _1754_recErased = _out1168;
+                    _1755_recIdents = _out1169;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1752_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1753_recOwned;
+                    isErased = _1754_recErased;
+                    readIdents = _1755_recIdents;
                   }
                 }
               } else if (_source62.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1741___mcc_h765 = _source62.dtor_Passthrough_a0;
+                Dafny.ISequence<Dafny.Rune> _1756___mcc_h767 = _source62.dtor_Passthrough_a0;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1742_recursiveGen;
-                  bool _1743___v55;
-                  bool _1744___v56;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1745_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1162;
-                  bool _out1163;
-                  bool _out1164;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1165;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, true, out _out1162, out _out1163, out _out1164, out _out1165);
-                  _1742_recursiveGen = _out1162;
-                  _1743___v55 = _out1163;
-                  _1744___v56 = _out1164;
-                  _1745_recIdents = _out1165;
-                  Dafny.ISequence<Dafny.Rune> _1746_toTpeGen;
-                  Dafny.ISequence<Dafny.Rune> _out1166;
-                  _out1166 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                  _1746_toTpeGen = _out1166;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(("), _1742_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(") as ")), _1746_toTpeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                  Dafny.ISequence<Dafny.Rune> _1757_recursiveGen;
+                  bool _1758___v56;
+                  bool _1759___v57;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1760_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1170;
+                  bool _out1171;
+                  bool _out1172;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1173;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, true, out _out1170, out _out1171, out _out1172, out _out1173);
+                  _1757_recursiveGen = _out1170;
+                  _1758___v56 = _out1171;
+                  _1759___v57 = _out1172;
+                  _1760_recIdents = _out1173;
+                  Dafny.ISequence<Dafny.Rune> _1761_toTpeGen;
+                  Dafny.ISequence<Dafny.Rune> _out1174;
+                  _out1174 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                  _1761_toTpeGen = _out1174;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(("), _1757_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(") as ")), _1761_toTpeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
                   isOwned = true;
                   isErased = true;
-                  readIdents = _1745_recIdents;
+                  readIdents = _1760_recIdents;
                 }
               } else {
-                Dafny.ISequence<Dafny.Rune> _1747___mcc_h767 = _source62.dtor_TypeArg_a0;
+                Dafny.ISequence<Dafny.Rune> _1762___mcc_h769 = _source62.dtor_TypeArg_a0;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1748_recursiveGen;
-                  bool _1749_recOwned;
-                  bool _1750_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1751_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1167;
-                  bool _out1168;
-                  bool _out1169;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1170;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1167, out _out1168, out _out1169, out _out1170);
-                  _1748_recursiveGen = _out1167;
-                  _1749_recOwned = _out1168;
-                  _1750_recErased = _out1169;
-                  _1751_recIdents = _out1170;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1748_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1749_recOwned;
-                  isErased = _1750_recErased;
-                  readIdents = _1751_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1763_recursiveGen;
+                  bool _1764_recOwned;
+                  bool _1765_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1766_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1175;
+                  bool _out1176;
+                  bool _out1177;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1178;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1175, out _out1176, out _out1177, out _out1178);
+                  _1763_recursiveGen = _out1175;
+                  _1764_recOwned = _out1176;
+                  _1765_recErased = _out1177;
+                  _1766_recIdents = _out1178;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1763_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1764_recOwned;
+                  isErased = _1765_recErased;
+                  readIdents = _1766_recIdents;
                 }
               }
             } else {
-              Dafny.ISequence<Dafny.Rune> _1752___mcc_h769 = _source26.dtor_TypeArg_a0;
-              DAST._IType _source65 = _473___mcc_h121;
+              Dafny.ISequence<Dafny.Rune> _1767___mcc_h771 = _source26.dtor_TypeArg_a0;
+              DAST._IType _source65 = _488___mcc_h123;
               if (_source65.is_Path) {
-                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1753___mcc_h772 = _source65.dtor_Path_a0;
-                Dafny.ISequence<DAST._IType> _1754___mcc_h773 = _source65.dtor_typeArgs;
-                DAST._IResolvedType _1755___mcc_h774 = _source65.dtor_resolved;
-                DAST._IResolvedType _source66 = _1755___mcc_h774;
+                Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1768___mcc_h774 = _source65.dtor_Path_a0;
+                Dafny.ISequence<DAST._IType> _1769___mcc_h775 = _source65.dtor_typeArgs;
+                DAST._IResolvedType _1770___mcc_h776 = _source65.dtor_resolved;
+                DAST._IResolvedType _source66 = _1770___mcc_h776;
                 if (_source66.is_Datatype) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1756___mcc_h778 = _source66.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1771___mcc_h780 = _source66.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1757_recursiveGen;
-                    bool _1758_recOwned;
-                    bool _1759_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1760_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1171;
-                    bool _out1172;
-                    bool _out1173;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1174;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1171, out _out1172, out _out1173, out _out1174);
-                    _1757_recursiveGen = _out1171;
-                    _1758_recOwned = _out1172;
-                    _1759_recErased = _out1173;
-                    _1760_recIdents = _out1174;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1757_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1758_recOwned;
-                    isErased = _1759_recErased;
-                    readIdents = _1760_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1772_recursiveGen;
+                    bool _1773_recOwned;
+                    bool _1774_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1775_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1179;
+                    bool _out1180;
+                    bool _out1181;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1182;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1179, out _out1180, out _out1181, out _out1182);
+                    _1772_recursiveGen = _out1179;
+                    _1773_recOwned = _out1180;
+                    _1774_recErased = _out1181;
+                    _1775_recIdents = _out1182;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1772_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1773_recOwned;
+                    isErased = _1774_recErased;
+                    readIdents = _1775_recIdents;
                   }
                 } else if (_source66.is_Trait) {
-                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1761___mcc_h780 = _source66.dtor_path;
+                  Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1776___mcc_h782 = _source66.dtor_path;
                   {
-                    Dafny.ISequence<Dafny.Rune> _1762_recursiveGen;
-                    bool _1763_recOwned;
-                    bool _1764_recErased;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1765_recIdents;
-                    Dafny.ISequence<Dafny.Rune> _out1175;
-                    bool _out1176;
-                    bool _out1177;
-                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1178;
-                    DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1175, out _out1176, out _out1177, out _out1178);
-                    _1762_recursiveGen = _out1175;
-                    _1763_recOwned = _out1176;
-                    _1764_recErased = _out1177;
-                    _1765_recIdents = _out1178;
-                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1762_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                    isOwned = _1763_recOwned;
-                    isErased = _1764_recErased;
-                    readIdents = _1765_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _1777_recursiveGen;
+                    bool _1778_recOwned;
+                    bool _1779_recErased;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1780_recIdents;
+                    Dafny.ISequence<Dafny.Rune> _out1183;
+                    bool _out1184;
+                    bool _out1185;
+                    Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1186;
+                    DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1183, out _out1184, out _out1185, out _out1186);
+                    _1777_recursiveGen = _out1183;
+                    _1778_recOwned = _out1184;
+                    _1779_recErased = _out1185;
+                    _1780_recIdents = _out1186;
+                    s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1777_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                    isOwned = _1778_recOwned;
+                    isErased = _1779_recErased;
+                    readIdents = _1780_recIdents;
                   }
                 } else {
-                  DAST._IType _1766___mcc_h782 = _source66.dtor_Newtype_a0;
-                  DAST._IType _1767_b = _1766___mcc_h782;
+                  DAST._IType _1781___mcc_h784 = _source66.dtor_Newtype_a0;
+                  DAST._IType _1782_b = _1781___mcc_h784;
                   {
-                    if (object.Equals(_466_fromTpe, _1767_b)) {
-                      Dafny.ISequence<Dafny.Rune> _1768_recursiveGen;
-                      bool _1769_recOwned;
-                      bool _1770_recErased;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1771_recIdents;
-                      Dafny.ISequence<Dafny.Rune> _out1179;
-                      bool _out1180;
-                      bool _out1181;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1182;
-                      DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1179, out _out1180, out _out1181, out _out1182);
-                      _1768_recursiveGen = _out1179;
-                      _1769_recOwned = _out1180;
-                      _1770_recErased = _out1181;
-                      _1771_recIdents = _out1182;
-                      Dafny.ISequence<Dafny.Rune> _1772_rhsType;
-                      Dafny.ISequence<Dafny.Rune> _out1183;
-                      _out1183 = DCOMP.COMP.GenType(_465_toTpe, true, false);
-                      _1772_rhsType = _out1183;
-                      Dafny.ISequence<Dafny.Rune> _1773_uneraseFn;
-                      _1773_uneraseFn = ((_1769_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1772_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1773_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1768_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-                      isOwned = _1769_recOwned;
+                    if (object.Equals(_481_fromTpe, _1782_b)) {
+                      Dafny.ISequence<Dafny.Rune> _1783_recursiveGen;
+                      bool _1784_recOwned;
+                      bool _1785_recErased;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1786_recIdents;
+                      Dafny.ISequence<Dafny.Rune> _out1187;
+                      bool _out1188;
+                      bool _out1189;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1190;
+                      DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1187, out _out1188, out _out1189, out _out1190);
+                      _1783_recursiveGen = _out1187;
+                      _1784_recOwned = _out1188;
+                      _1785_recErased = _out1189;
+                      _1786_recIdents = _out1190;
+                      Dafny.ISequence<Dafny.Rune> _1787_rhsType;
+                      Dafny.ISequence<Dafny.Rune> _out1191;
+                      _out1191 = DCOMP.COMP.GenType(_480_toTpe, true, false);
+                      _1787_rhsType = _out1191;
+                      Dafny.ISequence<Dafny.Rune> _1788_uneraseFn;
+                      _1788_uneraseFn = ((_1784_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+                      s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _1787_rhsType), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as ::dafny_runtime::DafnyUnerasable<_>>::")), _1788_uneraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1783_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+                      isOwned = _1784_recOwned;
                       isErased = false;
-                      readIdents = _1771_recIdents;
+                      readIdents = _1786_recIdents;
                     } else {
-                      Dafny.ISequence<Dafny.Rune> _out1184;
-                      bool _out1185;
-                      bool _out1186;
-                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1187;
-                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_467_expr, _466_fromTpe, _1767_b), _1767_b, _465_toTpe), @params, mustOwn, out _out1184, out _out1185, out _out1186, out _out1187);
-                      s = _out1184;
-                      isOwned = _out1185;
-                      isErased = _out1186;
-                      readIdents = _out1187;
+                      Dafny.ISequence<Dafny.Rune> _out1192;
+                      bool _out1193;
+                      bool _out1194;
+                      Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1195;
+                      DCOMP.COMP.GenExpr(DAST.Expression.create_Convert(DAST.Expression.create_Convert(_482_expr, _481_fromTpe, _1782_b), _1782_b, _480_toTpe), @params, mustOwn, out _out1192, out _out1193, out _out1194, out _out1195);
+                      s = _out1192;
+                      isOwned = _out1193;
+                      isErased = _out1194;
+                      readIdents = _out1195;
                     }
                   }
                 }
               } else if (_source65.is_Tuple) {
-                Dafny.ISequence<DAST._IType> _1774___mcc_h784 = _source65.dtor_Tuple_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1775_recursiveGen;
-                  bool _1776_recOwned;
-                  bool _1777_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1778_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1188;
-                  bool _out1189;
-                  bool _out1190;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1191;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1188, out _out1189, out _out1190, out _out1191);
-                  _1775_recursiveGen = _out1188;
-                  _1776_recOwned = _out1189;
-                  _1777_recErased = _out1190;
-                  _1778_recIdents = _out1191;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1775_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1776_recOwned;
-                  isErased = _1777_recErased;
-                  readIdents = _1778_recIdents;
-                }
-              } else if (_source65.is_Array) {
-                DAST._IType _1779___mcc_h786 = _source65.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1780_recursiveGen;
-                  bool _1781_recOwned;
-                  bool _1782_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1783_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1192;
-                  bool _out1193;
-                  bool _out1194;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1195;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1192, out _out1193, out _out1194, out _out1195);
-                  _1780_recursiveGen = _out1192;
-                  _1781_recOwned = _out1193;
-                  _1782_recErased = _out1194;
-                  _1783_recIdents = _out1195;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1780_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1781_recOwned;
-                  isErased = _1782_recErased;
-                  readIdents = _1783_recIdents;
-                }
-              } else if (_source65.is_Seq) {
-                DAST._IType _1784___mcc_h788 = _source65.dtor_element;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1785_recursiveGen;
-                  bool _1786_recOwned;
-                  bool _1787_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1788_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1196;
-                  bool _out1197;
-                  bool _out1198;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1199;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1196, out _out1197, out _out1198, out _out1199);
-                  _1785_recursiveGen = _out1196;
-                  _1786_recOwned = _out1197;
-                  _1787_recErased = _out1198;
-                  _1788_recIdents = _out1199;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1785_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1786_recOwned;
-                  isErased = _1787_recErased;
-                  readIdents = _1788_recIdents;
-                }
-              } else if (_source65.is_Set) {
-                DAST._IType _1789___mcc_h790 = _source65.dtor_element;
+                Dafny.ISequence<DAST._IType> _1789___mcc_h786 = _source65.dtor_Tuple_a0;
                 {
                   Dafny.ISequence<Dafny.Rune> _1790_recursiveGen;
                   bool _1791_recOwned;
                   bool _1792_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1793_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1200;
-                  bool _out1201;
-                  bool _out1202;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1203;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1200, out _out1201, out _out1202, out _out1203);
-                  _1790_recursiveGen = _out1200;
-                  _1791_recOwned = _out1201;
-                  _1792_recErased = _out1202;
-                  _1793_recIdents = _out1203;
+                  Dafny.ISequence<Dafny.Rune> _out1196;
+                  bool _out1197;
+                  bool _out1198;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1199;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1196, out _out1197, out _out1198, out _out1199);
+                  _1790_recursiveGen = _out1196;
+                  _1791_recOwned = _out1197;
+                  _1792_recErased = _out1198;
+                  _1793_recIdents = _out1199;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1790_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1791_recOwned;
                   isErased = _1792_recErased;
                   readIdents = _1793_recIdents;
                 }
-              } else if (_source65.is_Multiset) {
-                DAST._IType _1794___mcc_h792 = _source65.dtor_element;
+              } else if (_source65.is_Array) {
+                DAST._IType _1794___mcc_h788 = _source65.dtor_element;
                 {
                   Dafny.ISequence<Dafny.Rune> _1795_recursiveGen;
                   bool _1796_recOwned;
                   bool _1797_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1798_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1204;
-                  bool _out1205;
-                  bool _out1206;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1207;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1204, out _out1205, out _out1206, out _out1207);
-                  _1795_recursiveGen = _out1204;
-                  _1796_recOwned = _out1205;
-                  _1797_recErased = _out1206;
-                  _1798_recIdents = _out1207;
+                  Dafny.ISequence<Dafny.Rune> _out1200;
+                  bool _out1201;
+                  bool _out1202;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1203;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1200, out _out1201, out _out1202, out _out1203);
+                  _1795_recursiveGen = _out1200;
+                  _1796_recOwned = _out1201;
+                  _1797_recErased = _out1202;
+                  _1798_recIdents = _out1203;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1795_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1796_recOwned;
                   isErased = _1797_recErased;
                   readIdents = _1798_recIdents;
                 }
-              } else if (_source65.is_Map) {
-                DAST._IType _1799___mcc_h794 = _source65.dtor_key;
-                DAST._IType _1800___mcc_h795 = _source65.dtor_value;
+              } else if (_source65.is_Seq) {
+                DAST._IType _1799___mcc_h790 = _source65.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1801_recursiveGen;
-                  bool _1802_recOwned;
-                  bool _1803_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1804_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1800_recursiveGen;
+                  bool _1801_recOwned;
+                  bool _1802_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1803_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1204;
+                  bool _out1205;
+                  bool _out1206;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1207;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1204, out _out1205, out _out1206, out _out1207);
+                  _1800_recursiveGen = _out1204;
+                  _1801_recOwned = _out1205;
+                  _1802_recErased = _out1206;
+                  _1803_recIdents = _out1207;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1800_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1801_recOwned;
+                  isErased = _1802_recErased;
+                  readIdents = _1803_recIdents;
+                }
+              } else if (_source65.is_Set) {
+                DAST._IType _1804___mcc_h792 = _source65.dtor_element;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1805_recursiveGen;
+                  bool _1806_recOwned;
+                  bool _1807_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1808_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out1208;
                   bool _out1209;
                   bool _out1210;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1211;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1208, out _out1209, out _out1210, out _out1211);
-                  _1801_recursiveGen = _out1208;
-                  _1802_recOwned = _out1209;
-                  _1803_recErased = _out1210;
-                  _1804_recIdents = _out1211;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1801_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1802_recOwned;
-                  isErased = _1803_recErased;
-                  readIdents = _1804_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1208, out _out1209, out _out1210, out _out1211);
+                  _1805_recursiveGen = _out1208;
+                  _1806_recOwned = _out1209;
+                  _1807_recErased = _out1210;
+                  _1808_recIdents = _out1211;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1805_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1806_recOwned;
+                  isErased = _1807_recErased;
+                  readIdents = _1808_recIdents;
                 }
-              } else if (_source65.is_Arrow) {
-                Dafny.ISequence<DAST._IType> _1805___mcc_h798 = _source65.dtor_args;
-                DAST._IType _1806___mcc_h799 = _source65.dtor_result;
+              } else if (_source65.is_Multiset) {
+                DAST._IType _1809___mcc_h794 = _source65.dtor_element;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1807_recursiveGen;
-                  bool _1808_recOwned;
-                  bool _1809_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1810_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1810_recursiveGen;
+                  bool _1811_recOwned;
+                  bool _1812_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1813_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out1212;
                   bool _out1213;
                   bool _out1214;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1215;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1212, out _out1213, out _out1214, out _out1215);
-                  _1807_recursiveGen = _out1212;
-                  _1808_recOwned = _out1213;
-                  _1809_recErased = _out1214;
-                  _1810_recIdents = _out1215;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1807_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1808_recOwned;
-                  isErased = _1809_recErased;
-                  readIdents = _1810_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1212, out _out1213, out _out1214, out _out1215);
+                  _1810_recursiveGen = _out1212;
+                  _1811_recOwned = _out1213;
+                  _1812_recErased = _out1214;
+                  _1813_recIdents = _out1215;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1810_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1811_recOwned;
+                  isErased = _1812_recErased;
+                  readIdents = _1813_recIdents;
                 }
-              } else if (_source65.is_Primitive) {
-                DAST._IPrimitive _1811___mcc_h802 = _source65.dtor_Primitive_a0;
+              } else if (_source65.is_Map) {
+                DAST._IType _1814___mcc_h796 = _source65.dtor_key;
+                DAST._IType _1815___mcc_h797 = _source65.dtor_value;
                 {
-                  Dafny.ISequence<Dafny.Rune> _1812_recursiveGen;
-                  bool _1813_recOwned;
-                  bool _1814_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1815_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _1816_recursiveGen;
+                  bool _1817_recOwned;
+                  bool _1818_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1819_recIdents;
                   Dafny.ISequence<Dafny.Rune> _out1216;
                   bool _out1217;
                   bool _out1218;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1219;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1216, out _out1217, out _out1218, out _out1219);
-                  _1812_recursiveGen = _out1216;
-                  _1813_recOwned = _out1217;
-                  _1814_recErased = _out1218;
-                  _1815_recIdents = _out1219;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1812_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1813_recOwned;
-                  isErased = _1814_recErased;
-                  readIdents = _1815_recIdents;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1216, out _out1217, out _out1218, out _out1219);
+                  _1816_recursiveGen = _out1216;
+                  _1817_recOwned = _out1217;
+                  _1818_recErased = _out1218;
+                  _1819_recIdents = _out1219;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1816_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1817_recOwned;
+                  isErased = _1818_recErased;
+                  readIdents = _1819_recIdents;
                 }
-              } else if (_source65.is_Passthrough) {
-                Dafny.ISequence<Dafny.Rune> _1816___mcc_h804 = _source65.dtor_Passthrough_a0;
-                {
-                  Dafny.ISequence<Dafny.Rune> _1817_recursiveGen;
-                  bool _1818_recOwned;
-                  bool _1819_recErased;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1820_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1220;
-                  bool _out1221;
-                  bool _out1222;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1223;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1220, out _out1221, out _out1222, out _out1223);
-                  _1817_recursiveGen = _out1220;
-                  _1818_recOwned = _out1221;
-                  _1819_recErased = _out1222;
-                  _1820_recIdents = _out1223;
-                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1817_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
-                  isOwned = _1818_recOwned;
-                  isErased = _1819_recErased;
-                  readIdents = _1820_recIdents;
-                }
-              } else {
-                Dafny.ISequence<Dafny.Rune> _1821___mcc_h806 = _source65.dtor_TypeArg_a0;
+              } else if (_source65.is_Arrow) {
+                Dafny.ISequence<DAST._IType> _1820___mcc_h800 = _source65.dtor_args;
+                DAST._IType _1821___mcc_h801 = _source65.dtor_result;
                 {
                   Dafny.ISequence<Dafny.Rune> _1822_recursiveGen;
                   bool _1823_recOwned;
                   bool _1824_recErased;
                   Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1825_recIdents;
-                  Dafny.ISequence<Dafny.Rune> _out1224;
-                  bool _out1225;
-                  bool _out1226;
-                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1227;
-                  DCOMP.COMP.GenExpr(_467_expr, @params, mustOwn, out _out1224, out _out1225, out _out1226, out _out1227);
-                  _1822_recursiveGen = _out1224;
-                  _1823_recOwned = _out1225;
-                  _1824_recErased = _out1226;
-                  _1825_recIdents = _out1227;
+                  Dafny.ISequence<Dafny.Rune> _out1220;
+                  bool _out1221;
+                  bool _out1222;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1223;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1220, out _out1221, out _out1222, out _out1223);
+                  _1822_recursiveGen = _out1220;
+                  _1823_recOwned = _out1221;
+                  _1824_recErased = _out1222;
+                  _1825_recIdents = _out1223;
                   s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1822_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
                   isOwned = _1823_recOwned;
                   isErased = _1824_recErased;
                   readIdents = _1825_recIdents;
+                }
+              } else if (_source65.is_Primitive) {
+                DAST._IPrimitive _1826___mcc_h804 = _source65.dtor_Primitive_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1827_recursiveGen;
+                  bool _1828_recOwned;
+                  bool _1829_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1830_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1224;
+                  bool _out1225;
+                  bool _out1226;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1227;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1224, out _out1225, out _out1226, out _out1227);
+                  _1827_recursiveGen = _out1224;
+                  _1828_recOwned = _out1225;
+                  _1829_recErased = _out1226;
+                  _1830_recIdents = _out1227;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1827_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1828_recOwned;
+                  isErased = _1829_recErased;
+                  readIdents = _1830_recIdents;
+                }
+              } else if (_source65.is_Passthrough) {
+                Dafny.ISequence<Dafny.Rune> _1831___mcc_h806 = _source65.dtor_Passthrough_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1832_recursiveGen;
+                  bool _1833_recOwned;
+                  bool _1834_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1835_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1228;
+                  bool _out1229;
+                  bool _out1230;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1231;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1228, out _out1229, out _out1230, out _out1231);
+                  _1832_recursiveGen = _out1228;
+                  _1833_recOwned = _out1229;
+                  _1834_recErased = _out1230;
+                  _1835_recIdents = _out1231;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1832_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1833_recOwned;
+                  isErased = _1834_recErased;
+                  readIdents = _1835_recIdents;
+                }
+              } else {
+                Dafny.ISequence<Dafny.Rune> _1836___mcc_h808 = _source65.dtor_TypeArg_a0;
+                {
+                  Dafny.ISequence<Dafny.Rune> _1837_recursiveGen;
+                  bool _1838_recOwned;
+                  bool _1839_recErased;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1840_recIdents;
+                  Dafny.ISequence<Dafny.Rune> _out1232;
+                  bool _out1233;
+                  bool _out1234;
+                  Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1235;
+                  DCOMP.COMP.GenExpr(_482_expr, @params, mustOwn, out _out1232, out _out1233, out _out1234, out _out1235);
+                  _1837_recursiveGen = _out1232;
+                  _1838_recOwned = _out1233;
+                  _1839_recErased = _out1234;
+                  _1840_recIdents = _out1235;
+                  s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1837_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/* conversion not yet implemented */)"));
+                  isOwned = _1838_recOwned;
+                  isErased = _1839_recErased;
+                  readIdents = _1840_recIdents;
                 }
               }
             }
           }
         }
       } else if (_source19.is_SeqValue) {
-        Dafny.ISequence<DAST._IExpression> _1826___mcc_h22 = _source19.dtor_elements;
-        Dafny.ISequence<DAST._IExpression> _1827_exprs = _1826___mcc_h22;
+        Dafny.ISequence<DAST._IExpression> _1841___mcc_h22 = _source19.dtor_elements;
+        Dafny.ISequence<DAST._IExpression> _1842_exprs = _1841___mcc_h22;
         {
-          Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>> _1828_generatedValues;
-          _1828_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements();
+          Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>> _1843_generatedValues;
+          _1843_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements();
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _1829_i;
-          _1829_i = BigInteger.Zero;
-          bool _1830_allErased;
-          _1830_allErased = true;
-          while ((_1829_i) < (new BigInteger((_1827_exprs).Count))) {
-            Dafny.ISequence<Dafny.Rune> _1831_recursiveGen;
-            bool _1832___v58;
-            bool _1833_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1834_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out1228;
-            bool _out1229;
-            bool _out1230;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1231;
-            DCOMP.COMP.GenExpr((_1827_exprs).Select(_1829_i), @params, true, out _out1228, out _out1229, out _out1230, out _out1231);
-            _1831_recursiveGen = _out1228;
-            _1832___v58 = _out1229;
-            _1833_isErased = _out1230;
-            _1834_recIdents = _out1231;
-            _1830_allErased = (_1830_allErased) && (_1833_isErased);
-            _1828_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.Concat(_1828_generatedValues, Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements(_System.Tuple2<Dafny.ISequence<Dafny.Rune>, bool>.create(_1831_recursiveGen, _1833_isErased)));
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1834_recIdents);
-            _1829_i = (_1829_i) + (BigInteger.One);
+          BigInteger _1844_i;
+          _1844_i = BigInteger.Zero;
+          bool _1845_allErased;
+          _1845_allErased = true;
+          while ((_1844_i) < (new BigInteger((_1842_exprs).Count))) {
+            Dafny.ISequence<Dafny.Rune> _1846_recursiveGen;
+            bool _1847___v59;
+            bool _1848_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1849_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out1236;
+            bool _out1237;
+            bool _out1238;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1239;
+            DCOMP.COMP.GenExpr((_1842_exprs).Select(_1844_i), @params, true, out _out1236, out _out1237, out _out1238, out _out1239);
+            _1846_recursiveGen = _out1236;
+            _1847___v59 = _out1237;
+            _1848_isErased = _out1238;
+            _1849_recIdents = _out1239;
+            _1845_allErased = (_1845_allErased) && (_1848_isErased);
+            _1843_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.Concat(_1843_generatedValues, Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements(_System.Tuple2<Dafny.ISequence<Dafny.Rune>, bool>.create(_1846_recursiveGen, _1848_isErased)));
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1849_recIdents);
+            _1844_i = (_1844_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("vec![");
-          _1829_i = BigInteger.Zero;
-          while ((_1829_i) < (new BigInteger((_1828_generatedValues).Count))) {
-            if ((_1829_i).Sign == 1) {
+          _1844_i = BigInteger.Zero;
+          while ((_1844_i) < (new BigInteger((_1843_generatedValues).Count))) {
+            if ((_1844_i).Sign == 1) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _1835_gen;
-            _1835_gen = ((_1828_generatedValues).Select(_1829_i)).dtor__0;
-            if ((((_1828_generatedValues).Select(_1829_i)).dtor__1) && (!(_1830_allErased))) {
-              _1835_gen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _1835_gen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            Dafny.ISequence<Dafny.Rune> _1850_gen;
+            _1850_gen = ((_1843_generatedValues).Select(_1844_i)).dtor__0;
+            if ((((_1843_generatedValues).Select(_1844_i)).dtor__1) && (!(_1845_allErased))) {
+              _1850_gen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _1850_gen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _1835_gen);
-            _1829_i = (_1829_i) + (BigInteger.One);
+            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _1850_gen);
+            _1844_i = (_1844_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("]"));
           isOwned = true;
-          isErased = _1830_allErased;
+          isErased = _1845_allErased;
         }
       } else if (_source19.is_SetValue) {
-        Dafny.ISequence<DAST._IExpression> _1836___mcc_h23 = _source19.dtor_elements;
-        Dafny.ISequence<DAST._IExpression> _1837_exprs = _1836___mcc_h23;
+        Dafny.ISequence<DAST._IExpression> _1851___mcc_h23 = _source19.dtor_elements;
+        Dafny.ISequence<DAST._IExpression> _1852_exprs = _1851___mcc_h23;
         {
-          Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>> _1838_generatedValues;
-          _1838_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements();
+          Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>> _1853_generatedValues;
+          _1853_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements();
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _1839_i;
-          _1839_i = BigInteger.Zero;
-          bool _1840_allErased;
-          _1840_allErased = true;
-          while ((_1839_i) < (new BigInteger((_1837_exprs).Count))) {
-            Dafny.ISequence<Dafny.Rune> _1841_recursiveGen;
-            bool _1842___v59;
-            bool _1843_isErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1844_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out1232;
-            bool _out1233;
-            bool _out1234;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1235;
-            DCOMP.COMP.GenExpr((_1837_exprs).Select(_1839_i), @params, true, out _out1232, out _out1233, out _out1234, out _out1235);
-            _1841_recursiveGen = _out1232;
-            _1842___v59 = _out1233;
-            _1843_isErased = _out1234;
-            _1844_recIdents = _out1235;
-            _1840_allErased = (_1840_allErased) && (_1843_isErased);
-            _1838_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.Concat(_1838_generatedValues, Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements(_System.Tuple2<Dafny.ISequence<Dafny.Rune>, bool>.create(_1841_recursiveGen, _1843_isErased)));
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1844_recIdents);
-            _1839_i = (_1839_i) + (BigInteger.One);
+          BigInteger _1854_i;
+          _1854_i = BigInteger.Zero;
+          bool _1855_allErased;
+          _1855_allErased = true;
+          while ((_1854_i) < (new BigInteger((_1852_exprs).Count))) {
+            Dafny.ISequence<Dafny.Rune> _1856_recursiveGen;
+            bool _1857___v60;
+            bool _1858_isErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1859_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out1240;
+            bool _out1241;
+            bool _out1242;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1243;
+            DCOMP.COMP.GenExpr((_1852_exprs).Select(_1854_i), @params, true, out _out1240, out _out1241, out _out1242, out _out1243);
+            _1856_recursiveGen = _out1240;
+            _1857___v60 = _out1241;
+            _1858_isErased = _out1242;
+            _1859_recIdents = _out1243;
+            _1855_allErased = (_1855_allErased) && (_1858_isErased);
+            _1853_generatedValues = Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.Concat(_1853_generatedValues, Dafny.Sequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, bool>>.FromElements(_System.Tuple2<Dafny.ISequence<Dafny.Rune>, bool>.create(_1856_recursiveGen, _1858_isErased)));
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1859_recIdents);
+            _1854_i = (_1854_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("vec![");
-          _1839_i = BigInteger.Zero;
-          while ((_1839_i) < (new BigInteger((_1838_generatedValues).Count))) {
-            if ((_1839_i).Sign == 1) {
+          _1854_i = BigInteger.Zero;
+          while ((_1854_i) < (new BigInteger((_1853_generatedValues).Count))) {
+            if ((_1854_i).Sign == 1) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _1845_gen;
-            _1845_gen = ((_1838_generatedValues).Select(_1839_i)).dtor__0;
-            if ((((_1838_generatedValues).Select(_1839_i)).dtor__1) && (!(_1840_allErased))) {
-              _1845_gen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _1845_gen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            Dafny.ISequence<Dafny.Rune> _1860_gen;
+            _1860_gen = ((_1853_generatedValues).Select(_1854_i)).dtor__0;
+            if ((((_1853_generatedValues).Select(_1854_i)).dtor__1) && (!(_1855_allErased))) {
+              _1860_gen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::unerase_owned("), _1860_gen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _1845_gen);
-            _1839_i = (_1839_i) + (BigInteger.One);
+            s = Dafny.Sequence<Dafny.Rune>.Concat(s, _1860_gen);
+            _1854_i = (_1854_i) + (BigInteger.One);
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("].into_iter().collect::<std::collections::HashSet<_>>()"));
           isOwned = true;
@@ -11935,240 +12090,242 @@ namespace DCOMP {
           isErased = false;
         }
       } else if (_source19.is_Ite) {
-        DAST._IExpression _1846___mcc_h24 = _source19.dtor_cond;
-        DAST._IExpression _1847___mcc_h25 = _source19.dtor_thn;
-        DAST._IExpression _1848___mcc_h26 = _source19.dtor_els;
-        DAST._IExpression _1849_f = _1848___mcc_h26;
-        DAST._IExpression _1850_t = _1847___mcc_h25;
-        DAST._IExpression _1851_cond = _1846___mcc_h24;
+        DAST._IExpression _1861___mcc_h24 = _source19.dtor_cond;
+        DAST._IExpression _1862___mcc_h25 = _source19.dtor_thn;
+        DAST._IExpression _1863___mcc_h26 = _source19.dtor_els;
+        DAST._IExpression _1864_f = _1863___mcc_h26;
+        DAST._IExpression _1865_t = _1862___mcc_h25;
+        DAST._IExpression _1866_cond = _1861___mcc_h24;
         {
-          Dafny.ISequence<Dafny.Rune> _1852_condString;
-          bool _1853___v60;
-          bool _1854_condErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1855_recIdentsCond;
-          Dafny.ISequence<Dafny.Rune> _out1236;
-          bool _out1237;
-          bool _out1238;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1239;
-          DCOMP.COMP.GenExpr(_1851_cond, @params, true, out _out1236, out _out1237, out _out1238, out _out1239);
-          _1852_condString = _out1236;
-          _1853___v60 = _out1237;
-          _1854_condErased = _out1238;
-          _1855_recIdentsCond = _out1239;
-          if (!(_1854_condErased)) {
-            _1852_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1852_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          Dafny.ISequence<Dafny.Rune> _1856___v61;
-          bool _1857_tHasToBeOwned;
-          bool _1858___v62;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1859___v63;
-          Dafny.ISequence<Dafny.Rune> _out1240;
-          bool _out1241;
-          bool _out1242;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1243;
-          DCOMP.COMP.GenExpr(_1850_t, @params, mustOwn, out _out1240, out _out1241, out _out1242, out _out1243);
-          _1856___v61 = _out1240;
-          _1857_tHasToBeOwned = _out1241;
-          _1858___v62 = _out1242;
-          _1859___v63 = _out1243;
-          Dafny.ISequence<Dafny.Rune> _1860_fString;
-          bool _1861_fOwned;
-          bool _1862_fErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1863_recIdentsF;
+          Dafny.ISequence<Dafny.Rune> _1867_condString;
+          bool _1868___v61;
+          bool _1869_condErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1870_recIdentsCond;
           Dafny.ISequence<Dafny.Rune> _out1244;
           bool _out1245;
           bool _out1246;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1247;
-          DCOMP.COMP.GenExpr(_1849_f, @params, _1857_tHasToBeOwned, out _out1244, out _out1245, out _out1246, out _out1247);
-          _1860_fString = _out1244;
-          _1861_fOwned = _out1245;
-          _1862_fErased = _out1246;
-          _1863_recIdentsF = _out1247;
-          Dafny.ISequence<Dafny.Rune> _1864_tString;
-          bool _1865___v64;
-          bool _1866_tErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1867_recIdentsT;
+          DCOMP.COMP.GenExpr(_1866_cond, @params, true, out _out1244, out _out1245, out _out1246, out _out1247);
+          _1867_condString = _out1244;
+          _1868___v61 = _out1245;
+          _1869_condErased = _out1246;
+          _1870_recIdentsCond = _out1247;
+          if (!(_1869_condErased)) {
+            _1867_condString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1867_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          Dafny.ISequence<Dafny.Rune> _1871___v62;
+          bool _1872_tHasToBeOwned;
+          bool _1873___v63;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1874___v64;
           Dafny.ISequence<Dafny.Rune> _out1248;
           bool _out1249;
           bool _out1250;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1251;
-          DCOMP.COMP.GenExpr(_1850_t, @params, _1861_fOwned, out _out1248, out _out1249, out _out1250, out _out1251);
-          _1864_tString = _out1248;
-          _1865___v64 = _out1249;
-          _1866_tErased = _out1250;
-          _1867_recIdentsT = _out1251;
-          if ((!(_1862_fErased)) || (!(_1866_tErased))) {
-            if (_1862_fErased) {
-              _1860_fString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1860_fString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          DCOMP.COMP.GenExpr(_1865_t, @params, mustOwn, out _out1248, out _out1249, out _out1250, out _out1251);
+          _1871___v62 = _out1248;
+          _1872_tHasToBeOwned = _out1249;
+          _1873___v63 = _out1250;
+          _1874___v64 = _out1251;
+          Dafny.ISequence<Dafny.Rune> _1875_fString;
+          bool _1876_fOwned;
+          bool _1877_fErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1878_recIdentsF;
+          Dafny.ISequence<Dafny.Rune> _out1252;
+          bool _out1253;
+          bool _out1254;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1255;
+          DCOMP.COMP.GenExpr(_1864_f, @params, _1872_tHasToBeOwned, out _out1252, out _out1253, out _out1254, out _out1255);
+          _1875_fString = _out1252;
+          _1876_fOwned = _out1253;
+          _1877_fErased = _out1254;
+          _1878_recIdentsF = _out1255;
+          Dafny.ISequence<Dafny.Rune> _1879_tString;
+          bool _1880___v65;
+          bool _1881_tErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1882_recIdentsT;
+          Dafny.ISequence<Dafny.Rune> _out1256;
+          bool _out1257;
+          bool _out1258;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1259;
+          DCOMP.COMP.GenExpr(_1865_t, @params, _1876_fOwned, out _out1256, out _out1257, out _out1258, out _out1259);
+          _1879_tString = _out1256;
+          _1880___v65 = _out1257;
+          _1881_tErased = _out1258;
+          _1882_recIdentsT = _out1259;
+          if ((!(_1877_fErased)) || (!(_1881_tErased))) {
+            if (_1877_fErased) {
+              _1875_fString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1875_fString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            if (_1866_tErased) {
-              _1864_tString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1864_tString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            if (_1881_tErased) {
+              _1879_tString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1879_tString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
           }
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(if "), _1852_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _1864_tString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n} else {\n")), _1860_fString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n})"));
-          isOwned = _1861_fOwned;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_1855_recIdentsCond, _1867_recIdentsT), _1863_recIdentsF);
-          isErased = (_1862_fErased) || (_1866_tErased);
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(if "), _1867_condString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _1879_tString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n} else {\n")), _1875_fString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n})"));
+          isOwned = _1876_fOwned;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_1870_recIdentsCond, _1882_recIdentsT), _1878_recIdentsF);
+          isErased = (_1877_fErased) || (_1881_tErased);
         }
       } else if (_source19.is_UnOp) {
-        DAST._IUnaryOp _1868___mcc_h27 = _source19.dtor_unOp;
-        DAST._IExpression _1869___mcc_h28 = _source19.dtor_expr;
-        DAST._IUnaryOp _source67 = _1868___mcc_h27;
+        DAST._IUnaryOp _1883___mcc_h27 = _source19.dtor_unOp;
+        DAST._IExpression _1884___mcc_h28 = _source19.dtor_expr;
+        DAST._IUnaryOp _source67 = _1883___mcc_h27;
         if (_source67.is_Not) {
-          DAST._IExpression _1870_e = _1869___mcc_h28;
+          DAST._IExpression _1885_e = _1884___mcc_h28;
           {
-            Dafny.ISequence<Dafny.Rune> _1871_recursiveGen;
-            bool _1872___v65;
-            bool _1873_recErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1874_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out1252;
-            bool _out1253;
-            bool _out1254;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1255;
-            DCOMP.COMP.GenExpr(_1870_e, @params, true, out _out1252, out _out1253, out _out1254, out _out1255);
-            _1871_recursiveGen = _out1252;
-            _1872___v65 = _out1253;
-            _1873_recErased = _out1254;
-            _1874_recIdents = _out1255;
-            if (!(_1873_recErased)) {
-              _1871_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1871_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-            }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("!("), _1871_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-            isOwned = true;
-            readIdents = _1874_recIdents;
-            isErased = true;
-          }
-        } else if (_source67.is_BitwiseNot) {
-          DAST._IExpression _1875_e = _1869___mcc_h28;
-          {
-            Dafny.ISequence<Dafny.Rune> _1876_recursiveGen;
-            bool _1877___v66;
-            bool _1878_recErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1879_recIdents;
-            Dafny.ISequence<Dafny.Rune> _out1256;
-            bool _out1257;
-            bool _out1258;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1259;
-            DCOMP.COMP.GenExpr(_1875_e, @params, true, out _out1256, out _out1257, out _out1258, out _out1259);
-            _1876_recursiveGen = _out1256;
-            _1877___v66 = _out1257;
-            _1878_recErased = _out1258;
-            _1879_recIdents = _out1259;
-            if (!(_1878_recErased)) {
-              _1876_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1876_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-            }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("~("), _1876_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-            isOwned = true;
-            readIdents = _1879_recIdents;
-            isErased = true;
-          }
-        } else {
-          DAST._IExpression _1880_e = _1869___mcc_h28;
-          {
-            Dafny.ISequence<Dafny.Rune> _1881_recursiveGen;
-            bool _1882___v67;
-            bool _1883_recErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1884_recIdents;
+            Dafny.ISequence<Dafny.Rune> _1886_recursiveGen;
+            bool _1887___v66;
+            bool _1888_recErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1889_recIdents;
             Dafny.ISequence<Dafny.Rune> _out1260;
             bool _out1261;
             bool _out1262;
             Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1263;
-            DCOMP.COMP.GenExpr(_1880_e, @params, false, out _out1260, out _out1261, out _out1262, out _out1263);
-            _1881_recursiveGen = _out1260;
-            _1882___v67 = _out1261;
-            _1883_recErased = _out1262;
-            _1884_recIdents = _out1263;
-            if (!(_1883_recErased)) {
-              _1881_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1881_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            DCOMP.COMP.GenExpr(_1885_e, @params, true, out _out1260, out _out1261, out _out1262, out _out1263);
+            _1886_recursiveGen = _out1260;
+            _1887___v66 = _out1261;
+            _1888_recErased = _out1262;
+            _1889_recIdents = _out1263;
+            if (!(_1888_recErased)) {
+              _1886_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1886_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1881_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").len()"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("!("), _1886_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
             isOwned = true;
-            readIdents = _1884_recIdents;
+            readIdents = _1889_recIdents;
+            isErased = true;
+          }
+        } else if (_source67.is_BitwiseNot) {
+          DAST._IExpression _1890_e = _1884___mcc_h28;
+          {
+            Dafny.ISequence<Dafny.Rune> _1891_recursiveGen;
+            bool _1892___v67;
+            bool _1893_recErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1894_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out1264;
+            bool _out1265;
+            bool _out1266;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1267;
+            DCOMP.COMP.GenExpr(_1890_e, @params, true, out _out1264, out _out1265, out _out1266, out _out1267);
+            _1891_recursiveGen = _out1264;
+            _1892___v67 = _out1265;
+            _1893_recErased = _out1266;
+            _1894_recIdents = _out1267;
+            if (!(_1893_recErased)) {
+              _1891_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1891_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            }
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("~("), _1891_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            isOwned = true;
+            readIdents = _1894_recIdents;
+            isErased = true;
+          }
+        } else {
+          DAST._IExpression _1895_e = _1884___mcc_h28;
+          {
+            Dafny.ISequence<Dafny.Rune> _1896_recursiveGen;
+            bool _1897_recOwned;
+            bool _1898_recErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1899_recIdents;
+            Dafny.ISequence<Dafny.Rune> _out1268;
+            bool _out1269;
+            bool _out1270;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1271;
+            DCOMP.COMP.GenExpr(_1895_e, @params, false, out _out1268, out _out1269, out _out1270, out _out1271);
+            _1896_recursiveGen = _out1268;
+            _1897_recOwned = _out1269;
+            _1898_recErased = _out1270;
+            _1899_recIdents = _out1271;
+            if (!(_1898_recErased)) {
+              Dafny.ISequence<Dafny.Rune> _1900_eraseFn;
+              _1900_eraseFn = ((_1897_recOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+              _1896_recursiveGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _1900_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1896_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+            }
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::BigInt::from(("), _1896_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").len())"));
+            isOwned = true;
+            readIdents = _1899_recIdents;
             isErased = true;
           }
         }
       } else if (_source19.is_BinOp) {
-        Dafny.ISequence<Dafny.Rune> _1885___mcc_h29 = _source19.dtor_op;
-        DAST._IExpression _1886___mcc_h30 = _source19.dtor_left;
-        DAST._IExpression _1887___mcc_h31 = _source19.dtor_right;
-        DAST._IExpression _1888_r = _1887___mcc_h31;
-        DAST._IExpression _1889_l = _1886___mcc_h30;
-        Dafny.ISequence<Dafny.Rune> _1890_op = _1885___mcc_h29;
+        Dafny.ISequence<Dafny.Rune> _1901___mcc_h29 = _source19.dtor_op;
+        DAST._IExpression _1902___mcc_h30 = _source19.dtor_left;
+        DAST._IExpression _1903___mcc_h31 = _source19.dtor_right;
+        DAST._IExpression _1904_r = _1903___mcc_h31;
+        DAST._IExpression _1905_l = _1902___mcc_h30;
+        Dafny.ISequence<Dafny.Rune> _1906_op = _1901___mcc_h29;
         {
-          Dafny.ISequence<Dafny.Rune> _1891_left;
-          bool _1892___v68;
-          bool _1893_leftErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1894_recIdentsL;
-          Dafny.ISequence<Dafny.Rune> _out1264;
-          bool _out1265;
-          bool _out1266;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1267;
-          DCOMP.COMP.GenExpr(_1889_l, @params, true, out _out1264, out _out1265, out _out1266, out _out1267);
-          _1891_left = _out1264;
-          _1892___v68 = _out1265;
-          _1893_leftErased = _out1266;
-          _1894_recIdentsL = _out1267;
-          Dafny.ISequence<Dafny.Rune> _1895_right;
-          bool _1896___v69;
-          bool _1897_rightErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1898_recIdentsR;
-          Dafny.ISequence<Dafny.Rune> _out1268;
-          bool _out1269;
-          bool _out1270;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1271;
-          DCOMP.COMP.GenExpr(_1888_r, @params, true, out _out1268, out _out1269, out _out1270, out _out1271);
-          _1895_right = _out1268;
-          _1896___v69 = _out1269;
-          _1897_rightErased = _out1270;
-          _1898_recIdentsR = _out1271;
-          if (!(_1893_leftErased)) {
-            _1891_left = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1891_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          if (!(_1897_rightErased)) {
-            _1895_right = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1895_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          if ((_1890_op).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/"))) {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::euclidian_division("), _1891_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", ")), _1895_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          } else if ((_1890_op).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("%"))) {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::euclidian_modulo("), _1891_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", ")), _1895_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          } else {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1891_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ")), _1890_op), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ")), _1895_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
-          }
-          isOwned = true;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_1894_recIdentsL, _1898_recIdentsR);
-          isErased = true;
-        }
-      } else if (_source19.is_Select) {
-        DAST._IExpression _1899___mcc_h32 = _source19.dtor_expr;
-        Dafny.ISequence<Dafny.Rune> _1900___mcc_h33 = _source19.dtor_field;
-        bool _1901___mcc_h34 = _source19.dtor_isConstant;
-        bool _1902___mcc_h35 = _source19.dtor_onDatatype;
-        bool _1903_isDatatype = _1902___mcc_h35;
-        bool _1904_isConstant = _1901___mcc_h34;
-        Dafny.ISequence<Dafny.Rune> _1905_field = _1900___mcc_h33;
-        DAST._IExpression _1906_on = _1899___mcc_h32;
-        {
-          Dafny.ISequence<Dafny.Rune> _1907_onString;
-          bool _1908_onOwned;
-          bool _1909_onErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1910_recIdents;
+          Dafny.ISequence<Dafny.Rune> _1907_left;
+          bool _1908___v68;
+          bool _1909_leftErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1910_recIdentsL;
           Dafny.ISequence<Dafny.Rune> _out1272;
           bool _out1273;
           bool _out1274;
           Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1275;
-          DCOMP.COMP.GenExpr(_1906_on, @params, false, out _out1272, out _out1273, out _out1274, out _out1275);
-          _1907_onString = _out1272;
-          _1908_onOwned = _out1273;
-          _1909_onErased = _out1274;
-          _1910_recIdents = _out1275;
-          if (!(_1909_onErased)) {
-            Dafny.ISequence<Dafny.Rune> _1911_eraseFn;
-            _1911_eraseFn = ((_1908_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
-            _1907_onString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _1911_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1907_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          DCOMP.COMP.GenExpr(_1905_l, @params, true, out _out1272, out _out1273, out _out1274, out _out1275);
+          _1907_left = _out1272;
+          _1908___v68 = _out1273;
+          _1909_leftErased = _out1274;
+          _1910_recIdentsL = _out1275;
+          Dafny.ISequence<Dafny.Rune> _1911_right;
+          bool _1912___v69;
+          bool _1913_rightErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1914_recIdentsR;
+          Dafny.ISequence<Dafny.Rune> _out1276;
+          bool _out1277;
+          bool _out1278;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1279;
+          DCOMP.COMP.GenExpr(_1904_r, @params, true, out _out1276, out _out1277, out _out1278, out _out1279);
+          _1911_right = _out1276;
+          _1912___v69 = _out1277;
+          _1913_rightErased = _out1278;
+          _1914_recIdentsR = _out1279;
+          if (!(_1909_leftErased)) {
+            _1907_left = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1907_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           }
-          if ((_1903_isDatatype) || (_1904_isConstant)) {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1907_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".r#")), _1905_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("()"));
-            if (_1904_isConstant) {
+          if (!(_1913_rightErased)) {
+            _1911_right = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1911_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          if ((_1906_op).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("/"))) {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::euclidian_division("), _1907_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", ")), _1911_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          } else if ((_1906_op).Equals(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("%"))) {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::euclidian_modulo("), _1907_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", ")), _1911_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          } else {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1907_left), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ")), _1906_op), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" ")), _1911_right), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          isOwned = true;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_1910_recIdentsL, _1914_recIdentsR);
+          isErased = true;
+        }
+      } else if (_source19.is_Select) {
+        DAST._IExpression _1915___mcc_h32 = _source19.dtor_expr;
+        Dafny.ISequence<Dafny.Rune> _1916___mcc_h33 = _source19.dtor_field;
+        bool _1917___mcc_h34 = _source19.dtor_isConstant;
+        bool _1918___mcc_h35 = _source19.dtor_onDatatype;
+        bool _1919_isDatatype = _1918___mcc_h35;
+        bool _1920_isConstant = _1917___mcc_h34;
+        Dafny.ISequence<Dafny.Rune> _1921_field = _1916___mcc_h33;
+        DAST._IExpression _1922_on = _1915___mcc_h32;
+        {
+          Dafny.ISequence<Dafny.Rune> _1923_onString;
+          bool _1924_onOwned;
+          bool _1925_onErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1926_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1280;
+          bool _out1281;
+          bool _out1282;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1283;
+          DCOMP.COMP.GenExpr(_1922_on, @params, false, out _out1280, out _out1281, out _out1282, out _out1283);
+          _1923_onString = _out1280;
+          _1924_onOwned = _out1281;
+          _1925_onErased = _out1282;
+          _1926_recIdents = _out1283;
+          if (!(_1925_onErased)) {
+            Dafny.ISequence<Dafny.Rune> _1927_eraseFn;
+            _1927_eraseFn = ((_1924_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+            _1923_onString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _1927_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1923_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          if ((_1919_isDatatype) || (_1920_isConstant)) {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1923_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".r#")), _1921_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("()"));
+            if (_1920_isConstant) {
               s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), s);
             }
             if (mustOwn) {
@@ -12178,84 +12335,134 @@ namespace DCOMP {
               isOwned = false;
             }
           } else {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::ops::Deref::deref(&(("), _1907_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".r#")), _1905_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow()))"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::ops::Deref::deref(&(("), _1923_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".r#")), _1921_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".borrow()))"));
             s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").clone()"));
             isOwned = true;
           }
           isErased = false;
-          readIdents = _1910_recIdents;
+          readIdents = _1926_recIdents;
         }
       } else if (_source19.is_SelectFn) {
-        DAST._IExpression _1912___mcc_h36 = _source19.dtor_expr;
-        Dafny.ISequence<Dafny.Rune> _1913___mcc_h37 = _source19.dtor_field;
-        bool _1914___mcc_h38 = _source19.dtor_onDatatype;
-        bool _1915___mcc_h39 = _source19.dtor_isStatic;
-        BigInteger _1916___mcc_h40 = _source19.dtor_arity;
-        BigInteger _1917_arity = _1916___mcc_h40;
-        bool _1918_isStatic = _1915___mcc_h39;
-        bool _1919_isDatatype = _1914___mcc_h38;
-        Dafny.ISequence<Dafny.Rune> _1920_field = _1913___mcc_h37;
-        DAST._IExpression _1921_on = _1912___mcc_h36;
+        DAST._IExpression _1928___mcc_h36 = _source19.dtor_expr;
+        Dafny.ISequence<Dafny.Rune> _1929___mcc_h37 = _source19.dtor_field;
+        bool _1930___mcc_h38 = _source19.dtor_onDatatype;
+        bool _1931___mcc_h39 = _source19.dtor_isStatic;
+        BigInteger _1932___mcc_h40 = _source19.dtor_arity;
+        BigInteger _1933_arity = _1932___mcc_h40;
+        bool _1934_isStatic = _1931___mcc_h39;
+        bool _1935_isDatatype = _1930___mcc_h38;
+        Dafny.ISequence<Dafny.Rune> _1936_field = _1929___mcc_h37;
+        DAST._IExpression _1937_on = _1928___mcc_h36;
         {
-          Dafny.ISequence<Dafny.Rune> _1922_onString;
-          bool _1923_onOwned;
-          bool _1924___v70;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1925_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1276;
-          bool _out1277;
-          bool _out1278;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1279;
-          DCOMP.COMP.GenExpr(_1921_on, @params, false, out _out1276, out _out1277, out _out1278, out _out1279);
-          _1922_onString = _out1276;
-          _1923_onOwned = _out1277;
-          _1924___v70 = _out1278;
-          _1925_recIdents = _out1279;
-          if (_1918_isStatic) {
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1922_onString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::")), _1920_field);
+          Dafny.ISequence<Dafny.Rune> _1938_onString;
+          bool _1939_onOwned;
+          bool _1940___v70;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1941_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1284;
+          bool _out1285;
+          bool _out1286;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1287;
+          DCOMP.COMP.GenExpr(_1937_on, @params, false, out _out1284, out _out1285, out _out1286, out _out1287);
+          _1938_onString = _out1284;
+          _1939_onOwned = _out1285;
+          _1940___v70 = _out1286;
+          _1941_recIdents = _out1287;
+          if (_1934_isStatic) {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1938_onString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::")), _1936_field);
           } else {
             s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{\n");
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let callTarget = (")), _1922_onString), ((_1923_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").clone()")))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n"));
-            Dafny.ISequence<Dafny.Rune> _1926_args;
-            _1926_args = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-            BigInteger _1927_i;
-            _1927_i = BigInteger.Zero;
-            while ((_1927_i) < (_1917_arity)) {
-              if ((_1927_i).Sign == 1) {
-                _1926_args = Dafny.Sequence<Dafny.Rune>.Concat(_1926_args, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let callTarget = (")), _1938_onString), ((_1939_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").clone()")))), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n"));
+            Dafny.ISequence<Dafny.Rune> _1942_args;
+            _1942_args = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+            BigInteger _1943_i;
+            _1943_i = BigInteger.Zero;
+            while ((_1943_i) < (_1933_arity)) {
+              if ((_1943_i).Sign == 1) {
+                _1942_args = Dafny.Sequence<Dafny.Rune>.Concat(_1942_args, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
               }
-              _1926_args = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1926_args, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("arg")), DCOMP.__default.natToString(_1927_i));
-              _1927_i = (_1927_i) + (BigInteger.One);
+              _1942_args = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1942_args, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("arg")), DCOMP.__default.natToString(_1943_i));
+              _1943_i = (_1943_i) + (BigInteger.One);
             }
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("move |")), _1926_args), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("| {\n"));
-            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("callTarget.")), _1920_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1926_args), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")\n"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("move |")), _1942_args), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("| {\n"));
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("callTarget.")), _1936_field), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1942_args), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")\n"));
             s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("}\n"));
             s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("}"));
           }
           s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::FunctionWrapper("), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           isOwned = true;
           isErased = true;
-          readIdents = _1925_recIdents;
+          readIdents = _1941_recIdents;
+        }
+      } else if (_source19.is_Index) {
+        DAST._IExpression _1944___mcc_h41 = _source19.dtor_expr;
+        DAST._IExpression _1945___mcc_h42 = _source19.dtor_idx;
+        DAST._IExpression _1946_idx = _1945___mcc_h42;
+        DAST._IExpression _1947_on = _1944___mcc_h41;
+        {
+          Dafny.ISequence<Dafny.Rune> _1948_onString;
+          bool _1949_onOwned;
+          bool _1950_onErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1951_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1288;
+          bool _out1289;
+          bool _out1290;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1291;
+          DCOMP.COMP.GenExpr(_1947_on, @params, false, out _out1288, out _out1289, out _out1290, out _out1291);
+          _1948_onString = _out1288;
+          _1949_onOwned = _out1289;
+          _1950_onErased = _out1290;
+          _1951_recIdents = _out1291;
+          if (!(_1950_onErased)) {
+            Dafny.ISequence<Dafny.Rune> _1952_eraseFn;
+            _1952_eraseFn = ((_1949_onOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("erase")));
+            _1948_onString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::"), _1952_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1948_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          Dafny.ISequence<Dafny.Rune> _1953_idxString;
+          bool _1954___v71;
+          bool _1955_idxErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1956_recIdentsIdx;
+          Dafny.ISequence<Dafny.Rune> _out1292;
+          bool _out1293;
+          bool _out1294;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1295;
+          DCOMP.COMP.GenExpr(_1946_idx, @params, true, out _out1292, out _out1293, out _out1294, out _out1295);
+          _1953_idxString = _out1292;
+          _1954___v71 = _out1293;
+          _1955_idxErased = _out1294;
+          _1956_recIdentsIdx = _out1295;
+          if (!(_1955_idxErased)) {
+            _1953_idxString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyErasable::erase_owned("), _1953_idxString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          }
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1948_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("[<usize as ::dafny_runtime::NumCast>::from(")), _1953_idxString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").unwrap()]"));
+          if (mustOwn) {
+            s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").clone()"));
+            isOwned = true;
+          } else {
+            isOwned = false;
+          }
+          isErased = true;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(_1951_recIdents, _1956_recIdentsIdx);
         }
       } else if (_source19.is_TupleSelect) {
-        DAST._IExpression _1928___mcc_h41 = _source19.dtor_expr;
-        BigInteger _1929___mcc_h42 = _source19.dtor_index;
-        BigInteger _1930_idx = _1929___mcc_h42;
-        DAST._IExpression _1931_on = _1928___mcc_h41;
+        DAST._IExpression _1957___mcc_h43 = _source19.dtor_expr;
+        BigInteger _1958___mcc_h44 = _source19.dtor_index;
+        BigInteger _1959_idx = _1958___mcc_h44;
+        DAST._IExpression _1960_on = _1957___mcc_h43;
         {
-          Dafny.ISequence<Dafny.Rune> _1932_onString;
-          bool _1933___v71;
-          bool _1934_tupErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1935_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1280;
-          bool _out1281;
-          bool _out1282;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1283;
-          DCOMP.COMP.GenExpr(_1931_on, @params, false, out _out1280, out _out1281, out _out1282, out _out1283);
-          _1932_onString = _out1280;
-          _1933___v71 = _out1281;
-          _1934_tupErased = _out1282;
-          _1935_recIdents = _out1283;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1932_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").")), DCOMP.__default.natToString(_1930_idx));
+          Dafny.ISequence<Dafny.Rune> _1961_onString;
+          bool _1962___v72;
+          bool _1963_tupErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1964_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1296;
+          bool _out1297;
+          bool _out1298;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1299;
+          DCOMP.COMP.GenExpr(_1960_on, @params, false, out _out1296, out _out1297, out _out1298, out _out1299);
+          _1961_onString = _out1296;
+          _1962___v72 = _out1297;
+          _1963_tupErased = _out1298;
+          _1964_recIdents = _out1299;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1961_onString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").")), DCOMP.__default.natToString(_1959_idx));
           if (mustOwn) {
             s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), s), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".clone()"));
             isOwned = true;
@@ -12263,439 +12470,445 @@ namespace DCOMP {
             s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), s);
             isOwned = false;
           }
-          isErased = _1934_tupErased;
-          readIdents = _1935_recIdents;
+          isErased = _1963_tupErased;
+          readIdents = _1964_recIdents;
         }
       } else if (_source19.is_Call) {
-        DAST._IExpression _1936___mcc_h43 = _source19.dtor_on;
-        Dafny.ISequence<Dafny.Rune> _1937___mcc_h44 = _source19.dtor_name;
-        Dafny.ISequence<DAST._IType> _1938___mcc_h45 = _source19.dtor_typeArgs;
-        Dafny.ISequence<DAST._IExpression> _1939___mcc_h46 = _source19.dtor_args;
-        Dafny.ISequence<DAST._IExpression> _1940_args = _1939___mcc_h46;
-        Dafny.ISequence<DAST._IType> _1941_typeArgs = _1938___mcc_h45;
-        Dafny.ISequence<Dafny.Rune> _1942_name = _1937___mcc_h44;
-        DAST._IExpression _1943_on = _1936___mcc_h43;
+        DAST._IExpression _1965___mcc_h45 = _source19.dtor_on;
+        Dafny.ISequence<Dafny.Rune> _1966___mcc_h46 = _source19.dtor_name;
+        Dafny.ISequence<DAST._IType> _1967___mcc_h47 = _source19.dtor_typeArgs;
+        Dafny.ISequence<DAST._IExpression> _1968___mcc_h48 = _source19.dtor_args;
+        Dafny.ISequence<DAST._IExpression> _1969_args = _1968___mcc_h48;
+        Dafny.ISequence<DAST._IType> _1970_typeArgs = _1967___mcc_h47;
+        Dafny.ISequence<Dafny.Rune> _1971_name = _1966___mcc_h46;
+        DAST._IExpression _1972_on = _1965___mcc_h45;
         {
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          Dafny.ISequence<Dafny.Rune> _1944_typeArgString;
-          _1944_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          if ((new BigInteger((_1941_typeArgs).Count)) >= (BigInteger.One)) {
-            BigInteger _1945_typeI;
-            _1945_typeI = BigInteger.Zero;
-            _1944_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::<");
-            while ((_1945_typeI) < (new BigInteger((_1941_typeArgs).Count))) {
-              if ((_1945_typeI).Sign == 1) {
-                _1944_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1944_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _1973_typeArgString;
+          _1973_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          if ((new BigInteger((_1970_typeArgs).Count)) >= (BigInteger.One)) {
+            BigInteger _1974_typeI;
+            _1974_typeI = BigInteger.Zero;
+            _1973_typeArgString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::<");
+            while ((_1974_typeI) < (new BigInteger((_1970_typeArgs).Count))) {
+              if ((_1974_typeI).Sign == 1) {
+                _1973_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1973_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
               }
-              Dafny.ISequence<Dafny.Rune> _1946_typeString;
-              Dafny.ISequence<Dafny.Rune> _out1284;
-              _out1284 = DCOMP.COMP.GenType((_1941_typeArgs).Select(_1945_typeI), false, false);
-              _1946_typeString = _out1284;
-              _1944_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1944_typeArgString, _1946_typeString);
-              _1945_typeI = (_1945_typeI) + (BigInteger.One);
+              Dafny.ISequence<Dafny.Rune> _1975_typeString;
+              Dafny.ISequence<Dafny.Rune> _out1300;
+              _out1300 = DCOMP.COMP.GenType((_1970_typeArgs).Select(_1974_typeI), false, false);
+              _1975_typeString = _out1300;
+              _1973_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1973_typeArgString, _1975_typeString);
+              _1974_typeI = (_1974_typeI) + (BigInteger.One);
             }
-            _1944_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1944_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">"));
+            _1973_typeArgString = Dafny.Sequence<Dafny.Rune>.Concat(_1973_typeArgString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(">"));
           }
-          Dafny.ISequence<Dafny.Rune> _1947_argString;
-          _1947_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          BigInteger _1948_i;
-          _1948_i = BigInteger.Zero;
-          while ((_1948_i) < (new BigInteger((_1940_args).Count))) {
-            if ((_1948_i).Sign == 1) {
-              _1947_argString = Dafny.Sequence<Dafny.Rune>.Concat(_1947_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _1976_argString;
+          _1976_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          BigInteger _1977_i;
+          _1977_i = BigInteger.Zero;
+          while ((_1977_i) < (new BigInteger((_1969_args).Count))) {
+            if ((_1977_i).Sign == 1) {
+              _1976_argString = Dafny.Sequence<Dafny.Rune>.Concat(_1976_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _1949_argExpr;
-            bool _1950_isOwned;
-            bool _1951_argErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1952_argIdents;
-            Dafny.ISequence<Dafny.Rune> _out1285;
-            bool _out1286;
-            bool _out1287;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1288;
-            DCOMP.COMP.GenExpr((_1940_args).Select(_1948_i), @params, false, out _out1285, out _out1286, out _out1287, out _out1288);
-            _1949_argExpr = _out1285;
-            _1950_isOwned = _out1286;
-            _1951_argErased = _out1287;
-            _1952_argIdents = _out1288;
-            if (_1950_isOwned) {
-              _1949_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _1949_argExpr);
+            Dafny.ISequence<Dafny.Rune> _1978_argExpr;
+            bool _1979_isOwned;
+            bool _1980_argErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1981_argIdents;
+            Dafny.ISequence<Dafny.Rune> _out1301;
+            bool _out1302;
+            bool _out1303;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1304;
+            DCOMP.COMP.GenExpr((_1969_args).Select(_1977_i), @params, false, out _out1301, out _out1302, out _out1303, out _out1304);
+            _1978_argExpr = _out1301;
+            _1979_isOwned = _out1302;
+            _1980_argErased = _out1303;
+            _1981_argIdents = _out1304;
+            if (_1979_isOwned) {
+              _1978_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _1978_argExpr);
             }
-            _1947_argString = Dafny.Sequence<Dafny.Rune>.Concat(_1947_argString, _1949_argExpr);
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1952_argIdents);
-            _1948_i = (_1948_i) + (BigInteger.One);
+            _1976_argString = Dafny.Sequence<Dafny.Rune>.Concat(_1976_argString, _1978_argExpr);
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1981_argIdents);
+            _1977_i = (_1977_i) + (BigInteger.One);
           }
-          Dafny.ISequence<Dafny.Rune> _1953_enclosingString;
-          bool _1954___v72;
-          bool _1955___v73;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1956_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1289;
-          bool _out1290;
-          bool _out1291;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1292;
-          DCOMP.COMP.GenExpr(_1943_on, @params, false, out _out1289, out _out1290, out _out1291, out _out1292);
-          _1953_enclosingString = _out1289;
-          _1954___v72 = _out1290;
-          _1955___v73 = _out1291;
-          _1956_recIdents = _out1292;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1956_recIdents);
-          DAST._IExpression _source68 = _1943_on;
+          Dafny.ISequence<Dafny.Rune> _1982_enclosingString;
+          bool _1983___v73;
+          bool _1984___v74;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _1985_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1305;
+          bool _out1306;
+          bool _out1307;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1308;
+          DCOMP.COMP.GenExpr(_1972_on, @params, false, out _out1305, out _out1306, out _out1307, out _out1308);
+          _1982_enclosingString = _out1305;
+          _1983___v73 = _out1306;
+          _1984___v74 = _out1307;
+          _1985_recIdents = _out1308;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _1985_recIdents);
+          DAST._IExpression _source68 = _1972_on;
           if (_source68.is_Literal) {
-            DAST._ILiteral _1957___mcc_h808 = _source68.dtor_Literal_a0;
+            DAST._ILiteral _1986___mcc_h810 = _source68.dtor_Literal_a0;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Ident) {
-            Dafny.ISequence<Dafny.Rune> _1958___mcc_h810 = _source68.dtor_Ident_a0;
+            Dafny.ISequence<Dafny.Rune> _1987___mcc_h812 = _source68.dtor_Ident_a0;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Companion) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1959___mcc_h812 = _source68.dtor_Companion_a0;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1988___mcc_h814 = _source68.dtor_Companion_a0;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(_1953_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::"));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(_1982_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::"));
             }
           } else if (_source68.is_Tuple) {
-            Dafny.ISequence<DAST._IExpression> _1960___mcc_h814 = _source68.dtor_Tuple_a0;
+            Dafny.ISequence<DAST._IExpression> _1989___mcc_h816 = _source68.dtor_Tuple_a0;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_New) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1961___mcc_h816 = _source68.dtor_path;
-            Dafny.ISequence<DAST._IExpression> _1962___mcc_h817 = _source68.dtor_args;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1990___mcc_h818 = _source68.dtor_path;
+            Dafny.ISequence<DAST._IExpression> _1991___mcc_h819 = _source68.dtor_args;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_NewArray) {
-            Dafny.ISequence<DAST._IExpression> _1963___mcc_h820 = _source68.dtor_dims;
+            Dafny.ISequence<DAST._IExpression> _1992___mcc_h822 = _source68.dtor_dims;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_DatatypeValue) {
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1964___mcc_h822 = _source68.dtor_path;
-            Dafny.ISequence<Dafny.Rune> _1965___mcc_h823 = _source68.dtor_variant;
-            bool _1966___mcc_h824 = _source68.dtor_isCo;
-            Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _1967___mcc_h825 = _source68.dtor_contents;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _1993___mcc_h824 = _source68.dtor_path;
+            Dafny.ISequence<Dafny.Rune> _1994___mcc_h825 = _source68.dtor_variant;
+            bool _1995___mcc_h826 = _source68.dtor_isCo;
+            Dafny.ISequence<_System._ITuple2<Dafny.ISequence<Dafny.Rune>, DAST._IExpression>> _1996___mcc_h827 = _source68.dtor_contents;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Convert) {
-            DAST._IExpression _1968___mcc_h830 = _source68.dtor_value;
-            DAST._IType _1969___mcc_h831 = _source68.dtor_from;
-            DAST._IType _1970___mcc_h832 = _source68.dtor_typ;
+            DAST._IExpression _1997___mcc_h832 = _source68.dtor_value;
+            DAST._IType _1998___mcc_h833 = _source68.dtor_from;
+            DAST._IType _1999___mcc_h834 = _source68.dtor_typ;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_SeqValue) {
-            Dafny.ISequence<DAST._IExpression> _1971___mcc_h836 = _source68.dtor_elements;
+            Dafny.ISequence<DAST._IExpression> _2000___mcc_h838 = _source68.dtor_elements;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_SetValue) {
-            Dafny.ISequence<DAST._IExpression> _1972___mcc_h838 = _source68.dtor_elements;
+            Dafny.ISequence<DAST._IExpression> _2001___mcc_h840 = _source68.dtor_elements;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_This) {
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Ite) {
-            DAST._IExpression _1973___mcc_h840 = _source68.dtor_cond;
-            DAST._IExpression _1974___mcc_h841 = _source68.dtor_thn;
-            DAST._IExpression _1975___mcc_h842 = _source68.dtor_els;
+            DAST._IExpression _2002___mcc_h842 = _source68.dtor_cond;
+            DAST._IExpression _2003___mcc_h843 = _source68.dtor_thn;
+            DAST._IExpression _2004___mcc_h844 = _source68.dtor_els;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_UnOp) {
-            DAST._IUnaryOp _1976___mcc_h846 = _source68.dtor_unOp;
-            DAST._IExpression _1977___mcc_h847 = _source68.dtor_expr;
+            DAST._IUnaryOp _2005___mcc_h848 = _source68.dtor_unOp;
+            DAST._IExpression _2006___mcc_h849 = _source68.dtor_expr;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_BinOp) {
-            Dafny.ISequence<Dafny.Rune> _1978___mcc_h850 = _source68.dtor_op;
-            DAST._IExpression _1979___mcc_h851 = _source68.dtor_left;
-            DAST._IExpression _1980___mcc_h852 = _source68.dtor_right;
+            Dafny.ISequence<Dafny.Rune> _2007___mcc_h852 = _source68.dtor_op;
+            DAST._IExpression _2008___mcc_h853 = _source68.dtor_left;
+            DAST._IExpression _2009___mcc_h854 = _source68.dtor_right;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Select) {
-            DAST._IExpression _1981___mcc_h856 = _source68.dtor_expr;
-            Dafny.ISequence<Dafny.Rune> _1982___mcc_h857 = _source68.dtor_field;
-            bool _1983___mcc_h858 = _source68.dtor_isConstant;
-            bool _1984___mcc_h859 = _source68.dtor_onDatatype;
+            DAST._IExpression _2010___mcc_h858 = _source68.dtor_expr;
+            Dafny.ISequence<Dafny.Rune> _2011___mcc_h859 = _source68.dtor_field;
+            bool _2012___mcc_h860 = _source68.dtor_isConstant;
+            bool _2013___mcc_h861 = _source68.dtor_onDatatype;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_SelectFn) {
-            DAST._IExpression _1985___mcc_h864 = _source68.dtor_expr;
-            Dafny.ISequence<Dafny.Rune> _1986___mcc_h865 = _source68.dtor_field;
-            bool _1987___mcc_h866 = _source68.dtor_onDatatype;
-            bool _1988___mcc_h867 = _source68.dtor_isStatic;
-            BigInteger _1989___mcc_h868 = _source68.dtor_arity;
+            DAST._IExpression _2014___mcc_h866 = _source68.dtor_expr;
+            Dafny.ISequence<Dafny.Rune> _2015___mcc_h867 = _source68.dtor_field;
+            bool _2016___mcc_h868 = _source68.dtor_onDatatype;
+            bool _2017___mcc_h869 = _source68.dtor_isStatic;
+            BigInteger _2018___mcc_h870 = _source68.dtor_arity;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+            }
+          } else if (_source68.is_Index) {
+            DAST._IExpression _2019___mcc_h876 = _source68.dtor_expr;
+            DAST._IExpression _2020___mcc_h877 = _source68.dtor_idx;
+            {
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_TupleSelect) {
-            DAST._IExpression _1990___mcc_h874 = _source68.dtor_expr;
-            BigInteger _1991___mcc_h875 = _source68.dtor_index;
+            DAST._IExpression _2021___mcc_h880 = _source68.dtor_expr;
+            BigInteger _2022___mcc_h881 = _source68.dtor_index;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Call) {
-            DAST._IExpression _1992___mcc_h878 = _source68.dtor_on;
-            Dafny.ISequence<Dafny.Rune> _1993___mcc_h879 = _source68.dtor_name;
-            Dafny.ISequence<DAST._IType> _1994___mcc_h880 = _source68.dtor_typeArgs;
-            Dafny.ISequence<DAST._IExpression> _1995___mcc_h881 = _source68.dtor_args;
+            DAST._IExpression _2023___mcc_h884 = _source68.dtor_on;
+            Dafny.ISequence<Dafny.Rune> _2024___mcc_h885 = _source68.dtor_name;
+            Dafny.ISequence<DAST._IType> _2025___mcc_h886 = _source68.dtor_typeArgs;
+            Dafny.ISequence<DAST._IExpression> _2026___mcc_h887 = _source68.dtor_args;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Lambda) {
-            Dafny.ISequence<DAST._IFormal> _1996___mcc_h886 = _source68.dtor_params;
-            DAST._IType _1997___mcc_h887 = _source68.dtor_retType;
-            Dafny.ISequence<DAST._IStatement> _1998___mcc_h888 = _source68.dtor_body;
+            Dafny.ISequence<DAST._IFormal> _2027___mcc_h892 = _source68.dtor_params;
+            DAST._IType _2028___mcc_h893 = _source68.dtor_retType;
+            Dafny.ISequence<DAST._IStatement> _2029___mcc_h894 = _source68.dtor_body;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_IIFE) {
-            Dafny.ISequence<Dafny.Rune> _1999___mcc_h892 = _source68.dtor_name;
-            DAST._IType _2000___mcc_h893 = _source68.dtor_typ;
-            DAST._IExpression _2001___mcc_h894 = _source68.dtor_value;
-            DAST._IExpression _2002___mcc_h895 = _source68.dtor_iifeBody;
+            Dafny.ISequence<Dafny.Rune> _2030___mcc_h898 = _source68.dtor_name;
+            DAST._IType _2031___mcc_h899 = _source68.dtor_typ;
+            DAST._IExpression _2032___mcc_h900 = _source68.dtor_value;
+            DAST._IExpression _2033___mcc_h901 = _source68.dtor_iifeBody;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_Apply) {
-            DAST._IExpression _2003___mcc_h900 = _source68.dtor_expr;
-            Dafny.ISequence<DAST._IExpression> _2004___mcc_h901 = _source68.dtor_args;
+            DAST._IExpression _2034___mcc_h906 = _source68.dtor_expr;
+            Dafny.ISequence<DAST._IExpression> _2035___mcc_h907 = _source68.dtor_args;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else if (_source68.is_TypeTest) {
-            DAST._IExpression _2005___mcc_h904 = _source68.dtor_on;
-            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2006___mcc_h905 = _source68.dtor_dType;
-            Dafny.ISequence<Dafny.Rune> _2007___mcc_h906 = _source68.dtor_variant;
+            DAST._IExpression _2036___mcc_h910 = _source68.dtor_on;
+            Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2037___mcc_h911 = _source68.dtor_dType;
+            Dafny.ISequence<Dafny.Rune> _2038___mcc_h912 = _source68.dtor_variant;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           } else {
-            DAST._IType _2008___mcc_h910 = _source68.dtor_typ;
+            DAST._IType _2039___mcc_h916 = _source68.dtor_typ;
             {
-              _1953_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1953_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
+              _1982_enclosingString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("("), _1982_enclosingString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")."));
             }
           }
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1953_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), (_1942_name)), _1944_typeArgString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1947_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_1982_enclosingString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("r#")), (_1971_name)), _1973_typeArgString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _1976_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           isOwned = true;
           isErased = false;
         }
       } else if (_source19.is_Lambda) {
-        Dafny.ISequence<DAST._IFormal> _2009___mcc_h47 = _source19.dtor_params;
-        DAST._IType _2010___mcc_h48 = _source19.dtor_retType;
-        Dafny.ISequence<DAST._IStatement> _2011___mcc_h49 = _source19.dtor_body;
-        Dafny.ISequence<DAST._IStatement> _2012_body = _2011___mcc_h49;
-        DAST._IType _2013_retType = _2010___mcc_h48;
-        Dafny.ISequence<DAST._IFormal> _2014_params = _2009___mcc_h47;
+        Dafny.ISequence<DAST._IFormal> _2040___mcc_h49 = _source19.dtor_params;
+        DAST._IType _2041___mcc_h50 = _source19.dtor_retType;
+        Dafny.ISequence<DAST._IStatement> _2042___mcc_h51 = _source19.dtor_body;
+        Dafny.ISequence<DAST._IStatement> _2043_body = _2042___mcc_h51;
+        DAST._IType _2044_retType = _2041___mcc_h50;
+        Dafny.ISequence<DAST._IFormal> _2045_params = _2040___mcc_h49;
         {
-          Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2015_paramNames;
-          _2015_paramNames = Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          BigInteger _2016_i;
-          _2016_i = BigInteger.Zero;
-          while ((_2016_i) < (new BigInteger((_2014_params).Count))) {
-            _2015_paramNames = Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.Concat(_2015_paramNames, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements(((_2014_params).Select(_2016_i)).dtor_name));
-            _2016_i = (_2016_i) + (BigInteger.One);
+          Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2046_paramNames;
+          _2046_paramNames = Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements();
+          BigInteger _2047_i;
+          _2047_i = BigInteger.Zero;
+          while ((_2047_i) < (new BigInteger((_2045_params).Count))) {
+            _2046_paramNames = Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.Concat(_2046_paramNames, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements(((_2045_params).Select(_2047_i)).dtor_name));
+            _2047_i = (_2047_i) + (BigInteger.One);
           }
-          Dafny.ISequence<Dafny.Rune> _2017_recursiveGen;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2018_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1293;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1294;
-          DCOMP.COMP.GenStmts(_2012_body, _2015_paramNames, true, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""), out _out1293, out _out1294);
-          _2017_recursiveGen = _out1293;
-          _2018_recIdents = _out1294;
+          Dafny.ISequence<Dafny.Rune> _2048_recursiveGen;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2049_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1309;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1310;
+          DCOMP.COMP.GenStmts(_2043_body, _2046_paramNames, true, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(""), out _out1309, out _out1310);
+          _2048_recursiveGen = _out1309;
+          _2049_recIdents = _out1310;
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
-          Dafny.ISequence<Dafny.Rune> _2019_allReadCloned;
-          _2019_allReadCloned = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          while (!(_2018_recIdents).Equals(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements())) {
-            Dafny.ISequence<Dafny.Rune> _2020_next;
-            foreach (Dafny.ISequence<Dafny.Rune> _assign_such_that_1 in (_2018_recIdents).Elements) {
-              _2020_next = (Dafny.ISequence<Dafny.Rune>)_assign_such_that_1;
-              if ((_2018_recIdents).Contains(_2020_next)) {
+          Dafny.ISequence<Dafny.Rune> _2050_allReadCloned;
+          _2050_allReadCloned = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          while (!(_2049_recIdents).Equals(Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements())) {
+            Dafny.ISequence<Dafny.Rune> _2051_next;
+            foreach (Dafny.ISequence<Dafny.Rune> _assign_such_that_1 in (_2049_recIdents).Elements) {
+              _2051_next = (Dafny.ISequence<Dafny.Rune>)_assign_such_that_1;
+              if ((_2049_recIdents).Contains(_2051_next)) {
                 goto after__ASSIGN_SUCH_THAT_1;
               }
             }
-            throw new System.Exception("assign-such-that search produced no value (line 1513)");
+            throw new System.Exception("assign-such-that search produced no value (line 1559)");
           after__ASSIGN_SUCH_THAT_1:;
-            if (!((_2015_paramNames).Contains(_2020_next))) {
-              _2019_allReadCloned = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_2019_allReadCloned, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let r#")), _2020_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = r#")), _2020_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".clone();\n"));
-              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_2020_next));
+            if (!((_2046_paramNames).Contains(_2051_next))) {
+              _2050_allReadCloned = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_2050_allReadCloned, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("let r#")), _2051_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = r#")), _2051_next), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".clone();\n"));
+              readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_2051_next));
             }
-            _2018_recIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Difference(_2018_recIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_2020_next));
+            _2049_recIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Difference(_2049_recIdents, Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements(_2051_next));
           }
-          Dafny.ISequence<Dafny.Rune> _2021_paramsString;
-          _2021_paramsString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          _2016_i = BigInteger.Zero;
-          while ((_2016_i) < (new BigInteger((_2014_params).Count))) {
-            if ((_2016_i).Sign == 1) {
-              _2021_paramsString = Dafny.Sequence<Dafny.Rune>.Concat(_2021_paramsString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _2052_paramsString;
+          _2052_paramsString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          _2047_i = BigInteger.Zero;
+          while ((_2047_i) < (new BigInteger((_2045_params).Count))) {
+            if ((_2047_i).Sign == 1) {
+              _2052_paramsString = Dafny.Sequence<Dafny.Rune>.Concat(_2052_paramsString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _2022_typStr;
-            Dafny.ISequence<Dafny.Rune> _out1295;
-            _out1295 = DCOMP.COMP.GenType(((_2014_params).Select(_2016_i)).dtor_typ, false, true);
-            _2022_typStr = _out1295;
-            _2021_paramsString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_2021_paramsString, ((_2014_params).Select(_2016_i)).dtor_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": &")), _2022_typStr);
-            _2016_i = (_2016_i) + (BigInteger.One);
+            Dafny.ISequence<Dafny.Rune> _2053_typStr;
+            Dafny.ISequence<Dafny.Rune> _out1311;
+            _out1311 = DCOMP.COMP.GenType(((_2045_params).Select(_2047_i)).dtor_typ, false, true);
+            _2053_typStr = _out1311;
+            _2052_paramsString = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(_2052_paramsString, ((_2045_params).Select(_2047_i)).dtor_name), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": &")), _2053_typStr);
+            _2047_i = (_2047_i) + (BigInteger.One);
           }
-          Dafny.ISequence<Dafny.Rune> _2023_retTypeGen;
-          Dafny.ISequence<Dafny.Rune> _out1296;
-          _out1296 = DCOMP.COMP.GenType(_2013_retType, false, true);
-          _2023_retTypeGen = _out1296;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::FunctionWrapper({\n"), _2019_allReadCloned), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::boxed::Box::new(move |")), _2021_paramsString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("| -> ")), _2023_retTypeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _2017_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n})})"));
+          Dafny.ISequence<Dafny.Rune> _2054_retTypeGen;
+          Dafny.ISequence<Dafny.Rune> _out1312;
+          _out1312 = DCOMP.COMP.GenType(_2044_retType, false, true);
+          _2054_retTypeGen = _out1312;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::FunctionWrapper({\n"), _2050_allReadCloned), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::std::boxed::Box::new(move |")), _2052_paramsString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("| -> ")), _2054_retTypeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" {\n")), _2048_recursiveGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n})})"));
           isOwned = true;
           isErased = true;
         }
       } else if (_source19.is_IIFE) {
-        Dafny.ISequence<Dafny.Rune> _2024___mcc_h50 = _source19.dtor_name;
-        DAST._IType _2025___mcc_h51 = _source19.dtor_typ;
-        DAST._IExpression _2026___mcc_h52 = _source19.dtor_value;
-        DAST._IExpression _2027___mcc_h53 = _source19.dtor_iifeBody;
-        DAST._IExpression _2028_iifeBody = _2027___mcc_h53;
-        DAST._IExpression _2029_value = _2026___mcc_h52;
-        DAST._IType _2030_tpe = _2025___mcc_h51;
-        Dafny.ISequence<Dafny.Rune> _2031_name = _2024___mcc_h50;
+        Dafny.ISequence<Dafny.Rune> _2055___mcc_h52 = _source19.dtor_name;
+        DAST._IType _2056___mcc_h53 = _source19.dtor_typ;
+        DAST._IExpression _2057___mcc_h54 = _source19.dtor_value;
+        DAST._IExpression _2058___mcc_h55 = _source19.dtor_iifeBody;
+        DAST._IExpression _2059_iifeBody = _2058___mcc_h55;
+        DAST._IExpression _2060_value = _2057___mcc_h54;
+        DAST._IType _2061_tpe = _2056___mcc_h53;
+        Dafny.ISequence<Dafny.Rune> _2062_name = _2055___mcc_h52;
         {
-          Dafny.ISequence<Dafny.Rune> _2032_valueGen;
-          bool _2033_valueOwned;
-          bool _2034_valueErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2035_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1297;
-          bool _out1298;
-          bool _out1299;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1300;
-          DCOMP.COMP.GenExpr(_2029_value, @params, false, out _out1297, out _out1298, out _out1299, out _out1300);
-          _2032_valueGen = _out1297;
-          _2033_valueOwned = _out1298;
-          _2034_valueErased = _out1299;
-          _2035_recIdents = _out1300;
-          if (_2034_valueErased) {
-            Dafny.ISequence<Dafny.Rune> _2036_eraseFn;
-            _2036_eraseFn = ((_2033_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-            _2032_valueGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::"), _2036_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _2032_valueGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
+          Dafny.ISequence<Dafny.Rune> _2063_valueGen;
+          bool _2064_valueOwned;
+          bool _2065_valueErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2066_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1313;
+          bool _out1314;
+          bool _out1315;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1316;
+          DCOMP.COMP.GenExpr(_2060_value, @params, false, out _out1313, out _out1314, out _out1315, out _out1316);
+          _2063_valueGen = _out1313;
+          _2064_valueOwned = _out1314;
+          _2065_valueErased = _out1315;
+          _2066_recIdents = _out1316;
+          if (_2065_valueErased) {
+            Dafny.ISequence<Dafny.Rune> _2067_eraseFn;
+            _2067_eraseFn = ((_2064_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+            _2063_valueGen = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::dafny_runtime::DafnyUnerasable::<_>::"), _2067_eraseFn), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _2063_valueGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(")"));
           }
-          readIdents = _2035_recIdents;
-          Dafny.ISequence<Dafny.Rune> _2037_valueTypeGen;
-          Dafny.ISequence<Dafny.Rune> _out1301;
-          _out1301 = DCOMP.COMP.GenType(_2030_tpe, false, true);
-          _2037_valueTypeGen = _out1301;
-          Dafny.ISequence<Dafny.Rune> _2038_bodyGen;
-          bool _2039_bodyOwned;
-          bool _2040_bodyErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2041_bodyIdents;
-          Dafny.ISequence<Dafny.Rune> _out1302;
-          bool _out1303;
-          bool _out1304;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1305;
-          DCOMP.COMP.GenExpr(_2028_iifeBody, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.Concat(@params, ((_2033_valueOwned) ? (Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements()) : (Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements((_2031_name))))), mustOwn, out _out1302, out _out1303, out _out1304, out _out1305);
-          _2038_bodyGen = _out1302;
-          _2039_bodyOwned = _out1303;
-          _2040_bodyErased = _out1304;
-          _2041_bodyIdents = _out1305;
-          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _2041_bodyIdents);
-          Dafny.ISequence<Dafny.Rune> _2042_eraseFn;
-          _2042_eraseFn = ((_2033_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{\nlet r#"), (_2031_name)), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), ((_2033_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&")))), _2037_valueTypeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _2032_valueGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n")), _2038_bodyGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
-          isOwned = _2039_bodyOwned;
-          isErased = _2040_bodyErased;
+          readIdents = _2066_recIdents;
+          Dafny.ISequence<Dafny.Rune> _2068_valueTypeGen;
+          Dafny.ISequence<Dafny.Rune> _out1317;
+          _out1317 = DCOMP.COMP.GenType(_2061_tpe, false, true);
+          _2068_valueTypeGen = _out1317;
+          Dafny.ISequence<Dafny.Rune> _2069_bodyGen;
+          bool _2070_bodyOwned;
+          bool _2071_bodyErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2072_bodyIdents;
+          Dafny.ISequence<Dafny.Rune> _out1318;
+          bool _out1319;
+          bool _out1320;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1321;
+          DCOMP.COMP.GenExpr(_2059_iifeBody, Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.Concat(@params, ((_2064_valueOwned) ? (Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements()) : (Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements((_2062_name))))), mustOwn, out _out1318, out _out1319, out _out1320, out _out1321);
+          _2069_bodyGen = _out1318;
+          _2070_bodyOwned = _out1319;
+          _2071_bodyErased = _out1320;
+          _2072_bodyIdents = _out1321;
+          readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _2072_bodyIdents);
+          Dafny.ISequence<Dafny.Rune> _2073_eraseFn;
+          _2073_eraseFn = ((_2064_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase_owned")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("unerase")));
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{\nlet r#"), (_2062_name)), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(": ")), ((_2064_valueOwned) ? (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("")) : (Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&")))), _2068_valueTypeGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" = ")), _2063_valueGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(";\n")), _2069_bodyGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n}"));
+          isOwned = _2070_bodyOwned;
+          isErased = _2071_bodyErased;
         }
       } else if (_source19.is_Apply) {
-        DAST._IExpression _2043___mcc_h54 = _source19.dtor_expr;
-        Dafny.ISequence<DAST._IExpression> _2044___mcc_h55 = _source19.dtor_args;
-        Dafny.ISequence<DAST._IExpression> _2045_args = _2044___mcc_h55;
-        DAST._IExpression _2046_func = _2043___mcc_h54;
+        DAST._IExpression _2074___mcc_h56 = _source19.dtor_expr;
+        Dafny.ISequence<DAST._IExpression> _2075___mcc_h57 = _source19.dtor_args;
+        Dafny.ISequence<DAST._IExpression> _2076_args = _2075___mcc_h57;
+        DAST._IExpression _2077_func = _2074___mcc_h56;
         {
-          Dafny.ISequence<Dafny.Rune> _2047_funcString;
-          bool _2048___v76;
-          bool _2049_funcErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2050_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1306;
-          bool _out1307;
-          bool _out1308;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1309;
-          DCOMP.COMP.GenExpr(_2046_func, @params, false, out _out1306, out _out1307, out _out1308, out _out1309);
-          _2047_funcString = _out1306;
-          _2048___v76 = _out1307;
-          _2049_funcErased = _out1308;
-          _2050_recIdents = _out1309;
-          readIdents = _2050_recIdents;
-          Dafny.ISequence<Dafny.Rune> _2051_argString;
-          _2051_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
-          BigInteger _2052_i;
-          _2052_i = BigInteger.Zero;
-          while ((_2052_i) < (new BigInteger((_2045_args).Count))) {
-            if ((_2052_i).Sign == 1) {
-              _2051_argString = Dafny.Sequence<Dafny.Rune>.Concat(_2051_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
+          Dafny.ISequence<Dafny.Rune> _2078_funcString;
+          bool _2079___v77;
+          bool _2080_funcErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2081_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1322;
+          bool _out1323;
+          bool _out1324;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1325;
+          DCOMP.COMP.GenExpr(_2077_func, @params, false, out _out1322, out _out1323, out _out1324, out _out1325);
+          _2078_funcString = _out1322;
+          _2079___v77 = _out1323;
+          _2080_funcErased = _out1324;
+          _2081_recIdents = _out1325;
+          readIdents = _2081_recIdents;
+          Dafny.ISequence<Dafny.Rune> _2082_argString;
+          _2082_argString = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("");
+          BigInteger _2083_i;
+          _2083_i = BigInteger.Zero;
+          while ((_2083_i) < (new BigInteger((_2076_args).Count))) {
+            if ((_2083_i).Sign == 1) {
+              _2082_argString = Dafny.Sequence<Dafny.Rune>.Concat(_2082_argString, Dafny.Sequence<Dafny.Rune>.UnicodeFromString(", "));
             }
-            Dafny.ISequence<Dafny.Rune> _2053_argExpr;
-            bool _2054_isOwned;
-            bool _2055_argErased;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2056_argIdents;
-            Dafny.ISequence<Dafny.Rune> _out1310;
-            bool _out1311;
-            bool _out1312;
-            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1313;
-            DCOMP.COMP.GenExpr((_2045_args).Select(_2052_i), @params, false, out _out1310, out _out1311, out _out1312, out _out1313);
-            _2053_argExpr = _out1310;
-            _2054_isOwned = _out1311;
-            _2055_argErased = _out1312;
-            _2056_argIdents = _out1313;
-            if (_2054_isOwned) {
-              _2053_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _2053_argExpr);
+            Dafny.ISequence<Dafny.Rune> _2084_argExpr;
+            bool _2085_isOwned;
+            bool _2086_argErased;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2087_argIdents;
+            Dafny.ISequence<Dafny.Rune> _out1326;
+            bool _out1327;
+            bool _out1328;
+            Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1329;
+            DCOMP.COMP.GenExpr((_2076_args).Select(_2083_i), @params, false, out _out1326, out _out1327, out _out1328, out _out1329);
+            _2084_argExpr = _out1326;
+            _2085_isOwned = _out1327;
+            _2086_argErased = _out1328;
+            _2087_argIdents = _out1329;
+            if (_2085_isOwned) {
+              _2084_argExpr = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("&"), _2084_argExpr);
             }
-            _2051_argString = Dafny.Sequence<Dafny.Rune>.Concat(_2051_argString, _2053_argExpr);
-            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _2056_argIdents);
-            _2052_i = (_2052_i) + (BigInteger.One);
+            _2082_argString = Dafny.Sequence<Dafny.Rune>.Concat(_2082_argString, _2084_argExpr);
+            readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.Union(readIdents, _2087_argIdents);
+            _2083_i = (_2083_i) + (BigInteger.One);
           }
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(("), _2047_funcString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").0")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _2051_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("))"));
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(("), _2078_funcString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(").0")), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("(")), _2082_argString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("))"));
           isOwned = true;
           isErased = false;
         }
       } else if (_source19.is_TypeTest) {
-        DAST._IExpression _2057___mcc_h56 = _source19.dtor_on;
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2058___mcc_h57 = _source19.dtor_dType;
-        Dafny.ISequence<Dafny.Rune> _2059___mcc_h58 = _source19.dtor_variant;
-        Dafny.ISequence<Dafny.Rune> _2060_variant = _2059___mcc_h58;
-        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2061_dType = _2058___mcc_h57;
-        DAST._IExpression _2062_on = _2057___mcc_h56;
+        DAST._IExpression _2088___mcc_h58 = _source19.dtor_on;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2089___mcc_h59 = _source19.dtor_dType;
+        Dafny.ISequence<Dafny.Rune> _2090___mcc_h60 = _source19.dtor_variant;
+        Dafny.ISequence<Dafny.Rune> _2091_variant = _2090___mcc_h60;
+        Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> _2092_dType = _2089___mcc_h59;
+        DAST._IExpression _2093_on = _2088___mcc_h58;
         {
-          Dafny.ISequence<Dafny.Rune> _2063_exprGen;
-          bool _2064___v77;
-          bool _2065_exprErased;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2066_recIdents;
-          Dafny.ISequence<Dafny.Rune> _out1314;
-          bool _out1315;
-          bool _out1316;
-          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1317;
-          DCOMP.COMP.GenExpr(_2062_on, @params, false, out _out1314, out _out1315, out _out1316, out _out1317);
-          _2063_exprGen = _out1314;
-          _2064___v77 = _out1315;
-          _2065_exprErased = _out1316;
-          _2066_recIdents = _out1317;
-          Dafny.ISequence<Dafny.Rune> _2067_dTypePath;
-          Dafny.ISequence<Dafny.Rune> _out1318;
-          _out1318 = DCOMP.COMP.GenPath(_2061_dType);
-          _2067_dTypePath = _out1318;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("matches!("), _2063_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".as_ref(), ")), _2067_dTypePath), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::r#")), _2060_variant), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{ .. })"));
+          Dafny.ISequence<Dafny.Rune> _2094_exprGen;
+          bool _2095___v78;
+          bool _2096_exprErased;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _2097_recIdents;
+          Dafny.ISequence<Dafny.Rune> _out1330;
+          bool _out1331;
+          bool _out1332;
+          Dafny.ISet<Dafny.ISequence<Dafny.Rune>> _out1333;
+          DCOMP.COMP.GenExpr(_2093_on, @params, false, out _out1330, out _out1331, out _out1332, out _out1333);
+          _2094_exprGen = _out1330;
+          _2095___v78 = _out1331;
+          _2096_exprErased = _out1332;
+          _2097_recIdents = _out1333;
+          Dafny.ISequence<Dafny.Rune> _2098_dTypePath;
+          Dafny.ISequence<Dafny.Rune> _out1334;
+          _out1334 = DCOMP.COMP.GenPath(_2092_dType);
+          _2098_dTypePath = _out1334;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("matches!("), _2094_exprGen), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(".as_ref(), ")), _2098_dTypePath), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::r#")), _2091_variant), Dafny.Sequence<Dafny.Rune>.UnicodeFromString("{ .. })"));
           isOwned = true;
           isErased = true;
-          readIdents = _2066_recIdents;
+          readIdents = _2097_recIdents;
         }
       } else {
-        DAST._IType _2068___mcc_h59 = _source19.dtor_typ;
-        DAST._IType _2069_typ = _2068___mcc_h59;
+        DAST._IType _2099___mcc_h61 = _source19.dtor_typ;
+        DAST._IType _2100_typ = _2099___mcc_h61;
         {
-          Dafny.ISequence<Dafny.Rune> _2070_typString;
-          Dafny.ISequence<Dafny.Rune> _out1319;
-          _out1319 = DCOMP.COMP.GenType(_2069_typ, false, false);
-          _2070_typString = _out1319;
-          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _2070_typString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as std::default::Default>::default()"));
+          Dafny.ISequence<Dafny.Rune> _2101_typString;
+          Dafny.ISequence<Dafny.Rune> _out1335;
+          _out1335 = DCOMP.COMP.GenType(_2100_typ, false, false);
+          _2101_typString = _out1335;
+          s = Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.Concat(Dafny.Sequence<Dafny.Rune>.UnicodeFromString("<"), _2101_typString), Dafny.Sequence<Dafny.Rune>.UnicodeFromString(" as std::default::Default>::default()"));
           isOwned = true;
           isErased = false;
           readIdents = Dafny.Set<Dafny.ISequence<Dafny.Rune>>.FromElements();
@@ -12706,32 +12919,32 @@ namespace DCOMP {
       Dafny.ISequence<Dafny.Rune> s = Dafny.Sequence<Dafny.Rune>.Empty;
       s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("#![allow(warnings, unconditional_panic)]\n");
       s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("extern crate dafny_runtime;\n"));
-      BigInteger _2071_i;
-      _2071_i = BigInteger.Zero;
-      while ((_2071_i) < (new BigInteger((p).Count))) {
-        Dafny.ISequence<Dafny.Rune> _2072_generated = Dafny.Sequence<Dafny.Rune>.Empty;
-        Dafny.ISequence<Dafny.Rune> _out1320;
-        _out1320 = DCOMP.COMP.GenModule((p).Select(_2071_i), Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements());
-        _2072_generated = _out1320;
-        if ((_2071_i).Sign == 1) {
+      BigInteger _2102_i;
+      _2102_i = BigInteger.Zero;
+      while ((_2102_i) < (new BigInteger((p).Count))) {
+        Dafny.ISequence<Dafny.Rune> _2103_generated = Dafny.Sequence<Dafny.Rune>.Empty;
+        Dafny.ISequence<Dafny.Rune> _out1336;
+        _out1336 = DCOMP.COMP.GenModule((p).Select(_2102_i), Dafny.Sequence<Dafny.ISequence<Dafny.Rune>>.FromElements());
+        _2103_generated = _out1336;
+        if ((_2102_i).Sign == 1) {
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\n"));
         }
-        s = Dafny.Sequence<Dafny.Rune>.Concat(s, _2072_generated);
-        _2071_i = (_2071_i) + (BigInteger.One);
+        s = Dafny.Sequence<Dafny.Rune>.Concat(s, _2103_generated);
+        _2102_i = (_2102_i) + (BigInteger.One);
       }
       return s;
     }
     public static Dafny.ISequence<Dafny.Rune> EmitCallToMain(Dafny.ISequence<Dafny.ISequence<Dafny.Rune>> fullName) {
       Dafny.ISequence<Dafny.Rune> s = Dafny.Sequence<Dafny.Rune>.Empty;
       s = Dafny.Sequence<Dafny.Rune>.UnicodeFromString("\nfn main() {\n");
-      BigInteger _2073_i;
-      _2073_i = BigInteger.Zero;
-      while ((_2073_i) < (new BigInteger((fullName).Count))) {
-        if ((_2073_i).Sign == 1) {
+      BigInteger _2104_i;
+      _2104_i = BigInteger.Zero;
+      while ((_2104_i) < (new BigInteger((fullName).Count))) {
+        if ((_2104_i).Sign == 1) {
           s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("::"));
         }
-        s = Dafny.Sequence<Dafny.Rune>.Concat(s, (fullName).Select(_2073_i));
-        _2073_i = (_2073_i) + (BigInteger.One);
+        s = Dafny.Sequence<Dafny.Rune>.Concat(s, (fullName).Select(_2104_i));
+        _2104_i = (_2104_i) + (BigInteger.One);
       }
       s = Dafny.Sequence<Dafny.Rune>.Concat(s, Dafny.Sequence<Dafny.Rune>.UnicodeFromString("();\n}"));
       return s;
