@@ -791,7 +791,7 @@ module {:extern "DCOMP"} DCOMP {
           readIdents := readIdents + elsIdents;
           generated := "if " + condString + " {\n" + thnString + "\n} else {\n" + elsString + "\n}";
         }
-        case While(cond, body) => {
+        case While(lbl, cond, body) => {
           var condString, _, condErased, recIdents := GenExpr(cond, selfIdent, params, true);
           if !condErased {
             condString := "::dafny_runtime::DafnyErasable::erase(" + condString + ")";
@@ -800,7 +800,20 @@ module {:extern "DCOMP"} DCOMP {
           readIdents := recIdents;
           var bodyString, bodyIdents := GenStmts(body, selfIdent, params, false, earlyReturn);
           readIdents := readIdents + bodyIdents;
-          generated := "while " + condString + " {\n" + bodyString + "\n}";
+
+          var lblString := "";
+          match lbl {
+            case Some(id) => {
+              lblString := "'label_" + id + ": ";
+            }
+            case None => {}
+          }
+
+          generated := lblString + "while " + condString + " {\n" + bodyString + "\n}";
+        }
+        case Break(toLabel) => {
+          generated := "break 'label_" + toLabel + ";";
+          readIdents := {};
         }
         case TailRecursive(body) => {
           // clone the parameters to make them mutable
