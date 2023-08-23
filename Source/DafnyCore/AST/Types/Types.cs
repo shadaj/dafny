@@ -2321,13 +2321,18 @@ public class UserDefinedType : NonProxyType {
   ///   Return the upcast of "receiverType" that has base type "member.EnclosingClass".
   ///   Assumes that "receiverType" normalizes to a UserDefinedFunction with a .ResolveClass that is a subtype
   ///   of "member.EnclosingClass".
+  ///   Preserves non-null-ness of "receiverType" if it is a non-null reference.
   /// Otherwise:
   ///   Return "receiverType" (expanded).
   /// </summary>
   public static Type UpcastToMemberEnclosingType(Type receiverType, MemberDecl/*?*/ member) {
     Contract.Requires(receiverType != null);
     if (member != null && member.EnclosingClass != null && !(member.EnclosingClass is ValuetypeDecl)) {
-      return receiverType.AsParentType(member.EnclosingClass);
+      if (receiverType.IsNonNullRefType) {
+        return CreateNonNullType(receiverType.AsParentType(member.EnclosingClass));
+      } else {
+        return receiverType.AsParentType(member.EnclosingClass);
+      }
     }
     return receiverType.NormalizeExpandKeepConstraints();
   }
