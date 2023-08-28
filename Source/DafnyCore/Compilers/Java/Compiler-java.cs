@@ -1630,7 +1630,16 @@ namespace Microsoft.Dafny.Compilers {
         } else {
           wr.Write($"(({TypeName(elementType, wr, Token.NoToken)}{Repeat("[]", indices.Count)}) (");
           wArray = wr.Fork();
-          wr.Write($").elmts){Util.Comma("", indices, ix => $"[{DafnyHelpersClass}.toInt({ix})]")} = ");
+          wr.Write($").elmts)");
+          for (int i = 0; i < indices.Count; i++) {
+            if (i > 0) {
+              wr.Write(", ");
+            }
+            wr.Write($"[{DafnyHelpersClass}.toInt(");
+            indices[i](wr);
+            wr.Write(")]");
+          }
+          wr.Write(" = ");
           wRhs = wr.Fork();
         }
       }
