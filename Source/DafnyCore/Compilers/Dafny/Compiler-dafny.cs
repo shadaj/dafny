@@ -849,7 +849,7 @@ namespace Microsoft.Dafny.Compilers {
       var index = indexBuf.Finish();
 
       return new ExprLvalue(
-        (DAST.Expression)DAST.Expression.create_Index(source, index),
+        (DAST.Expression)DAST.Expression.create_Index(source, ll.Seq.Type.IsArrayType, Sequence<DAST.Expression>.FromElements(index)),
         (DAST.AssignLhs)DAST.AssignLhs.create_Index(source, index)
       );
     }
@@ -877,11 +877,26 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override ConcreteSyntaxTree CreateLabeledCode(string label, bool createContinueLabel, ConcreteSyntaxTree wr) {
-      throw new NotImplementedException();
+      if (createContinueLabel) {
+        return wr;
+      }
+
+      if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
+        var labelBuilder = stmtContainer.Builder.Labeled(label);
+        return new BuilderSyntaxTree<StatementContainer>(labelBuilder);
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitBreak(string label, ConcreteSyntaxTree wr) {
-      throw new NotImplementedException();
+      if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
+        stmtContainer.Builder.AddStatement((DAST.Statement)DAST.Statement.create_Break(
+          Sequence<Rune>.UnicodeFromString(label)
+        ));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitContinue(string label, ConcreteSyntaxTree wr) {
@@ -1058,7 +1073,13 @@ namespace Microsoft.Dafny.Compilers {
             ));
             break;
           case StaticReceiverExpr:
-            throw new NotImplementedException();
+            if (e.Type.NormalizeExpandKeepConstraints() is UserDefinedType udt && udt.ResolvedClass is DatatypeDecl dt &&
+                DatatypeWrapperEraser.IsErasableDatatypeWrapper(Options, dt, out _)) {
+              baseExpr = (DAST.Expression)DAST.Expression.create_Companion(PathFromTopLevel(udt.ResolvedClass));
+            } else {
+              baseExpr = (DAST.Expression)DAST.Expression.create_Companion(PathFromTopLevel(e.Type.AsTopLevelTypeWithMembers));
+            }
+            break;
           default:
             DAST.Type baseType;
             if (e.Type.AsNewtype != null) {
@@ -1415,13 +1436,24 @@ namespace Microsoft.Dafny.Compilers {
       }
     }
 
-    protected override ConcreteSyntaxTree EmitArraySelect(List<string> indices, Type elmtType, ConcreteSyntaxTree wr) {
+    protected override ConcreteSyntaxTree EmitArraySelect(List<Action<ConcreteSyntaxTree>> indices, Type elmtType, ConcreteSyntaxTree wr) {
       throw new NotImplementedException();
     }
 
     protected override ConcreteSyntaxTree EmitArraySelect(List<Expression> indices, Type elmtType, bool inLetExprBody,
         ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
-      throw new NotImplementedException();
+      if (wr is BuilderSyntaxTree<ExprContainer> builder) {
+        var indicesAST = indices.Select(i => {
+          var buf = new ExprBuffer(null);
+          var localWriter = new BuilderSyntaxTree<ExprContainer>(buf);
+          EmitExpr(i, inLetExprBody, localWriter, wStmts);
+          return buf.Finish();
+        }).ToList();
+
+        return new BuilderSyntaxTree<ExprContainer>(builder.Builder.Index(indicesAST, true));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitExprAsNativeInt(Expression expr, bool inLetExprBody, ConcreteSyntaxTree wr,
@@ -1440,7 +1472,8 @@ namespace Microsoft.Dafny.Compilers {
       if (wr is BuilderSyntaxTree<ExprContainer> builder) {
         builder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_Index(
           sourceBuf.Finish(),
-          indexBuf.Finish()
+          source.Type.IsArrayType,
+          Sequence<DAST.Expression>.FromElements(indexBuf.Finish())
         ));
       } else {
         throw new InvalidOperationException();
@@ -1454,7 +1487,34 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override void EmitSeqSelectRange(Expression source, Expression lo, Expression hi, bool fromArray,
       bool inLetExprBody, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
-      throw new NotImplementedException();
+      var sourceBuf = new ExprBuffer(null);
+      EmitExpr(source, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(sourceBuf), wStmts);
+      var sourceExpr = sourceBuf.Finish();
+
+      DAST.Expression loExpr = null;
+      if (lo != null) {
+        var loBuf = new ExprBuffer(null);
+        EmitExpr(lo, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(loBuf), wStmts);
+        loExpr = loBuf.Finish();
+      }
+
+      DAST.Expression hiExpr = null;
+      if (hi != null) {
+        var hiBuf = new ExprBuffer(null);
+        EmitExpr(hi, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(hiBuf), wStmts);
+        hiExpr = hiBuf.Finish();
+      }
+
+      if (wr is BuilderSyntaxTree<ExprContainer> builder) {
+        builder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_IndexRange(
+          sourceExpr,
+          fromArray,
+          loExpr != null ? Optional<DAST._IExpression>.create_Some(loExpr) : Optional<DAST._IExpression>.create_None(),
+          hiExpr != null ? Optional<DAST._IExpression>.create_Some(hiExpr) : Optional<DAST._IExpression>.create_None()
+        ));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitSeqConstructionExpr(SeqConstructionExpr expr, bool inLetExprBody, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
@@ -1535,6 +1595,20 @@ namespace Microsoft.Dafny.Compilers {
         var retType = GenType(resultType);
 
         return new BuilderSyntaxTree<StatementContainer>(builder.Builder.Lambda(formals, retType));
+      } else {
+        throw new InvalidOperationException();
+      }
+    }
+
+    protected override void EmitLambdaApply(ConcreteSyntaxTree wr, out ConcreteSyntaxTree wLambda, out ConcreteSyntaxTree wArg) {
+      if (wr is BuilderSyntaxTree<StatementContainer> builder) {
+        var lambda = builder.Builder.Call();
+        wLambda = new BuilderSyntaxTree<ExprContainer>(lambda);
+        wArg = new BuilderSyntaxTree<ExprContainer>(lambda);
+      } else if (wr is BuilderSyntaxTree<ExprContainer> exprBuilder) {
+        var lambda = exprBuilder.Builder.Call();
+        wLambda = new BuilderSyntaxTree<ExprContainer>(lambda);
+        wArg = new BuilderSyntaxTree<ExprContainer>(lambda);
       } else {
         throw new InvalidOperationException();
       }

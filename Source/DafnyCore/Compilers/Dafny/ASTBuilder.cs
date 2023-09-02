@@ -377,7 +377,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     public WhileBuilder While() {
-      var ret = new WhileBuilder();
+      var ret = new WhileBuilder(null);
       AddBuildable(ret);
       return ret;
     }
@@ -398,6 +398,10 @@ namespace Microsoft.Dafny.Compilers {
       var ret = new ReturnBuilder();
       AddBuildable(ret);
       return ret;
+    }
+
+    public LabeledBuilder Labeled(string label) {
+      return new LabeledBuilder(label, this);
     }
   }
 
@@ -597,10 +601,13 @@ namespace Microsoft.Dafny.Compilers {
   }
 
   class WhileBuilder : ExprContainer, StatementContainer, BuildableStatement {
+    readonly string label;
     object condition = null;
     readonly List<object> body = new();
 
-    public WhileBuilder() { }
+    public WhileBuilder(string label) {
+      this.label = label;
+    }
 
     public void AddExpr(DAST.Expression value) {
       if (condition != null) {
@@ -640,6 +647,7 @@ namespace Microsoft.Dafny.Compilers {
       StatementContainer.RecursivelyBuild(body, builtStatements);
 
       return (DAST.Statement)DAST.Statement.create_While(
+        label == null ? Optional<ISequence<Rune>>.create_None() : Optional<ISequence<Rune>>.create_Some(Sequence<Rune>.UnicodeFromString(label)),
         builtCondition[0],
         Sequence<DAST.Statement>.FromArray(builtStatements.ToArray())
       );
@@ -770,6 +778,38 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
+  class LabeledBuilder : StatementContainer {
+    readonly string label;
+    readonly StatementContainer parent;
+
+    public LabeledBuilder(string label, StatementContainer parent) {
+      this.label = label;
+      this.parent = parent;
+    }
+
+    public void AddStatement(DAST.Statement item) {
+      parent.AddStatement(item);
+    }
+
+    public void AddBuildable(BuildableStatement item) {
+      parent.AddBuildable(item);
+    }
+
+    public StatementContainer Fork() {
+      return null;
+    }
+
+    public List<object> ForkList() {
+      throw new InvalidOperationException();
+    }
+
+    public WhileBuilder While() {
+      var ret = new WhileBuilder(label);
+      parent.AddBuildable(ret);
+      return ret;
+    }
+  }
+
   class StatementBuffer : StatementContainer {
     readonly List<object> statements = new();
 
@@ -871,6 +911,12 @@ namespace Microsoft.Dafny.Compilers {
 
     ConvertBuilder Convert(DAST.Type fromType, DAST.Type toType) {
       var ret = new ConvertBuilder(fromType, toType);
+      AddBuildable(ret);
+      return ret;
+    }
+
+    IndexBuilder Index(List<DAST.Expression> indices, bool isArray) {
+      var ret = new IndexBuilder(indices, isArray);
       AddBuildable(ret);
       return ret;
     }
@@ -1128,6 +1174,44 @@ class ConvertBuilder : ExprContainer, BuildableExpr {
       builtValue[0],
       fromType,
       toType
+    );
+  }
+}
+
+class IndexBuilder : ExprContainer, BuildableExpr {
+  readonly List<DAST.Expression> indices;
+  readonly bool isArray;
+  object value = null;
+
+  public IndexBuilder(List<DAST.Expression> indices, bool isArray) {
+    this.indices = indices;
+    this.isArray = isArray;
+  }
+
+  public void AddExpr(DAST.Expression item) {
+    if (value != null) {
+      throw new InvalidOperationException();
+    } else {
+      value = item;
+    }
+  }
+
+  public void AddBuildable(BuildableExpr item) {
+    if (value != null) {
+      throw new InvalidOperationException();
+    } else {
+      value = item;
+    }
+  }
+
+  public DAST.Expression Build() {
+    var builtValue = new List<DAST.Expression>();
+    ExprContainer.RecursivelyBuild(new List<object> { value }, builtValue);
+
+    return (DAST.Expression)DAST.Expression.create_Index(
+      builtValue[0],
+      isArray,
+      Sequence<DAST.Expression>.FromArray(indices.ToArray())
     );
   }
 }
