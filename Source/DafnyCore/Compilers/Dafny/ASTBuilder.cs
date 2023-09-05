@@ -1023,8 +1023,8 @@ namespace Microsoft.Dafny.Compilers {
 
       return (DAST.Expression)DAST.Expression.create_Call(
         builtOn[0],
-        Sequence<Rune>.UnicodeFromString(name),
-        Sequence<DAST.Type>.FromArray(typeArgs.ToArray()),
+        name != null ? DAST.Optional<ISequence<Rune>>.create_Some(Sequence<Rune>.UnicodeFromString(name)) : DAST.Optional<ISequence<Rune>>.create_None(),
+        Sequence<DAST.Type>.FromArray((typeArgs ?? new()).ToArray()),
         Sequence<DAST.Expression>.FromArray(builtArgs.ToArray())
       );
     }
