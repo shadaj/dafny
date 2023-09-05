@@ -459,7 +459,7 @@ namespace Microsoft.Dafny.Compilers {
             if (selectExpr.Seq.Type.IsArrayType || selectExpr.Seq.Type.AsSeqType != null) {
               targetIndex = ArrayIndexToNativeInt(targetIndex, selectExpr.E0.Type);
             }
-            ILvalue newLhs = new ArrayLvalueImpl(this, targetArray, new List<Action<ConcreteSyntaxTree>>() { wIndex => wIndex.Write(targetIndex) }, lhsTypes[i]);
+            ILvalue newLhs = new ArrayLvalueImpl(this, targetArray, new List<Action<ConcreteSyntaxTree>>() { wIndex => EmitIdentifier(targetIndex, wIndex) }, lhsTypes[i]);
             lhssn.Add(newLhs);
 
           } else if (lexpr is MultiSelectExpr multiSelectExpr) {
@@ -470,7 +470,7 @@ namespace Microsoft.Dafny.Compilers {
               targetIndex = ArrayIndexToNativeInt(targetIndex, index.Type);
               targetIndices.Add(targetIndex);
             }
-            ILvalue newLhs = new ArrayLvalueImpl(this, targetArray, Util.Map<string, Action<ConcreteSyntaxTree>>(targetIndices, i => wIndex => wIndex.Write(i)), lhsTypes[i]);
+            ILvalue newLhs = new ArrayLvalueImpl(this, targetArray, Util.Map<string, Action<ConcreteSyntaxTree>>(targetIndices, i => wIndex => EmitIdentifier(i, wIndex)), lhsTypes[i]);
             lhssn.Add(newLhs);
 
           } else {
@@ -622,7 +622,7 @@ namespace Microsoft.Dafny.Compilers {
     /// Returns null if no condition is necessary
     /// </summary>
     [CanBeNull]
-    protected abstract string GetSubtypeCondition(
+    protected abstract Action<ConcreteSyntaxTree> GetSubtypeCondition(
       string tmpVarName, Type boundVarType, IToken tok, ConcreteSyntaxTree wPreconditions);
 
     /// <summary>
@@ -4460,10 +4460,17 @@ namespace Microsoft.Dafny.Compilers {
           var bound = $"{pre}{nw}{(len == "" ? "" : "." + len)}{post}";
           w = CreateForLoop(indices[d], bound, w);
         }
-        var (wArray, wrRhs) = EmitArrayUpdate(Util.Map<string, Action<ConcreteSyntaxTree>>(indices, i => wIndex => wIndex.Write(i)), typeRhs.EType, w);
+        var (wArray, wrRhs) = EmitArrayUpdate(Util.Map<string, Action<ConcreteSyntaxTree>>(indices, i => wIndex => EmitIdentifier(i, wIndex)), typeRhs.EType, w);
         wrRhs = EmitCoercionIfNecessary(TypeForCoercion(typeRhs.EType), typeRhs.EType, typeRhs.Tok, wrRhs);
-        wrRhs.Write("{0}{1}({2})", init, LambdaExecute, indices.Comma(idx => ArrayIndexToInt(idx)));
-        wArray.Write(nw);
+        EmitLambdaApply(wrRhs, out var wLambda, out var wArg);
+        EmitIdentifier(init, wLambda);
+        for (var i = 0; i < indices.Count; i++) {
+          if (i > 0) {
+            wArg.Write(", ");
+          }
+          EmitIdentifier(ArrayIndexToInt(indices[i]), wArg);
+        }
+        EmitIdentifier(nw, wArray);
         EndStmt(w);
       }
     }
@@ -5401,7 +5408,7 @@ namespace Microsoft.Dafny.Compilers {
         var termLeftWriter = EmitMapBuilder_Add(e.Type.AsMapType, e.tok, collection_name, e.Term, inLetExprBody, thn);
         if (e.TermLeft == null) {
           Contract.Assert(e.BoundVars.Count == 1);
-          termLeftWriter.Write(IdName(e.BoundVars[0]));
+          EmitIdentifier(IdName(e.BoundVars[0]), termLeftWriter);
         } else {
           EmitExpr(e.TermLeft, inLetExprBody, termLeftWriter, wStmts);
         }
@@ -5494,12 +5501,15 @@ namespace Microsoft.Dafny.Compilers {
           preconditions.Clear();
         } else {
           var thenWriter = EmitIf(out var guardWriter, isReturning, wr);
-          guardWriter.Write(conditions);
+          conditions(guardWriter);
           if (isReturning) {
             wr = EmitBlock(wr);
             var wStmts = wr.Fork();
             wr = EmitReturnExpr(wr);
-            EmitExpr(new LiteralExpr(tok, elseReturnValue), inLetExprBody, wr, wStmts);
+            var elseLiteral = new LiteralExpr(tok, elseReturnValue) {
+              Type = Type.Bool
+            };
+            EmitExpr(elseLiteral, inLetExprBody, wr, wStmts);
           }
           wr = thenWriter;
         }
@@ -5717,7 +5727,7 @@ namespace Microsoft.Dafny.Compilers {
       Function f = e.Function;
 
       var toType = thisContext == null ? e.Type : e.Type.Subst(thisContext.ParentFormalTypeParametersToActuals);
-      wr = EmitCoercionIfNecessary(f.Original.ResultType, toType, e.tok, wr);
+      // wr = EmitCoercionIfNecessary(f.Original.ResultType, toType, e.tok, wr);
 
       var customReceiver = !(f.EnclosingClass is TraitDecl) && NeedsCustomReceiver(f);
       string qual = "";

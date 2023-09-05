@@ -555,30 +555,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     internal override string TypeName(Type type, ConcreteSyntaxTree wr, IToken tok, MemberDecl/*?*/ member = null) {
-      var xType = DatatypeWrapperEraser.SimplifyType(Options, type);
-
-      if (xType.IsObjectQ) {
-        return "object";
-      }
-
-      switch (xType) {
-        case BoolType:
-          return "bool";
-        case CharType:
-          return "str";
-        case IntType or BigOrdinalType or BitvectorType:
-          return "int";
-        case RealType:
-          return $"{DafnyRuntimeModule}.BigRational";
-        case UserDefinedType udt: {
-            var s = FullTypeName(udt, member);
-            return TypeName_UDT(s, udt, wr, udt.tok);
-          }
-        case CollectionType:
-          throw new NotImplementedException();
-      }
-
-      throw new cce.UnreachableException();
+      return "PLACEBO_TYPE";
     }
 
     // sometimes, the compiler generates the initial value before the declaration,
@@ -953,12 +930,6 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override ConcreteSyntaxTree EmitForStmt(IToken tok, IVariable loopIndex, bool goingUp, string endVarName,
       List<Statement> body, LList<Label> labels, ConcreteSyntaxTree wr) {
-      // var direction = goingUp ? "to" : "downto";
-      // var lowWr = new ConcreteSyntaxTree();
-      // wr.Format($"for {IdName(loopIndex)} := {lowWr} {direction} {endVarName}");
-      // var bodyWr = wr.NewBlock();
-      // TrStmtList(body, bodyWr);
-      // return lowWr;
       throw new NotImplementedException();
     }
 
@@ -1233,6 +1204,19 @@ namespace Microsoft.Dafny.Compilers {
         nonNull = false;
       }
 
+      while (true) {
+        if (topLevel is SubsetTypeDecl subsetType) {
+          var rhs = subsetType.Rhs;
+          if (rhs is UserDefinedType udt && udt.ResolvedClass is SubsetTypeDecl) {
+            topLevel = udt.ResolvedClass;
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+
       ResolvedType resolvedType;
       if (topLevel is NewtypeDecl newType) {
         resolvedType = (DAST.ResolvedType)DAST.ResolvedType.create_Newtype(GenType(newType.BaseType));
@@ -1451,7 +1435,18 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override ConcreteSyntaxTree EmitArraySelect(List<Action<ConcreteSyntaxTree>> indices, Type elmtType, ConcreteSyntaxTree wr) {
-      throw new NotImplementedException();
+      if (wr is BuilderSyntaxTree<ExprContainer> builder) {
+        var indicesAST = indices.Select(i => {
+          var buf = new ExprBuffer(null);
+          var localWriter = new BuilderSyntaxTree<ExprContainer>(buf);
+          i(localWriter);
+          return buf.Finish();
+        }).ToList();
+
+        return new BuilderSyntaxTree<ExprContainer>(builder.Builder.Index(indicesAST, true));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override ConcreteSyntaxTree EmitArraySelect(List<Expression> indices, Type elmtType, bool inLetExprBody,
@@ -1468,6 +1463,10 @@ namespace Microsoft.Dafny.Compilers {
       } else {
         throw new InvalidOperationException();
       }
+    }
+
+    protected override (ConcreteSyntaxTree wArray, ConcreteSyntaxTree wRhs) EmitArrayUpdate(List<Action<ConcreteSyntaxTree>> indices, Type elmtType, ConcreteSyntaxTree wr) {
+      throw new NotImplementedException();
     }
 
     protected override void EmitExprAsNativeInt(Expression expr, bool inLetExprBody, ConcreteSyntaxTree wr,
@@ -1726,9 +1725,13 @@ namespace Microsoft.Dafny.Compilers {
           BinaryExpr.ResolvedOpcode.EqCommon => "==",
           BinaryExpr.ResolvedOpcode.NeqCommon => "!=",
           BinaryExpr.ResolvedOpcode.Lt => "<",
+          BinaryExpr.ResolvedOpcode.LtChar => "<",
           BinaryExpr.ResolvedOpcode.Le => "<=",
+          BinaryExpr.ResolvedOpcode.LeChar => "<=",
           BinaryExpr.ResolvedOpcode.Ge => ">=",
+          BinaryExpr.ResolvedOpcode.GeChar => ">=",
           BinaryExpr.ResolvedOpcode.Gt => ">",
+          BinaryExpr.ResolvedOpcode.GtChar => ">",
           BinaryExpr.ResolvedOpcode.LeftShift => "<<",
           BinaryExpr.ResolvedOpcode.RightShift => ">>",
           BinaryExpr.ResolvedOpcode.Add => "+",
@@ -1737,9 +1740,13 @@ namespace Microsoft.Dafny.Compilers {
           BinaryExpr.ResolvedOpcode.Div => "/",
           BinaryExpr.ResolvedOpcode.Mod => "%",
           BinaryExpr.ResolvedOpcode.SetEq => "==",
+          BinaryExpr.ResolvedOpcode.SetNeq => "!=",
           BinaryExpr.ResolvedOpcode.MultiSetEq => "==",
+          BinaryExpr.ResolvedOpcode.MultiSetNeq => "!=",
           BinaryExpr.ResolvedOpcode.SeqEq => "==",
+          BinaryExpr.ResolvedOpcode.SeqNeq => "!=",
           BinaryExpr.ResolvedOpcode.MapEq => "==",
+          BinaryExpr.ResolvedOpcode.MapNeq => "!=",
           BinaryExpr.ResolvedOpcode.ProperSubset => "<",
           BinaryExpr.ResolvedOpcode.ProperMultiSubset => "<",
           BinaryExpr.ResolvedOpcode.Subset => "<=",
@@ -1761,7 +1768,8 @@ namespace Microsoft.Dafny.Compilers {
           BinaryExpr.ResolvedOpcode.Prefix => "<",
           BinaryExpr.ResolvedOpcode.Concat => "+",
           BinaryExpr.ResolvedOpcode.InSeq => "in",
-          _ => throw new NotImplementedException(),
+          BinaryExpr.ResolvedOpcode.NotInSeq => "notin",
+          _ => throw new NotImplementedException(op.ToString()),
         };
 
         currentBuilder = builder.Builder.BinOp(opString);
@@ -1875,7 +1883,7 @@ namespace Microsoft.Dafny.Compilers {
       throw new NotImplementedException();
     }
 
-    protected override string GetSubtypeCondition(string tmpVarName, Type boundVarType, IToken tok, ConcreteSyntaxTree wPreconditions) {
+    protected override Action<ConcreteSyntaxTree> GetSubtypeCondition(string tmpVarName, Type boundVarType, IToken tok, ConcreteSyntaxTree wPreconditions) {
       throw new NotImplementedException();
     }
 

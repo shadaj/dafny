@@ -1657,7 +1657,7 @@ module {:extern "DCOMP"} DCOMP {
           isErased := tupErased;
           readIdents := recIdents;
         }
-        case Call(on, name, typeArgs, args) => {
+        case Call(on, maybeName, typeArgs, args) => {
           readIdents := {};
 
           var typeArgString := "";
@@ -1697,16 +1697,21 @@ module {:extern "DCOMP"} DCOMP {
 
           var enclosingString, _, _, recIdents := GenExpr(on, selfIdent, params, false);
           readIdents := readIdents + recIdents;
-          match on {
-            case Companion(_) => {
-              enclosingString := enclosingString + "::";
+          match maybeName {
+            case Some(name) => {
+              match on {
+                case Companion(_) => {
+                  enclosingString := enclosingString + "::r#" + name.id;
+                }
+                case _ => {
+                  enclosingString := "(" + enclosingString + ").r#" + name.id;
+                }
+              }
             }
-            case _ => {
-              enclosingString := "(" + enclosingString + ").";
-            }
+            case None => {}
           }
 
-          s := enclosingString + "r#" + name.id + typeArgString + "(" + argString + ")";
+          s := enclosingString + typeArgString + "(" + argString + ")";
           isOwned := true;
           isErased := false;
         }
