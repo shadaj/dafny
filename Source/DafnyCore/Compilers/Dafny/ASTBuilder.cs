@@ -468,11 +468,19 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
-  class AssignBuilder : ExprContainer, BuildableStatement {
-    DAST.AssignLhs lhs = null;
+  class AssignBuilder : LhsContainer, ExprContainer, BuildableStatement {
+    object lhs = null;
     public object value;
 
-    public void SetLhs(DAST.AssignLhs lhs) {
+    public void AddLhs(DAST.AssignLhs lhs) {
+      if (this.lhs != null && this.lhs != lhs) {
+        throw new InvalidOperationException("Cannot change name of variable in assignment: " + this.lhs + " -> " + lhs);
+      } else {
+        this.lhs = lhs;
+      }
+    }
+
+    public void AddBuildable(BuildableLhs lhs) {
       if (this.lhs != null && this.lhs != lhs) {
         throw new InvalidOperationException("Cannot change name of variable in assignment: " + this.lhs + " -> " + lhs);
       } else {
@@ -502,7 +510,10 @@ namespace Microsoft.Dafny.Compilers {
       } else {
         var builtValue = new List<DAST.Expression>();
         ExprContainer.RecursivelyBuild(new List<object> { value }, builtValue);
-        return (DAST.Statement)DAST.Statement.create_Assign(lhs, builtValue[0]);
+
+        var builtLhs = LhsContainer.Build(lhs);
+
+        return (DAST.Statement)DAST.Statement.create_Assign(builtLhs, builtValue[0]);
       }
     }
   }
@@ -934,6 +945,64 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
+  interface LhsContainer {
+    void AddLhs(DAST.AssignLhs lhs);
+
+    void AddBuildable(BuildableLhs lhs);
+
+    ArrayLhs Array(List<DAST.Expression> indices) {
+      var ret = new ArrayLhs(indices);
+      AddBuildable(ret);
+      return ret;
+    }
+
+    protected static DAST.AssignLhs Build(object maybeBuilt) {
+      if (maybeBuilt is DAST.AssignLhs built) {
+        return built;
+      } else if (maybeBuilt is BuildableLhs buildable) {
+        return buildable.Build();
+      } else {
+        throw new InvalidOperationException("Unknown buildable type: " + maybeBuilt.GetType());
+      }
+    }
+  }
+
+  interface BuildableLhs {
+    DAST.AssignLhs Build();
+  }
+
+  class ArrayLhs : BuildableLhs, ExprContainer {
+    readonly List<DAST.Expression> indices;
+    object arrayExpr = null;
+
+    public ArrayLhs(List<DAST.Expression> indices) {
+      this.indices = indices;
+    }
+
+    public void AddExpr(DAST.Expression item) {
+      if (arrayExpr != null) {
+        throw new InvalidOperationException();
+      } else {
+        arrayExpr = item;
+      }
+    }
+
+    public void AddBuildable(BuildableExpr item) {
+      if (arrayExpr != null) {
+        throw new InvalidOperationException();
+      } else {
+        arrayExpr = item;
+      }
+    }
+
+    public DAST.AssignLhs Build() {
+      var builtArrayExpr = new List<DAST.Expression>();
+      ExprContainer.RecursivelyBuild(new List<object> { arrayExpr }, builtArrayExpr);
+
+      return (DAST.AssignLhs)DAST.AssignLhs.create_Index(builtArrayExpr[0], Sequence<DAST.Expression>.FromArray(indices.ToArray()));
+    }
+  }
+
   interface BuildableExpr {
     DAST.Expression Build();
   }
@@ -1023,8 +1092,8 @@ namespace Microsoft.Dafny.Compilers {
 
       return (DAST.Expression)DAST.Expression.create_Call(
         builtOn[0],
-        Sequence<Rune>.UnicodeFromString(name),
-        Sequence<DAST.Type>.FromArray(typeArgs.ToArray()),
+        name != null ? DAST.Optional<ISequence<Rune>>.create_Some(Sequence<Rune>.UnicodeFromString(name)) : DAST.Optional<ISequence<Rune>>.create_None(),
+        Sequence<DAST.Type>.FromArray((typeArgs ?? new()).ToArray()),
         Sequence<DAST.Expression>.FromArray(builtArgs.ToArray())
       );
     }
