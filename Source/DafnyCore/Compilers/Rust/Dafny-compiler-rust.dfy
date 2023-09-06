@@ -744,21 +744,38 @@ module {:extern "DCOMP"} DCOMP {
           needsIIFE := true;
         }
 
-        case Index(on, idx) => {
+        case Index(on, indices) => {
           var onExpr, onOwned, onErased, recIdents := GenExpr(on, selfIdent, params, false);
+          readIdents := recIdents;
           if !onErased {
             var eraseFn := if onOwned then "erase_owned" else "erase";
             onExpr := "::dafny_runtime::DafnyErasable::" + eraseFn + "(" + onExpr + ")";
           }
 
-          var idxString, _, idxErased, idxIdents := GenExpr(idx, selfIdent, params, true);
-          if !idxErased {
-            idxString := "::dafny_runtime::DafnyErasable::erase_owned(" + idxString + ")";
+          generated := "{\n";
+
+          var i := 0;
+          while i < |indices| {
+            var idx, _, idxErased, recIdentsIdx := GenExpr(indices[i], selfIdent, params, true);
+            if !idxErased {
+              idx := "::dafny_runtime::DafnyErasable::erase_owned(" + idx + ")";
+            }
+
+            generated := generated + "let __idx" + natToString(i) + " = <usize as ::dafny_runtime::NumCast>::from(" + idx + ").unwrap();\n";
+
+            readIdents := readIdents + recIdentsIdx;
+
+            i := i + 1;
           }
 
-          generated := "{\nlet __idx = <usize as ::dafny_runtime::NumCast>::from(" + idxString + ").unwrap();\n";
-          generated := generated + onExpr + ".borrow_mut()[__idx] = " + rhs + ";\n}";
-          readIdents := recIdents + idxIdents;
+          generated := generated + onExpr + ".borrow_mut()";
+          i := 0;
+          while i < |indices| {
+            generated := generated + "[__idx" + natToString(i) + "]";
+            i := i + 1;
+          }
+
+          generated := generated + " = " + rhs + ";\n}";
           needsIIFE := true;
         }
       }
@@ -1657,7 +1674,7 @@ module {:extern "DCOMP"} DCOMP {
           isErased := tupErased;
           readIdents := recIdents;
         }
-        case Call(on, name, typeArgs, args) => {
+        case Call(on, maybeName, typeArgs, args) => {
           readIdents := {};
 
           var typeArgString := "";
@@ -1697,16 +1714,21 @@ module {:extern "DCOMP"} DCOMP {
 
           var enclosingString, _, _, recIdents := GenExpr(on, selfIdent, params, false);
           readIdents := readIdents + recIdents;
-          match on {
-            case Companion(_) => {
-              enclosingString := enclosingString + "::";
+          match maybeName {
+            case Some(name) => {
+              match on {
+                case Companion(_) => {
+                  enclosingString := enclosingString + "::r#" + name.id;
+                }
+                case _ => {
+                  enclosingString := "(" + enclosingString + ").r#" + name.id;
+                }
+              }
             }
-            case _ => {
-              enclosingString := "(" + enclosingString + ").";
-            }
+            case None => {}
           }
 
-          s := enclosingString + "r#" + name.id + typeArgString + "(" + argString + ")";
+          s := enclosingString + typeArgString + "(" + argString + ")";
           isOwned := true;
           isErased := false;
         }
