@@ -59,7 +59,7 @@ module {:extern "DAST"} DAST {
   datatype AssignLhs =
     Ident(Ident) |
     Select(expr: Expression, field: string) |
-    Index(expr: Expression, idx: Expression)
+    Index(expr: Expression, indices: seq<Expression>)
 
   datatype Expression =
     Literal(Literal) |
@@ -82,7 +82,7 @@ module {:extern "DAST"} DAST {
     Index(expr: Expression, isArray: bool, indices: seq<Expression>) |
     IndexRange(expr: Expression, isArray: bool, low: Optional<Expression>, high: Optional<Expression>) |
     TupleSelect(expr: Expression, index: nat) |
-    Call(on: Expression, name: Ident, typeArgs: seq<Type>, args: seq<Expression>) |
+    Call(on: Expression, maybeName: Optional<Ident>, typeArgs: seq<Type>, args: seq<Expression>) |
     Lambda(params: seq<Formal>, retType: Type, body: seq<Statement>) |
     IIFE(name: Ident, typ: Type, value: Expression, iifeBody: Expression) |
     Apply(expr: Expression, args: seq<Expression>) |
