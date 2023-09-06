@@ -3297,7 +3297,9 @@ namespace Microsoft.Dafny.Compilers {
           // emit a loop structure. The structure "while (false) { }" comes to mind, but that results in
           // an "unreachable code" error from Java, so we instead use "while (true) { break; }".
           var wBody = CreateWhileLoop(out var guardWriter, wr);
-          guardWriter.Write(True);
+          EmitExpr(new LiteralExpr(null, true) {
+            Type = Type.Bool
+          }, false, guardWriter, wStmts);
           EmitBreak(null, wBody);
           Coverage.UnusedInstrumentationPoint(s.Body.Tok, "while body");
         } else {
