@@ -91,8 +91,8 @@ namespace Microsoft.Dafny.Compilers {
       body.Add(item);
     }
 
-    public void AddField(DAST.Formal item, DAST.Expression defaultValue) {
-      fields.Add((DAST.Field)DAST.Field.create_Field(item, defaultValue != null ? Optional<DAST._IExpression>.create_Some(defaultValue) : Optional<DAST._IExpression>.create_None()));
+    public void AddField(DAST.Formal item, _IOptional<DAST._IExpression> defaultValue) {
+      fields.Add((DAST.Field)DAST.Field.create_Field(item, defaultValue));
     }
 
     public object Finish() {
@@ -140,7 +140,7 @@ namespace Microsoft.Dafny.Compilers {
       body.Add(item);
     }
 
-    public void AddField(DAST.Formal item, DAST.Expression defaultValue) {
+    public void AddField(DAST.Formal item, _IOptional<DAST._IExpression> defaultValue) {
       throw new NotImplementedException();
     }
 
@@ -183,7 +183,7 @@ namespace Microsoft.Dafny.Compilers {
       throw new NotImplementedException();
     }
 
-    public void AddField(DAST.Formal item, DAST.Expression defaultValue) {
+    public void AddField(DAST.Formal item, _IOptional<DAST._IExpression> defaultValue) {
       throw new NotImplementedException();
     }
 
@@ -229,7 +229,7 @@ namespace Microsoft.Dafny.Compilers {
       body.Add(item);
     }
 
-    public void AddField(DAST.Formal item, DAST.Expression defaultValue) {
+    public void AddField(DAST.Formal item, _IOptional<DAST._IExpression> defaultValue) {
       throw new NotImplementedException();
     }
 
@@ -249,7 +249,7 @@ namespace Microsoft.Dafny.Compilers {
   interface ClassLike {
     void AddMethod(DAST.Method item);
 
-    void AddField(DAST.Formal item, DAST.Expression defaultValue);
+    void AddField(DAST.Formal item, _IOptional<DAST._IExpression> defaultValue);
 
     public MethodBuilder Method(
       bool isStatic, bool hasBody,

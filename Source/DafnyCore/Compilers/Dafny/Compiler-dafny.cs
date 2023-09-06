@@ -467,7 +467,7 @@ namespace Microsoft.Dafny.Compilers {
 
       public void DeclareField(string name, TopLevelDecl enclosingDecl, bool isStatic, bool isConst, Type type,
           IToken tok, string rhs, Field field) {
-        DAST.Expression rhsExpr = null;
+        _IOptional<DAST._IExpression> rhsExpr = null;
         if (rhs != null) {
           rhsExpr = compiler.bufferedInitializationValue;
           compiler.bufferedInitializationValue = null;
@@ -475,6 +475,8 @@ namespace Microsoft.Dafny.Compilers {
           if (rhsExpr == null) {
             throw new InvalidOperationException();
           }
+        } else {
+          rhsExpr = Optional<DAST._IExpression>.create_None();
         }
 
         builder.AddField((DAST.Formal)DAST.Formal.create_Formal(
@@ -507,7 +509,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override void EmitReturnExpr(string returnExpr, ConcreteSyntaxTree wr) {
-      if (returnExpr == "PLACEBO") {
+      if (returnExpr == "BUFFERED") {
         if (bufferedInitializationValue == null) {
           throw new InvalidOperationException("Expected a buffered value to have been populated because rhs != null");
         }
@@ -517,7 +519,7 @@ namespace Microsoft.Dafny.Compilers {
 
         if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
           var returnBuilder = stmtContainer.Builder.Return();
-          returnBuilder.AddExpr(rhsValue);
+          returnBuilder.AddExpr((DAST.Expression)rhsValue.dtor_Some_a0);
         } else {
           throw new InvalidOperationException();
         }
@@ -560,7 +562,7 @@ namespace Microsoft.Dafny.Compilers {
 
     // sometimes, the compiler generates the initial value before the declaration,
     // so we buffer it here
-    DAST.Expression bufferedInitializationValue = null;
+    _IOptional<DAST._IExpression> bufferedInitializationValue = null;
 
     protected override string TypeInitializationValue(Type type, ConcreteSyntaxTree wr, IToken tok,
         bool usePlaceboValue, bool constructTypeParameterDefaultsFromTypeDescriptors) {
@@ -568,29 +570,37 @@ namespace Microsoft.Dafny.Compilers {
         throw new InvalidOperationException();
       } else {
         type = type.NormalizeExpandKeepConstraints();
-        if (type.AsNewtype != null && type.AsNewtype.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
-          var buf = new ExprBuffer(null);
-          EmitExpr(type.AsNewtype.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), null);
-          bufferedInitializationValue = buf.Finish();
-        } else if (type.AsSubsetType != null && type.AsSubsetType.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
-          var buf = new ExprBuffer(null);
-          EmitExpr(type.AsSubsetType.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), null);
-          bufferedInitializationValue = buf.Finish();
-        } else if (type.AsDatatype != null && type.AsDatatype.Ctors.Count == 1 && type.AsDatatype.Ctors[0].EnclosingDatatype is TupleTypeDecl tupleDecl) {
-          var elems = new List<DAST.Expression>();
-          for (var i = 0; i < tupleDecl.Ctors[0].Formals.Count; i++) {
-            if (!tupleDecl.Ctors[0].Formals[i].IsGhost) {
-              TypeInitializationValue(type.TypeArgs[i], wr, tok, usePlaceboValue, constructTypeParameterDefaultsFromTypeDescriptors);
-              elems.Add(bufferedInitializationValue);
-              bufferedInitializationValue = null;
-            }
-          }
-
-          bufferedInitializationValue = (DAST.Expression)DAST.Expression.create_Tuple(Sequence<DAST.Expression>.FromArray(elems.ToArray()));
+        if (usePlaceboValue) {
+          bufferedInitializationValue = Optional<DAST._IExpression>.create_None();
         } else {
-          bufferedInitializationValue = (DAST.Expression)DAST.Expression.create_InitializationValue(GenType(type));
+          if (type.AsNewtype != null && type.AsNewtype.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
+            var buf = new ExprBuffer(null);
+            EmitExpr(type.AsNewtype.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), null);
+            bufferedInitializationValue = Optional<DAST._IExpression>.create_Some(buf.Finish());
+          } else if (type.AsSubsetType != null && type.AsSubsetType.WitnessKind == SubsetTypeDecl.WKind.Compiled) {
+            var buf = new ExprBuffer(null);
+            EmitExpr(type.AsSubsetType.Witness, false, new BuilderSyntaxTree<ExprContainer>(buf), null);
+            bufferedInitializationValue = Optional<DAST._IExpression>.create_Some(buf.Finish());
+          } else if (type.AsDatatype != null && type.AsDatatype.Ctors.Count == 1 && type.AsDatatype.Ctors[0].EnclosingDatatype is TupleTypeDecl tupleDecl) {
+            var elems = new List<DAST._IExpression>();
+            for (var i = 0; i < tupleDecl.Ctors[0].Formals.Count; i++) {
+              if (!tupleDecl.Ctors[0].Formals[i].IsGhost) {
+                TypeInitializationValue(type.TypeArgs[i], wr, tok, usePlaceboValue, constructTypeParameterDefaultsFromTypeDescriptors);
+                elems.Add(bufferedInitializationValue.dtor_Some_a0);
+                bufferedInitializationValue = null;
+              }
+            }
+
+            bufferedInitializationValue = Optional<DAST._IExpression>.create_Some(
+              DAST.Expression.create_Tuple(Sequence<DAST._IExpression>.FromArray(elems.ToArray()))
+            );
+          } else {
+            bufferedInitializationValue = Optional<DAST._IExpression>.create_Some(
+              DAST.Expression.create_InitializationValue(GenType(type))
+            );
+          }
         }
-        return "PLACEBO"; // used by DeclareLocal(Out)Var
+        return "BUFFERED"; // used by DeclareLocal(Out)Var
       }
     }
 
@@ -659,7 +669,7 @@ namespace Microsoft.Dafny.Compilers {
           if (leaveRoomForRhs) {
             throw new InvalidOperationException();
           }
-        } else if (rhs == "PLACEBO") {
+        } else if (rhs == "BUFFERED") {
           if (bufferedInitializationValue == null) {
             throw new InvalidOperationException("Expected a buffered value to have been populated because rhs != null");
           }
@@ -671,7 +681,7 @@ namespace Microsoft.Dafny.Compilers {
             (DAST.Statement)DAST.Statement.create_DeclareVar(
               Sequence<Rune>.UnicodeFromString(name),
               typ,
-              DAST.Optional<DAST._IExpression>.create_Some(rhsValue)
+              rhsValue
             )
           );
         } else {
@@ -1767,6 +1777,7 @@ namespace Microsoft.Dafny.Compilers {
           BinaryExpr.ResolvedOpcode.Disjoint => "!!",
           BinaryExpr.ResolvedOpcode.MultiSetDisjoint => "!!",
           BinaryExpr.ResolvedOpcode.InSet => "in",
+          BinaryExpr.ResolvedOpcode.NotInSet => "notin",
           BinaryExpr.ResolvedOpcode.InMultiSet => "in",
           BinaryExpr.ResolvedOpcode.InMap => "in",
           BinaryExpr.ResolvedOpcode.Union => "+",
