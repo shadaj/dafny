@@ -14,6 +14,10 @@ namespace Microsoft.Dafny.Compilers {
     public readonly T Builder;
 
     public BuilderSyntaxTree(T builder) {
+      if (builder == null) {
+        throw new ArgumentNullException(nameof(builder));
+      }
+
       Builder = builder;
     }
 

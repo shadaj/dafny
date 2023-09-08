@@ -3941,10 +3941,12 @@ namespace Microsoft.Dafny.Compilers {
       var iterLimit = "_iterLimit_" + c;
 
       bool needIterLimit = lhss.Count != 1 && bounds.Exists(bnd => (bnd.Virtues & ComprehensionExpr.BoundedPool.PoolVirtues.Finite) == 0);
+      var currentBlock = wr.Fork();
       wr = CreateLabeledCode(doneLabel, false, wr);
       var wrOuter = wr;
       if (needIterLimit) {
         wr = CreateDoublingForLoop(iterLimit, 5, wr);
+        currentBlock = wr;
       }
 
       for (int i = 0; i < n; i++) {
@@ -3952,12 +3954,13 @@ namespace Microsoft.Dafny.Compilers {
         Contract.Assert((bound.Virtues & ComprehensionExpr.BoundedPool.PoolVirtues.Enumerable) != 0);  // if we have got this far, it must be an enumerable bound
         var bv = lhss[i];
         if (needIterLimit) {
-          DeclareLocalVar(string.Format("{0}_{1}", iterLimit, i), null, null, false, iterLimit, wr, Type.Int);
+          DeclareLocalVar(string.Format("{0}_{1}", iterLimit, i), null, null, false, iterLimit, currentBlock, Type.Int);
         }
         var tmpVar = ProtectedFreshId("_assign_such_that_");
-        var wStmts = wr.Fork();
+        var wStmts = currentBlock.Fork();
         var elementType = CompileCollection(bound, bv, inLetExprBody, true, null, out var collection, wStmts);
         wr = CreateGuardedForeachLoop(tmpVar, elementType, bv, false, inLetExprBody, bv.Tok, collection, wr);
+        currentBlock = wr;
         if (needIterLimit) {
           var varName = $"{iterLimit}_{i}";
           var thn = EmitIf(out var isZeroWriter, false, wr);
