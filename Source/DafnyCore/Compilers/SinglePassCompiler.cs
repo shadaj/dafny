@@ -606,10 +606,10 @@ namespace Microsoft.Dafny.Compilers {
       string tmpVarName, Type collectionElementType,
       IVariable boundVar,
       bool introduceBoundVar, bool inLetExprBody,
-      IToken tok, ConcreteSyntaxTree collection, ConcreteSyntaxTree wr
+      IToken tok, Action<ConcreteSyntaxTree> collection, ConcreteSyntaxTree wr
       ) {
       wr = CreateForeachLoop(tmpVarName, collectionElementType, tok, out var collectionWriter, wr);
-      collectionWriter.Append(collection);
+      collection(collectionWriter);
       wr = MaybeInjectSubtypeConstraint(tmpVarName, collectionElementType, boundVar.Type, inLetExprBody, tok, wr);
       EmitDowncastVariableAssignment(IdName(boundVar), boundVar.Type, tmpVarName, collectionElementType,
           introduceBoundVar, tok, wr);
@@ -1346,20 +1346,27 @@ namespace Microsoft.Dafny.Compilers {
     /// </summary>
     protected abstract string GetCollectionBuilder_Build(CollectionType ct, IToken tok, string collName, ConcreteSyntaxTree wr);
 
-    protected virtual Type EmitIntegerRange(Type type, out ConcreteSyntaxTree wLo, out ConcreteSyntaxTree wHi, ConcreteSyntaxTree wr) {
+    protected virtual (Type, Action<ConcreteSyntaxTree>) EmitIntegerRange(Type type, Action<ConcreteSyntaxTree> wLo, Action<ConcreteSyntaxTree> wHi) {
       Type result;
       if (AsNativeType(type) != null) {
-        wr.Write("{0}.IntegerRange(", IdProtect(type.AsNewtype.GetFullCompileName(Options)));
         result = type;
       } else {
-        wr.Write("{0}.IntegerRange(", GetHelperModuleName());
         result = new IntType();
       }
-      wLo = wr.Fork();
-      wr.Write(", ");
-      wHi = wr.Fork();
-      wr.Write(')');
-      return result;
+
+      return (result, (wr) => {
+        if (AsNativeType(type) != null) {
+          wr.Write("{0}.IntegerRange(", IdProtect(type.AsNewtype.GetFullCompileName(Options)));
+        } else {
+          wr.Write("{0}.IntegerRange(", GetHelperModuleName());
+        }
+
+        wLo(wr);
+        wr.Write(", ");
+        wHi(wr);
+        wr.Write(')');
+      }
+      );
     }
     protected abstract void EmitSingleValueGenerator(Expression e, bool inLetExprBody, string type,
       ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts);
@@ -3643,77 +3650,92 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     Type CompileCollection(ComprehensionExpr.BoundedPool bound, IVariable bv, bool inLetExprBody, bool includeDuplicates,
-        Substituter/*?*/ su, out ConcreteSyntaxTree collectionWriter, ConcreteSyntaxTree wStmts,
+        Substituter/*?*/ su, out Action<ConcreteSyntaxTree> collectionWriter, ConcreteSyntaxTree wStmts,
         List<ComprehensionExpr.BoundedPool>/*?*/ bounds = null, List<BoundVar>/*?*/ boundVars = null, int boundIndex = 0) {
       Contract.Requires(bound != null);
       Contract.Requires(bounds == null || (boundVars != null && bounds.Count == boundVars.Count && 0 <= boundIndex && boundIndex < bounds.Count));
 
-      collectionWriter = new ConcreteSyntaxTree();
+      wStmts = wStmts.Fork();
 
       var propertySuffix = SupportsProperties ? "" : "()";
       su = su ?? new Substituter(null, new Dictionary<IVariable, Expression>(), new Dictionary<TypeParameter, Type>());
 
       if (bound is ComprehensionExpr.BoolBoundedPool) {
-        collectionWriter.Write("{0}.AllBooleans()", GetHelperModuleName());
+        collectionWriter = (wr) => wr.Write("{0}.AllBooleans()", GetHelperModuleName());
         return new BoolType();
       } else if (bound is ComprehensionExpr.CharBoundedPool) {
-        collectionWriter.Write($"{GetHelperModuleName()}.All{CharMethodQualifier}Chars()");
+        collectionWriter = (wr) => wr.Write($"{GetHelperModuleName()}.All{CharMethodQualifier}Chars()");
         return new CharType();
       } else if (bound is ComprehensionExpr.IntBoundedPool) {
         var b = (ComprehensionExpr.IntBoundedPool)bound;
-        var type = EmitIntegerRange(bv.Type, out var wLo, out var wHi, collectionWriter);
-        if (b.LowerBound == null) {
-          EmitNull(bv.Type, wLo);
-        } else if (bounds != null) {
-          var low = SubstituteBound(b, bounds, boundVars, boundIndex, true);
-          EmitExpr(su.Substitute(low), inLetExprBody, wLo, wStmts);
-        } else {
-          EmitExpr(su.Substitute(b.LowerBound), inLetExprBody, wLo, wStmts);
-        }
-        if (b.UpperBound == null) {
-          EmitNull(bv.Type, wHi);
-        } else if (bounds != null) {
-          var high = SubstituteBound(b, bounds, boundVars, boundIndex, false);
-          EmitExpr(su.Substitute(high), inLetExprBody, wHi, wStmts);
-        } else {
-          EmitExpr(su.Substitute(b.UpperBound), inLetExprBody, wHi, wStmts);
-        }
-        return type;
+        var res = EmitIntegerRange(bv.Type, wLo => {
+          if (b.LowerBound == null) {
+            EmitNull(bv.Type, wLo);
+          } else if (bounds != null) {
+            var low = SubstituteBound(b, bounds, boundVars, boundIndex, true);
+            EmitExpr(su.Substitute(low), inLetExprBody, wLo, wStmts);
+          } else {
+            EmitExpr(su.Substitute(b.LowerBound), inLetExprBody, wLo, wStmts);
+          }
+        }, wHi => {
+          if (b.UpperBound == null) {
+            EmitNull(bv.Type, wHi);
+          } else if (bounds != null) {
+            var high = SubstituteBound(b, bounds, boundVars, boundIndex, false);
+            EmitExpr(su.Substitute(high), inLetExprBody, wHi, wStmts);
+          } else {
+            EmitExpr(su.Substitute(b.UpperBound), inLetExprBody, wHi, wStmts);
+          }
+        });
+
+        collectionWriter = res.Item2;
+
+        return res.Item1;
       } else if (bound is AssignSuchThatStmt.WiggleWaggleBound) {
-        collectionWriter.Write("{0}.AllIntegers()", GetHelperModuleName());
+        collectionWriter = (wr) => wr.Write("{0}.AllIntegers()", GetHelperModuleName());
         return bv.Type;
       } else if (bound is ComprehensionExpr.ExactBoundedPool) {
         var b = (ComprehensionExpr.ExactBoundedPool)bound;
-        EmitSingleValueGenerator(su.Substitute(b.E), inLetExprBody, TypeName(b.E.Type, collectionWriter, b.E.tok), collectionWriter, wStmts);
+        collectionWriter = (wr) => EmitSingleValueGenerator(su.Substitute(b.E), inLetExprBody, TypeName(b.E.Type, wr, b.E.tok), wr, wStmts);
         return b.E.Type;
       } else if (bound is ComprehensionExpr.SetBoundedPool setBoundedPool) {
-        TrParenExpr(su.Substitute(setBoundedPool.Set), collectionWriter, inLetExprBody, wStmts);
-        collectionWriter.Write(".Elements" + propertySuffix);
+        collectionWriter = (wr) => {
+          TrParenExpr(su.Substitute(setBoundedPool.Set), wr, inLetExprBody, wStmts);
+          wr.Write(".Elements" + propertySuffix);
+        };
         return setBoundedPool.CollectionElementType;
       } else if (bound is ComprehensionExpr.MultiSetBoundedPool) {
         var b = (ComprehensionExpr.MultiSetBoundedPool)bound;
-        TrParenExpr(su.Substitute(b.MultiSet), collectionWriter, inLetExprBody, wStmts);
-        collectionWriter.Write((includeDuplicates ? ".Elements" : ".UniqueElements") + propertySuffix);
+        collectionWriter = (wr) => {
+          TrParenExpr(su.Substitute(b.MultiSet), wr, inLetExprBody, wStmts);
+          wr.Write((includeDuplicates ? ".Elements" : ".UniqueElements") + propertySuffix);
+        };
         return b.CollectionElementType;
       } else if (bound is ComprehensionExpr.SubSetBoundedPool) {
         var b = (ComprehensionExpr.SubSetBoundedPool)bound;
-        TrParenExpr(su.Substitute(b.UpperBound), collectionWriter, inLetExprBody, wStmts);
-        collectionWriter.Write(".AllSubsets" + propertySuffix);
+        collectionWriter = (wr) => {
+          TrParenExpr(su.Substitute(b.UpperBound), wr, inLetExprBody, wStmts);
+          wr.Write(".AllSubsets" + propertySuffix);
+        };
         return b.UpperBound.Type;
       } else if (bound is ComprehensionExpr.MapBoundedPool) {
         var b = (ComprehensionExpr.MapBoundedPool)bound;
-        TrParenExpr(su.Substitute(b.Map), collectionWriter, inLetExprBody, wStmts);
-        GetSpecialFieldInfo(SpecialField.ID.Keys, null, null, out var keyName, out _, out _);
-        collectionWriter.Write($".{keyName}.Elements{propertySuffix}");
+        collectionWriter = (wr) => {
+          TrParenExpr(su.Substitute(b.Map), wr, inLetExprBody, wStmts);
+          GetSpecialFieldInfo(SpecialField.ID.Keys, null, null, out var keyName, out _, out _);
+          wr.Write($".{keyName}.Elements{propertySuffix}");
+        };
         return b.CollectionElementType;
       } else if (bound is ComprehensionExpr.SeqBoundedPool) {
         var b = (ComprehensionExpr.SeqBoundedPool)bound;
-        TrParenExpr(su.Substitute(b.Seq), collectionWriter, inLetExprBody, wStmts);
-        collectionWriter.Write((includeDuplicates ? ".Elements" : ".UniqueElements") + propertySuffix);
+        collectionWriter = (wr) => {
+          TrParenExpr(su.Substitute(b.Seq), wr, inLetExprBody, wStmts);
+          wr.Write((includeDuplicates ? ".Elements" : ".UniqueElements") + propertySuffix);
+        };
         return b.CollectionElementType;
       } else if (bound is ComprehensionExpr.DatatypeBoundedPool) {
         var b = (ComprehensionExpr.DatatypeBoundedPool)bound;
-        collectionWriter.Write("{0}.AllSingletonConstructors{1}", TypeName_Companion(bv.Type, collectionWriter, bv.Tok, null), propertySuffix);
+        collectionWriter = (wr) => wr.Write("{0}.AllSingletonConstructors{1}", TypeName_Companion(bv.Type, wr, bv.Tok, null), propertySuffix);
         return new UserDefinedType(bv.Tok, new NameSegment(bv.Tok, b.Decl.Name, new())) {
           ResolvedClass = b.Decl
         };
@@ -5327,7 +5349,7 @@ namespace Microsoft.Dafny.Compilers {
 
           var collectionElementType = CompileCollection(bound, bv, inLetExprBody, false, su, out var collection, wStmts, e.Bounds, e.BoundVars, i);
           wBody.Write("{0}(", GetQuantifierName(TypeName(collectionElementType, wBody, bv.tok)));
-          wBody.Append(collection);
+          collection(wBody);
           wBody.Write(", {0}, ", expr is ForallExpr ? True : False);
           var native = AsNativeType(e.BoundVars[i].Type);
           var tmpVarName = ProtectedFreshId(e is ForallExpr ? "_forall_var_" : "_exists_var_");
