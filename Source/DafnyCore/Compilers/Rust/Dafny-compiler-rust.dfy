@@ -134,21 +134,7 @@ module {:extern "DCOMP"} DCOMP {
       defaultImpl := defaultImpl + "}\n";
 
       var printImpl := "impl " + constrainedTypeParams + " ::dafny_runtime::DafnyPrint for r#" + c.name + typeParams + " {\n" + "fn fmt_print(&self, __fmt_print_formatter: &mut ::std::fmt::Formatter, _in_seq: bool) -> std::fmt::Result {\n";
-      printImpl := printImpl + "write!(__fmt_print_formatter, \"" + c.enclosingModule.id + "." + c.name + (if |c.fields| > 0 then "("  else "") + "\")?;";
-      var i := 0;
-      while i < |c.fields| {
-        var field := c.fields[i];
-        if (i > 0) {
-          printImpl := printImpl + "\nwrite!(__fmt_print_formatter, \", \")?;";
-        }
-        printImpl := printImpl + "\n::dafny_runtime::DafnyPrint::fmt_print(::std::ops::Deref::deref(&(self.r#" + field.formal.name + ".borrow())), __fmt_print_formatter, false)?;";
-        i := i + 1;
-      }
-
-      if |c.fields| > 0 {
-        printImpl := printImpl + "\nwrite!(__fmt_print_formatter, \")\")?;";
-      }
-      printImpl := printImpl + "\nOk(())\n}\n}\n";
+      printImpl := printImpl + "write!(__fmt_print_formatter, \"" + c.enclosingModule.id + "." + c.name + "\")\n}\n}\n";
 
       var ptrPartialEqImpl := "impl " + constrainedTypeParams + " ::std::cmp::PartialEq for r#" + c.name + typeParams + " {\n";
       ptrPartialEqImpl := ptrPartialEqImpl + "fn eq(&self, other: &Self) -> bool {\n";
