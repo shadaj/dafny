@@ -134,21 +134,7 @@ module {:extern "DCOMP"} DCOMP {
       defaultImpl := defaultImpl + "}\n";
 
       var printImpl := "impl " + constrainedTypeParams + " ::dafny_runtime::DafnyPrint for r#" + c.name + typeParams + " {\n" + "fn fmt_print(&self, __fmt_print_formatter: &mut ::std::fmt::Formatter, _in_seq: bool) -> std::fmt::Result {\n";
-      printImpl := printImpl + "write!(__fmt_print_formatter, \"" + c.enclosingModule.id + "." + c.name + (if |c.fields| > 0 then "("  else "") + "\")?;";
-      var i := 0;
-      while i < |c.fields| {
-        var field := c.fields[i];
-        if (i > 0) {
-          printImpl := printImpl + "\nwrite!(__fmt_print_formatter, \", \")?;";
-        }
-        printImpl := printImpl + "\n::dafny_runtime::DafnyPrint::fmt_print(::std::ops::Deref::deref(&(self.r#" + field.formal.name + ".borrow())), __fmt_print_formatter, false)?;";
-        i := i + 1;
-      }
-
-      if |c.fields| > 0 {
-        printImpl := printImpl + "\nwrite!(__fmt_print_formatter, \")\")?;";
-      }
-      printImpl := printImpl + "\nOk(())\n}\n}\n";
+      printImpl := printImpl + "write!(__fmt_print_formatter, \"" + c.enclosingModule.id + "." + c.name + "\")\n}\n}\n";
 
       var ptrPartialEqImpl := "impl " + constrainedTypeParams + " ::std::cmp::PartialEq for r#" + c.name + typeParams + " {\n";
       ptrPartialEqImpl := ptrPartialEqImpl + "fn eq(&self, other: &Self) -> bool {\n";
@@ -831,7 +817,12 @@ module {:extern "DCOMP"} DCOMP {
           readIdents := readIdents + elsIdents;
           generated := "if " + condString + " {\n" + thnString + "\n} else {\n" + elsString + "\n}";
         }
-        case While(lbl, cond, body) => {
+        case Labeled(lbl, body) => {
+          var bodyString, bodyIdents := GenStmts(body, selfIdent, params, isLast, earlyReturn);
+          readIdents := bodyIdents;
+          generated := "'label_" + lbl + ": loop {\n" + bodyString + "\n" + "break;" + "\n}";
+        }
+        case While(cond, body) => {
           var condString, _, condErased, recIdents := GenExpr(cond, selfIdent, params, true);
           if !condErased {
             condString := "::dafny_runtime::DafnyErasable::erase(" + condString + ")";
@@ -841,15 +832,19 @@ module {:extern "DCOMP"} DCOMP {
           var bodyString, bodyIdents := GenStmts(body, selfIdent, params, false, earlyReturn);
           readIdents := readIdents + bodyIdents;
 
-          var lblString := "";
-          match lbl {
-            case Some(id) => {
-              lblString := "'label_" + id + ": ";
-            }
-            case None => {}
+          generated := "while " + condString + " {\n" + bodyString + "\n}";
+        }
+        case Foreach(boundName, over, body) => {
+          var overString, _, overErased, recIdents := GenExpr(over, selfIdent, params, true);
+          if !overErased {
+            overString := "::dafny_runtime::DafnyErasable::erase(" + overString + ")";
           }
 
-          generated := lblString + "while " + condString + " {\n" + bodyString + "\n}";
+          readIdents := recIdents;
+          var bodyString, bodyIdents := GenStmts(body, selfIdent, params, false, earlyReturn);
+          readIdents := readIdents + bodyIdents;
+
+          generated := "for r#" + boundName + " in " + overString + " {\n" + bodyString + "\n}";
         }
         case Break(toLabel) => {
           match toLabel {
@@ -1918,6 +1913,12 @@ module {:extern "DCOMP"} DCOMP {
           isOwned := true;
           isErased := true;
           readIdents := recIdents;
+        }
+        case BoolBoundedPool() => {
+          s := "[false, true]";
+          isOwned := true;
+          isErased := true;
+          readIdents := {};
         }
       }
     }

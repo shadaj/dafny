@@ -46,7 +46,9 @@ module {:extern "DAST"} DAST {
     DeclareVar(name: string, typ: Type, maybeValue: Optional<Expression>) |
     Assign(lhs: AssignLhs, value: Expression) |
     If(cond: Expression, thn: seq<Statement>, els: seq<Statement>) |
-    While(lbl: Optional<string>, cond: Expression, body: seq<Statement>) |
+    Labeled(lbl: string, body: seq<Statement>) |
+    While(cond: Expression, body: seq<Statement>) |
+    Foreach(boundName: string, over: Expression, body: seq<Statement>) |
     Call(on: Expression, name: string, typeArgs: seq<Type>, args: seq<Expression>, outs: Optional<seq<Ident>>) |
     Return(expr: Expression) |
     EarlyReturn() |
@@ -91,7 +93,8 @@ module {:extern "DAST"} DAST {
     IIFE(name: Ident, typ: Type, value: Expression, iifeBody: Expression) |
     Apply(expr: Expression, args: seq<Expression>) |
     TypeTest(on: Expression, dType: seq<Ident>, variant: string) |
-    InitializationValue(typ: Type)
+    InitializationValue(typ: Type) |
+    BoolBoundedPool()
 
   datatype UnaryOp = Not | BitwiseNot | Cardinality
 
