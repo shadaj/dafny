@@ -382,6 +382,12 @@ namespace Microsoft.Dafny.Compilers {
       return ret;
     }
 
+    public ForeachBuilder Foreach(string boundName) {
+      var ret = new ForeachBuilder(null, boundName);
+      AddBuildable(ret);
+      return ret;
+    }
+
     public TailRecursiveBuilder TailRecursive() {
       var ret = new TailRecursiveBuilder();
       AddBuildable(ret);
@@ -665,6 +671,63 @@ namespace Microsoft.Dafny.Compilers {
     }
   }
 
+  class ForeachBuilder : ExprContainer, StatementContainer, BuildableStatement {
+    readonly string label;
+    readonly string boundName;
+    object over = null;
+    readonly List<object> body = new();
+
+    public ForeachBuilder(string label, string boundName) {
+      this.label = label;
+      this.boundName = boundName;
+    }
+
+    public void AddExpr(DAST.Expression value) {
+      if (over != null) {
+        throw new InvalidOperationException();
+      } else {
+        over = value;
+      }
+    }
+
+    public void AddBuildable(BuildableExpr value) {
+      if (over != null) {
+        throw new InvalidOperationException();
+      } else {
+        over = value;
+      }
+    }
+
+    public void AddStatement(DAST.Statement item) {
+      body.Add(item);
+    }
+
+    public void AddBuildable(BuildableStatement item) {
+      body.Add(item);
+    }
+
+    public List<object> ForkList() {
+      var ret = new List<object>();
+      this.body.Add(ret);
+      return ret;
+    }
+
+    public DAST.Statement Build() {
+      List<DAST.Expression> builtOver = new();
+      ExprContainer.RecursivelyBuild(new List<object> { over }, builtOver);
+
+      List<DAST.Statement> builtStatements = new();
+      StatementContainer.RecursivelyBuild(body, builtStatements);
+
+      return (DAST.Statement)DAST.Statement.create_Foreach(
+        label == null ? Optional<ISequence<Rune>>.create_None() : Optional<ISequence<Rune>>.create_Some(Sequence<Rune>.UnicodeFromString(label)),
+        Sequence<Rune>.UnicodeFromString(boundName),
+        builtOver[0],
+        Sequence<DAST.Statement>.FromArray(builtStatements.ToArray())
+      );
+    }
+  }
+
   class TailRecursiveBuilder : StatementContainer, BuildableStatement {
     readonly List<object> body = new();
 
@@ -816,6 +879,12 @@ namespace Microsoft.Dafny.Compilers {
 
     public WhileBuilder While() {
       var ret = new WhileBuilder(label);
+      parent.AddBuildable(ret);
+      return ret;
+    }
+
+    public ForeachBuilder Foreach(string boundName) {
+      var ret = new ForeachBuilder(label, boundName);
       parent.AddBuildable(ret);
       return ret;
     }
