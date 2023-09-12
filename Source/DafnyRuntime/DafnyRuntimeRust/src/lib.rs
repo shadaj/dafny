@@ -7,6 +7,7 @@ pub use num::rational::BigRational;
 pub use num::FromPrimitive;
 pub use num::NumCast;
 pub use num::Zero;
+pub use itertools;
 
 pub fn dafny_rational_to_int(r: &BigRational) -> BigInt {
     euclidian_division(r.numer().clone(), r.denom().clone())
