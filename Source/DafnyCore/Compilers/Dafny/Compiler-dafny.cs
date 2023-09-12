@@ -755,10 +755,13 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override void CompileFunctionCallExpr(FunctionCallExpr e, ConcreteSyntaxTree wr, bool inLetExprBody,
-        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr) {
+        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr, bool alreadyCoerced) {
+      var toType = thisContext == null ? e.Type : e.Type.Subst(thisContext.ParentFormalTypeParametersToActuals);
+      wr = EmitCoercionIfNecessary(e.Function.Original.ResultType, toType, e.tok, wr);
+
       if (wr is BuilderSyntaxTree<ExprContainer> builder) {
         var callBuilder = builder.Builder.Call();
-        base.CompileFunctionCallExpr(e, new BuilderSyntaxTree<ExprContainer>(callBuilder), inLetExprBody, wStmts, tr);
+        base.CompileFunctionCallExpr(e, new BuilderSyntaxTree<ExprContainer>(callBuilder), inLetExprBody, wStmts, tr, true);
       } else {
         throw new InvalidOperationException("Cannot call function in this context: " + currentBuilder);
       }

@@ -5811,14 +5811,16 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected virtual void CompileFunctionCallExpr(FunctionCallExpr e, ConcreteSyntaxTree wr, bool inLetExprBody,
-        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr) {
+        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr, bool alreadyCoerced = false) {
       Contract.Requires(e != null && e.Function != null);
       Contract.Requires(wr != null);
       Contract.Requires(tr != null);
       Function f = e.Function;
 
-      var toType = thisContext == null ? e.Type : e.Type.Subst(thisContext.ParentFormalTypeParametersToActuals);
-      wr = EmitCoercionIfNecessary(f.Original.ResultType, toType, e.tok, wr);
+      if (!alreadyCoerced) {
+        var toType = thisContext == null ? e.Type : e.Type.Subst(thisContext.ParentFormalTypeParametersToActuals);
+        wr = EmitCoercionIfNecessary(f.Original.ResultType, toType, e.tok, wr);
+      }
 
       var customReceiver = !(f.EnclosingClass is TraitDecl) && NeedsCustomReceiver(f);
       string qual = "";
