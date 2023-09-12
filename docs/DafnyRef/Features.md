@@ -29,7 +29,7 @@
 | [Type test expressions on subset types](#sec-as-is-expression) |  |  |  |  |  |  |  X  |  |
 | [Quantifiers](#sec-quantifier-expression) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
 | [Bitvector RotateLeft/RotateRight functions](#sec-bit-vector-types) |  X  |  X  |  X  |  X  |  X  |  |  X  |  |
-| [`for` loops](#sec-for-statement) |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  |
+| [`for` loops](#sec-for-statement) |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |
 | [`continue` statements](#sec-break-continue-statement) |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |
 | [Assign-such-that statements with potentially infinite bounds](#sec-update-and-call-statement)[^compiler-infinite-assign-such-that-note] |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  |
 | [Sequence update expressions](#sec-other-sequence-expressions) |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  |

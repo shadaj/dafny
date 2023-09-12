@@ -65,6 +65,14 @@ module {:extern "DAST"} DAST {
 
   datatype CollKind = Seq | Array | Map
 
+  datatype BinOp =
+    Implies() |
+    In() |
+    NotIn() |
+    SetDifference() |
+    Concat() |
+    Passthrough(string)
+
   datatype Expression =
     Literal(Literal) |
     Ident(string) |
@@ -81,7 +89,7 @@ module {:extern "DAST"} DAST {
     This() |
     Ite(cond: Expression, thn: Expression, els: Expression) |
     UnOp(unOp: UnaryOp, expr: Expression) |
-    BinOp(op: string, left: Expression, right: Expression) |
+    BinOp(op: BinOp, left: Expression, right: Expression) |
     ArrayLen(expr: Expression, dim: nat) |
     Select(expr: Expression, field: string, isConstant: bool, onDatatype: bool) |
     SelectFn(expr: Expression, field: string, onDatatype: bool, isStatic: bool, arity: nat) |
@@ -96,6 +104,8 @@ module {:extern "DAST"} DAST {
     TypeTest(on: Expression, dType: seq<Ident>, variant: string) |
     InitializationValue(typ: Type) |
     BoolBoundedPool() |
+    SetBoundedPool(of: Expression) |
+    SeqBoundedPool(of: Expression, includeDuplicates: bool) |
     IntRange(lo: Expression, hi: Expression)
 
   datatype UnaryOp = Not | BitwiseNot | Cardinality
