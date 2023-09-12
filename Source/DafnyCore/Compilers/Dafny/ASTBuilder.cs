@@ -960,7 +960,7 @@ namespace Microsoft.Dafny.Compilers {
 
     void AddBuildable(BuildableExpr item);
 
-    BinOpBuilder BinOp(string op) {
+    BinOpBuilder BinOp(DAST.BinOp op) {
       var ret = new BinOpBuilder(op);
       AddBuildable(ret);
       return ret;
@@ -1050,6 +1050,7 @@ namespace Microsoft.Dafny.Compilers {
   class ArrayLhs : BuildableLhs, ExprContainer {
     readonly List<DAST.Expression> indices;
     object arrayExpr = null;
+    readonly System.Diagnostics.StackTrace stackTrace = new(true);
 
     public ArrayLhs(List<DAST.Expression> indices) {
       this.indices = indices;
@@ -1072,6 +1073,9 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     public DAST.AssignLhs Build() {
+      if (arrayExpr == null) {
+        Console.WriteLine(stackTrace);
+      }
       var builtArrayExpr = new List<DAST.Expression>();
       ExprContainer.RecursivelyBuild(new List<object> { arrayExpr }, builtArrayExpr);
 
@@ -1084,10 +1088,10 @@ namespace Microsoft.Dafny.Compilers {
   }
 
   class BinOpBuilder : ExprContainer, BuildableExpr {
-    readonly string op;
+    readonly DAST.BinOp op;
     readonly List<object> operands = new();
 
-    public BinOpBuilder(string op) {
+    public BinOpBuilder(DAST.BinOp op) {
       this.op = op;
     }
 
@@ -1106,7 +1110,7 @@ namespace Microsoft.Dafny.Compilers {
 
       var builtOperands = new List<DAST.Expression>();
       ExprContainer.RecursivelyBuild(operands, builtOperands);
-      return (DAST.Expression)DAST.Expression.create_BinOp(Sequence<Rune>.UnicodeFromString(op), builtOperands[0], builtOperands[1]);
+      return (DAST.Expression)DAST.Expression.create_BinOp(op, builtOperands[0], builtOperands[1]);
     }
   }
 
