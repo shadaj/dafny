@@ -676,12 +676,6 @@ module {:extern "DCOMP"} DCOMP {
         }
 
         var body, _ := GenStmts(m.body, if m.isStatic then None else Some("self"), paramNames, true, earlyReturn);
-        match m.outVars {
-          case Some(outVars) => {
-            body := body + "\n" + earlyReturn;
-          }
-          case None => {}
-        }
 
         s := s + " {\n" + body + "\n}\n";
       } else {
@@ -841,18 +835,20 @@ module {:extern "DCOMP"} DCOMP {
         }
         case Foreach(boundName, boundType, over, body) => {
           var overString, _, overErased, recIdents := GenExpr(over, selfIdent, params, true);
-          if !overErased {
-            overString := "::dafny_runtime::DafnyErasable::erase(" + overString + ")";
-          }
 
           var boundTypeStr := GenType(boundType, false, false);
 
           readIdents := recIdents;
-          var bodyString, bodyIdents := GenStmts(body, selfIdent, params, false, earlyReturn);
+          var bodyString, bodyIdents := GenStmts(body, selfIdent, params + [boundName], false, earlyReturn);
           readIdents := readIdents + bodyIdents;
 
+          var unerasedIter := "_iter_erased";
+          if overErased {
+            unerasedIter := "<" + boundTypeStr + " as ::dafny_runtime::DafnyUnerasable<_>>::unerase_owned(" + unerasedIter + ")";
+          }
+
           generated := "for _iter_erased in " + overString + " {\n";
-          generated := generated + "let r#" + boundName + " = <" + boundTypeStr + " as ::dafny_runtime::DafnyUnerasable<_>>::unerase_owned(_iter_erased);\n" + bodyString + "\n}";
+          generated := generated + "let r#" + boundName + " = " + unerasedIter + ";\n" + bodyString + "\n}";
         }
         case Break(toLabel) => {
           match toLabel {
@@ -1546,12 +1542,25 @@ module {:extern "DCOMP"} DCOMP {
             right := "::dafny_runtime::DafnyErasable::erase_owned(" + right + ")";
           }
 
-          if op == "/" {
-            s := "::dafny_runtime::euclidian_division(" + left + ", " + right + ")";
-          } else if op == "%" {
-            s := "::dafny_runtime::euclidian_modulo(" + left + ", " + right + ")";
-          } else {
-            s := "(" + left + " " + op + " " + right + ")";
+          match op {
+            case In() => {
+              s := right + ".contains(&" + left + ")";
+            }
+            case SetDifference() => {
+              s := left + ".difference(&" + right + ").cloned().collect::<::std::collections::HashSet<_>>()";
+            }
+            case Concat() => {
+              s := "[" + left + ", " + right + "].concat()";
+            }
+            case Passthrough(op) => {
+              if op == "/" {
+                s := "::dafny_runtime::euclidian_division(" + left + ", " + right + ")";
+              } else if op == "%" {
+                s := "::dafny_runtime::euclidian_modulo(" + left + ", " + right + ")";
+              } else {
+                s := "(" + left + " " + op + " " + right + ")";
+              }
+            }
           }
 
           isOwned := true;
@@ -1949,6 +1958,13 @@ module {:extern "DCOMP"} DCOMP {
           isOwned := true;
           isErased := true;
           readIdents := {};
+        }
+        case SetBoundedPool(of) => {
+          var exprGen, _, exprErased, recIdents := GenExpr(of, selfIdent, params, false);
+          s := "(" + exprGen + ").iter()";
+          isOwned := true;
+          isErased := exprErased;
+          readIdents := recIdents;
         }
         case IntRange(lo, hi) => {
           var loString, _, loErased, recIdentsLo := GenExpr(lo, selfIdent, params, true);

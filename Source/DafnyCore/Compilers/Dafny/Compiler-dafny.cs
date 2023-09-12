@@ -755,10 +755,13 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override void CompileFunctionCallExpr(FunctionCallExpr e, ConcreteSyntaxTree wr, bool inLetExprBody,
-        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr) {
+        ConcreteSyntaxTree wStmts, FCE_Arg_Translator tr, bool alreadyCoerced) {
+      var toType = thisContext == null ? e.Type : e.Type.Subst(thisContext.ParentFormalTypeParametersToActuals);
+      wr = EmitCoercionIfNecessary(e.Function.Original.ResultType, toType, e.tok, wr);
+
       if (wr is BuilderSyntaxTree<ExprContainer> builder) {
         var callBuilder = builder.Builder.Call();
-        base.CompileFunctionCallExpr(e, new BuilderSyntaxTree<ExprContainer>(callBuilder), inLetExprBody, wStmts, tr);
+        base.CompileFunctionCallExpr(e, new BuilderSyntaxTree<ExprContainer>(callBuilder), inLetExprBody, wStmts, tr, true);
       } else {
         throw new InvalidOperationException("Cannot call function in this context: " + currentBuilder);
       }
@@ -1776,7 +1779,9 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override ConcreteSyntaxTree EmitAnd(Action<ConcreteSyntaxTree> lhs, ConcreteSyntaxTree wr) {
       if (wr is BuilderSyntaxTree<ExprContainer> builder) {
-        var binOp = builder.Builder.BinOp("&&");
+        var binOp = builder.Builder.BinOp((DAST.BinOp)DAST.BinOp.create_Passthrough(
+          Sequence<Rune>.UnicodeFromString("&&")
+        ));
         lhs(new BuilderSyntaxTree<ExprContainer>(binOp));
 
         return new BuilderSyntaxTree<ExprContainer>(binOp);
@@ -1802,7 +1807,16 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override void EmitSetBoundedPool(Expression of, string propertySuffix, bool inLetExprBody, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
-      throw new NotImplementedException();
+      if (wr is BuilderSyntaxTree<ExprContainer> exprBuilder) {
+        var buf = new ExprBuffer(null);
+        EmitExpr(of, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(buf), wStmts);
+
+        exprBuilder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_SetBoundedPool(
+          buf.Finish()
+        ));
+      } else {
+        throw new InvalidOperationException();
+      }
     }
 
     protected override void EmitMultiSetBoundedPool(Expression of, bool includeDuplicates, string propertySuffix, bool inLetExprBody, ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
@@ -1962,7 +1976,14 @@ namespace Microsoft.Dafny.Compilers {
           _ => throw new NotImplementedException(op.ToString()),
         };
 
-        currentBuilder = builder.Builder.BinOp(opString);
+        var opAst = op switch {
+          BinaryExpr.ResolvedOpcode.InSet => DAST.BinOp.create_In(),
+          BinaryExpr.ResolvedOpcode.SetDifference => DAST.BinOp.create_SetDifference(),
+          BinaryExpr.ResolvedOpcode.Concat => DAST.BinOp.create_Concat(),
+          _ => DAST.BinOp.create_Passthrough(Sequence<Rune>.UnicodeFromString(opString)),
+        };
+
+        currentBuilder = builder.Builder.BinOp((DAST.BinOp)opAst);
         // cleaned up by EmitExpr
       } else {
         throw new InvalidOperationException();
@@ -2107,9 +2128,9 @@ namespace Microsoft.Dafny.Compilers {
           typeTest = wr => {
             if (wr is BuilderSyntaxTree<ExprContainer> builder) {
               builder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_BinOp(
-                Sequence<Rune>.UnicodeFromString("&&"),
+                DAST.BinOp.create_Passthrough(Sequence<Rune>.UnicodeFromString("&&")),
                 DAST.Expression.create_BinOp(
-                  Sequence<Rune>.UnicodeFromString("!="),
+                  DAST.BinOp.create_Passthrough(Sequence<Rune>.UnicodeFromString("!=")),
                   DAST.Expression.create_Ident(Sequence<Rune>.UnicodeFromString(tmpVarName)),
                   DAST.Expression.create_Literal(DAST.Literal.create_Null())
                 ),
@@ -2123,9 +2144,9 @@ namespace Microsoft.Dafny.Compilers {
           typeTest = wr => {
             if (wr is BuilderSyntaxTree<ExprContainer> builder) {
               builder.Builder.AddExpr((DAST.Expression)DAST.Expression.create_BinOp(
-                Sequence<Rune>.UnicodeFromString("||"),
+                DAST.BinOp.create_Passthrough(Sequence<Rune>.UnicodeFromString("||")),
                 DAST.Expression.create_BinOp(
-                  Sequence<Rune>.UnicodeFromString("=="),
+                  DAST.BinOp.create_Passthrough(Sequence<Rune>.UnicodeFromString("==")),
                   DAST.Expression.create_Ident(Sequence<Rune>.UnicodeFromString(tmpVarName)),
                   DAST.Expression.create_Literal(DAST.Literal.create_Null())
                 ),
