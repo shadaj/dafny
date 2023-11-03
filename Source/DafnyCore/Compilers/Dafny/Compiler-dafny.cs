@@ -2299,6 +2299,10 @@ namespace Microsoft.Dafny.Compilers {
       );
     }
 
+    protected override void EmitNull(Type _, ConcreteSyntaxTree wr) {
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
+    }
+
     protected override void EmitSingleValueGenerator(Expression e, bool inLetExprBody, string type,
       ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
       throw new UnsupportedFeatureException(Token.NoToken, Feature.ExactBoundedPool);
