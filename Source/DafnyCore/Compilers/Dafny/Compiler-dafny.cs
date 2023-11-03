@@ -83,7 +83,8 @@ namespace Microsoft.Dafny.Compilers {
       Feature.ExternalConstructors,
       Feature.SubtypeConstraintsInQuantifiers,
       Feature.TuplesWiderThan20,
-      Feature.ForLoops
+      Feature.ForLoops,
+      Feature.Traits
     };
 
     private readonly List<string> Imports = new() { DafnyDefaultModule };
