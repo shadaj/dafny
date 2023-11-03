@@ -186,16 +186,19 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override IClassWriter CreateTrait(string name, bool isExtern, List<TypeParameter> typeParameters,
       TraitDecl trait, List<Type> superClasses, IToken tok, ConcreteSyntaxTree wr) {
-      if (currentBuilder is TraitContainer builder) {
-        List<DAST.Type> typeParams = new();
-        foreach (var tp in trait.TypeArgs) {
-          typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
-        }
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.Traits);
 
-        return new ClassWriter(this, builder.Trait(name, typeParams));
-      } else {
-        throw new InvalidOperationException();
-      }
+      // traits need a bit more work
+      // if (currentBuilder is TraitContainer builder) {
+      //   List<DAST.Type> typeParams = new();
+      //   foreach (var tp in trait.TypeArgs) {
+      //     typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
+      //   }
+
+      //   return new ClassWriter(this, builder.Trait(name, typeParams));
+      // } else {
+      //   throw new InvalidOperationException();
+      // }
     }
 
     protected override ConcreteSyntaxTree CreateIterator(IteratorDecl iter, ConcreteSyntaxTree wr) {
