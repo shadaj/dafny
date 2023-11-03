@@ -109,7 +109,7 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is ModuleContainer moduleBuilder) {
         currentBuilder = moduleBuilder.Module(moduleName, isExtern);
       } else {
-        throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
+        throw new InvalidOperationException();
       }
 
       return wr;
@@ -119,7 +119,7 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is ModuleBuilder builder) {
         currentBuilder = builder.Finish();
       } else {
-        throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
+        throw new InvalidOperationException();
       }
     }
 
@@ -171,7 +171,7 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is ClassContainer builder) {
         List<DAST.Type> typeParams = new();
         foreach (var tp in typeParameters) {
-          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+          if (tp.Variance != TypeParameter.TPVariance.Non) {
             throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); //("Contravariance in type parameters");
           }
 
@@ -206,7 +206,7 @@ namespace Microsoft.Dafny.Compilers {
       if (currentBuilder is DatatypeContainer builder) {
         List<DAST.Type> typeParams = new();
         foreach (var tp in dt.TypeArgs) {
-          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+          if (tp.Variance != TypeParameter.TPVariance.Non) {
             throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); //("Contravariance in type parameters");
           }
 
@@ -332,7 +332,7 @@ namespace Microsoft.Dafny.Compilers {
 
         List<DAST.Type> typeParams = new();
         foreach (var tp in sst.TypeArgs) {
-          if (tp.Variance == TypeParameter.TPVariance.Contra) {
+          if (tp.Variance != TypeParameter.TPVariance.Non) {
             throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); //("Contravariance in type parameters");
           }
 
@@ -365,7 +365,7 @@ namespace Microsoft.Dafny.Compilers {
         bool forBodyInheritance, bool lookasideBody) {
         List<DAST.Type> astTypeArgs = new();
         foreach (var typeArg in typeArgs) {
-          if (typeArg.Formal.Variance == TypeParameter.TPVariance.Contra) {
+          if (typeArg.Formal.Variance != TypeParameter.TPVariance.Non) {
             throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); //("Contravariance in type parameters")
           }
 
@@ -415,7 +415,7 @@ namespace Microsoft.Dafny.Compilers {
           bool forBodyInheritance, bool lookasideBody) {
         List<DAST.Type> astTypeArgs = new();
         foreach (var typeArg in typeArgs) {
-          if (typeArg.Formal.Variance == TypeParameter.TPVariance.Contra) {
+          if (typeArg.Formal.Variance != TypeParameter.TPVariance.Non) {
             throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); //("Contravariance in type parameters");
           }
 
@@ -658,7 +658,7 @@ namespace Microsoft.Dafny.Compilers {
       } else if (wr is BuilderSyntaxTree<ExprContainer> st2 && st2.Builder is CallStmtBuilder callStmt) {
         callStmt.SetName(protectedName);
       } else {
-        throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); // Warning: this is actually an invalid operation
+        throw new InvalidOperationException();
       }
 
       base.EmitNameAndActualTypeArgs(protectedName, typeArgs, tok, wr);
@@ -790,7 +790,7 @@ namespace Microsoft.Dafny.Compilers {
       }
 
       public void EmitRead(ConcreteSyntaxTree wr) {
-        throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
+        throw new InvalidOperationException();
       }
 
       public ConcreteSyntaxTree EmitWrite(ConcreteSyntaxTree wr) {
@@ -823,7 +823,7 @@ namespace Microsoft.Dafny.Compilers {
 
       public ConcreteSyntaxTree EmitWrite(ConcreteSyntaxTree wr) {
         if (assignExpr == null) {
-          throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests);
+          throw new InvalidOperationException();
         }
 
         if (wr is BuilderSyntaxTree<StatementContainer> stmtContainer) {
@@ -987,7 +987,7 @@ namespace Microsoft.Dafny.Compilers {
 
     protected override ConcreteSyntaxTree EmitForStmt(IToken tok, IVariable loopIndex, bool goingUp, string endVarName,
       List<Statement> body, LList<Label> labels, ConcreteSyntaxTree wr) {
-      return new BuilderSyntaxTree<ExprContainer>(new ExprBuffer(null));
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.ForLoops);
     }
 
     protected override ConcreteSyntaxTree CreateWhileLoop(out ConcreteSyntaxTree guardWriter, ConcreteSyntaxTree wr) {
@@ -1001,7 +1001,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     protected override ConcreteSyntaxTree CreateForLoop(string indexVar, Action<ConcreteSyntaxTree> bound, ConcreteSyntaxTree wr, string start = null) {
-      return new BuilderSyntaxTree<StatementContainer>(new StatementBuffer());
+      throw new UnsupportedFeatureException(Token.NoToken, Feature.ForLoops);
     }
 
     protected override ConcreteSyntaxTree CreateDoublingForLoop(string indexVar, int start, ConcreteSyntaxTree wr) {
@@ -1423,8 +1423,7 @@ namespace Microsoft.Dafny.Compilers {
         // we don't need to create a copy of the identifier, that's language specific
         base.EmitExpr(expr, false, actualWr, wStmts);
       } else {
-        throw new UnsupportedFeatureException(Token.NoToken, Feature.RunAllTests); // warning: the following code craches on multiple examples
-        //base.EmitExpr(expr, inLetExprBody, actualWr, wStmts);
+        base.EmitExpr(expr, inLetExprBody, actualWr, wStmts);
       }
     }
 
