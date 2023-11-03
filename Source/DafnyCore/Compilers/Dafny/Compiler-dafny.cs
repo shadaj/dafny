@@ -1961,7 +1961,7 @@ namespace Microsoft.Dafny.Compilers {
         ConcreteSyntaxTree wr, ConcreteSyntaxTree wStmts) {
       if (wr is BuilderSyntaxTree<ExprContainer> container) {
         var buf = new ExprBuffer(null);
-        EmitExpr(expr, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(buf), null);
+        EmitExpr(expr, inLetExprBody, new BuilderSyntaxTree<ExprContainer>(buf), wStmts);
 
         switch (op) {
           case ResolvedUnaryOp.BoolNot: {
