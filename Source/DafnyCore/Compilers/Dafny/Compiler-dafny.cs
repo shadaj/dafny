@@ -1179,10 +1179,15 @@ namespace Microsoft.Dafny.Compilers {
 
         switch (e) {
           case CharLiteralExpr c:
-            var codePoint = Util.UnescapedCharacters(Options, (string)c.Value, false).Single();
-            baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_CharLiteral(
-              new Rune(codePoint)
-            ));
+            if (UnicodeCharEnabled) {
+              var codePoint = Util.UnescapedCharacters(Options, (string)c.Value, false).Single();
+              baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_CharLiteral(
+                new Rune(codePoint)
+              ));
+            } else {
+              throwGeneralUnsupported();
+              throw new InvalidOperationException();
+            }
             break;
           case StringLiteralExpr str:
             baseExpr = (DAST.Expression)DAST.Expression.create_Literal(DAST.Literal.create_StringLiteral(
