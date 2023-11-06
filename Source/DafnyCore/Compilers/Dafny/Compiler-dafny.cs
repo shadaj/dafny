@@ -650,6 +650,9 @@ namespace Microsoft.Dafny.Compilers {
                 DAST.Expression.create_Tuple(Sequence<DAST._IExpression>.FromArray(elems.ToArray()))
               );
             }
+          } else if (type.IsArrowType) {
+            throwGeneralUnsupported();
+            throw new InvalidOperationException();
           } else {
             bufferedInitializationValue = Optional<DAST._IExpression>.create_Some(
               DAST.Expression.create_InitializationValue(GenType(type))
