@@ -3890,7 +3890,11 @@ namespace Microsoft.Dafny.Compilers {
       }
     }
 
-    protected override ConcreteSyntaxTree EmitCoercionIfNecessary(Type/*?*/ from, Type/*?*/ to, IToken tok, ConcreteSyntaxTree wr) {
+    protected override ConcreteSyntaxTree EmitCoercionIfNecessary(Type/*?*/ from, Type/*?*/ to, IToken tok, ConcreteSyntaxTree wr, Type toOrig = null) {
+      if (toOrig == null) {
+        toOrig = to;
+      }
+
       if (from != null && to != null && from.IsTraitType && to.AsNewtype != null) {
         return FromFatPointer(to, wr);
       }
@@ -3911,7 +3915,7 @@ namespace Microsoft.Dafny.Compilers {
           return w;
         }
 
-        if (from is { IsCharType: true } && IsNativeObjectType(to)) {
+        if (from is { IsCharType: true } && IsNativeObjectType(toOrig)) {
           wr.Write("dafny.CodePoint.valueOf(");
           var w = wr.Fork();
           wr.Write(")");
