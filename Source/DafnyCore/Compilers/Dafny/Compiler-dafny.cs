@@ -172,7 +172,8 @@ namespace Microsoft.Dafny.Compilers {
           return base.EmitCoercionIfNecessary(from, to, tok, wr);
         }
       } else {
-        return base.EmitCoercionIfNecessary(from, to, tok, wr);
+        throwGeneralUnsupported();
+        throw new InvalidOperationException();
       }
     }
 
@@ -188,7 +189,7 @@ namespace Microsoft.Dafny.Compilers {
           typeParams.Add((DAST.Type)DAST.Type.create_TypeArg(Sequence<Rune>.UnicodeFromString(IdProtect(tp.GetCompileName(Options)))));
         }
 
-        return new ClassWriter(this, builder.Class(name, moduleName, typeParams, superClasses.Select(t => GenType(t)).ToList()));
+        return new ClassWriter(this, typeParams.Count > 0, builder.Class(name, moduleName, typeParams, superClasses.Select(t => GenType(t)).ToList()));
       } else {
         throw new InvalidOperationException();
       }
@@ -242,7 +243,7 @@ namespace Microsoft.Dafny.Compilers {
           ctors.Add((DAST.DatatypeCtor)DAST.DatatypeCtor.create_DatatypeCtor(Sequence<Rune>.UnicodeFromString(ctor.GetCompileName(Options)), Sequence<DAST.Formal>.FromArray(args.ToArray()), ctor.Formals.Count > 0));
         }
 
-        return new ClassWriter(this, builder.Datatype(
+        return new ClassWriter(this, typeParams.Count > 0, builder.Datatype(
           dt.GetCompileName(Options),
           dt.EnclosingModuleDefinition.GetCompileName(Options),
           typeParams,
@@ -270,7 +271,7 @@ namespace Microsoft.Dafny.Compilers {
           witnessStmts = statementBuf.PopAll();
         }
 
-        return new ClassWriter(this, builder.Newtype(nt.GetCompileName(Options), new(), GenType(nt.BaseType), witnessStmts, witness));
+        return new ClassWriter(this, false, builder.Newtype(nt.GetCompileName(Options), new(), GenType(nt.BaseType), witnessStmts, witness));
       } else {
         throw new InvalidOperationException();
       }
@@ -374,15 +375,21 @@ namespace Microsoft.Dafny.Compilers {
     private class ClassWriter : IClassWriter {
       private readonly DafnyCompiler compiler;
       private readonly ClassLike builder;
+      private readonly bool hasTypeArgs;
       private readonly List<MethodBuilder> methods = new();
 
-      public ClassWriter(DafnyCompiler compiler, ClassLike builder) {
+      public ClassWriter(DafnyCompiler compiler, bool hasTypeArgs, ClassLike builder) {
         this.compiler = compiler;
+        this.hasTypeArgs = hasTypeArgs;
         this.builder = builder;
       }
 
       public ConcreteSyntaxTree CreateMethod(Method m, List<TypeArgumentInstantiation> typeArgs, bool createBody,
         bool forBodyInheritance, bool lookasideBody) {
+        if (m.IsStatic && this.hasTypeArgs) {
+          throwGeneralUnsupported(); //("Static methods with type arguments");
+        }
+
         List<DAST.Type> astTypeArgs = new();
         foreach (var typeArg in typeArgs) {
           if (!isTpSupported(typeArg.Formal)) {
@@ -433,6 +440,10 @@ namespace Microsoft.Dafny.Compilers {
       public ConcreteSyntaxTree CreateFunction(string name, List<TypeArgumentInstantiation> typeArgs,
           List<Formal> formals, Type resultType, IToken tok, bool isStatic, bool createBody, MemberDecl member,
           bool forBodyInheritance, bool lookasideBody) {
+        if (isStatic && this.hasTypeArgs) {
+          throwGeneralUnsupported(); //("Static methods with type arguments");
+        }
+
         List<DAST.Type> astTypeArgs = new();
         foreach (var typeArg in typeArgs) {
           if (!isTpSupported(typeArg.Formal)) {
