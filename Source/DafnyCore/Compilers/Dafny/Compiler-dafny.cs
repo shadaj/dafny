@@ -56,6 +56,7 @@ namespace Microsoft.Dafny.Compilers {
     }
 
     public DafnyCompiler(DafnyOptions options, ErrorReporter reporter) : base(options, reporter) {
+      options.SystemModuleTranslationMode = CommonOptionBag.SystemModuleMode.Include;
       if (Options?.CoverageLegendFile != null) {
         Imports.Add("DafnyProfiling");
       }
